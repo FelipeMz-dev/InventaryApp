@@ -20,6 +20,8 @@ abstract class BaseViewModel<S : State, E : Event> : ViewModel() {
     private val _state: MutableStateFlow<S> by lazy { MutableStateFlow(initState()) }
     val state get() = _state.asStateFlow()
 
+    init { this.intentHandler() }
+
     abstract fun initState(): S
 
     abstract fun intentHandler()

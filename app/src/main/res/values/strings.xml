@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">InventaryApp</string>
+    <string name="copy_select_label">Selecciona una etiqueta</string>
 </resources>

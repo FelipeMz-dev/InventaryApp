@@ -1,5 +1,6 @@
 package com.felipemz.inventaryapp.core.extensions
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 

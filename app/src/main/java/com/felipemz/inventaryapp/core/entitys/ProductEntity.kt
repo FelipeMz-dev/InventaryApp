@@ -1,6 +1,6 @@
 package com.felipemz.inventaryapp.core.entitys
 
-import com.felipemz.inventaryapp.ui.home.tabs.components.ProductTypeImage
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
 data class ProductEntity(
     val id: Int = 0,
