@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.home.tabs.components
+package com.felipemz.inventaryapp.ui.home.tabs.movements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
@@ -25,8 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.ifTrue
+import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
+import com.felipemz.inventaryapp.core.enums.MovementType
+import com.felipemz.inventaryapp.core.extensions.ifTrue
+import com.felipemz.inventaryapp.core.handler.PriceHandler
 
 @Composable
 fun MovementItem(
@@ -60,9 +63,8 @@ fun MovementItem(
                     text = movement.number?.let {
                         "${movement.type.text} #${it}"
                     } ?: movement.type.text,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                    )
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
                 )
 
                 Text(
@@ -88,6 +90,7 @@ fun MovementItem(
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 8.dp)
+                        .clip(CircleShape)
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
@@ -114,32 +117,12 @@ fun MovementItem(
                             shape = CircleShape
                         )
                         .padding(horizontal = 6.dp),
-                    text = formatPrice(movement.amount, isLess = movement.type == MovementType.MOVEMENT_EXPENSE),
+                    text = PriceHandler.formatPrice(movement.amount, isLess = movement.type == MovementType.MOVEMENT_EXPENSE),
                     fontWeight = FontWeight.Bold
                 )
             }
         }
     }
-}
-
-data class MovementItemEntity(
-    val type: MovementType = MovementType.MOVEMENT_PENDING,
-    val number: Int? = null,
-    val date: String = String(),
-    val time: String = String(),
-    val amount: Int = 0,
-    val labels: List<String> = emptyList(),
-)
-
-enum class MovementType(
-    val text: String,
-    val icon: Int,
-    val color: Int,
-    val scaleY: Float,
-) {
-    MOVEMENT_SALE("Venta", R.drawable.ic_movement_up, R.color.blue, 1f),
-    MOVEMENT_EXPENSE("Gasto", R.drawable.ic_movement_up, R.color.orange, -1f),
-    MOVEMENT_PENDING("Pendiente", R.drawable.ic_movement_pending, R.color.deep_red, 1f),
 }
 
 @Preview(showSystemUi = true)
