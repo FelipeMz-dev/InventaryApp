@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -15,22 +14,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -40,10 +39,10 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -55,11 +54,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.HomeTabs
+import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.extensions.ifFalse
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.ui.commons.PopupDialog
-import com.felipemz.inventaryapp.ui.home.tabs.products.InventoryTab
 import com.felipemz.inventaryapp.ui.home.tabs.movements.MovementsTab
+import com.felipemz.inventaryapp.ui.home.tabs.products.InventoryTab
 import com.felipemz.inventaryapp.ui.home.tabs.reports.ReportsTab
 
 @Composable
@@ -70,7 +70,6 @@ internal fun HomeScreen(
 
     val tabSelected = remember { mutableStateOf(HomeTabs.MOVEMENTS) }
     val pagerState = rememberPagerState(1) { HomeTabs.entries.size }
-    val isSearchFocused = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val isReports by remember(tabSelected.value) {
         derivedStateOf { tabSelected.value == HomeTabs.REPORTS }
@@ -99,16 +98,17 @@ internal fun HomeScreen(
                 .fillMaxSize()
                 .imePadding(),
             topBar = {
-                AnimatedVisibility(!isSearchFocused.value) {
+                AnimatedVisibility(!state.isSearchFocused) {
                     TopBarHome(
                         tabSelected = tabSelected.value,
                         isMovementsInverted = state.isMovementsInverted,
+                        isProductOrderInverted = state.isProductOrderInverted,
                         eventHandler = eventHandler
                     )
                 }
             },
             bottomBar = {
-                AnimatedVisibility(!isSearchFocused.value) {
+                AnimatedVisibility(!state.isSearchFocused) {
                     BottomBarHome(tabSelected)
                 }
             },
@@ -127,10 +127,12 @@ internal fun HomeScreen(
             ) { page ->
                 when (page) {
                     HomeTabs.PRODUCTS.ordinal -> InventoryTab(
-                        isInventory = pagerState.settledPage == HomeTabs.PRODUCTS.ordinal,
-                        isFocusSearch = isSearchFocused,
                         categories = state.categories,
-                        products = state.products
+                        categorySelected = state.categorySelected,
+                        isInventory = pagerState.settledPage == HomeTabs.PRODUCTS.ordinal,
+                        isFocusSearch = state.isSearchFocused,
+                        products = state.products,
+                        eventHandler = eventHandler,
                     )
                     HomeTabs.MOVEMENTS.ordinal -> MovementsTab(
                         movements = state.movements,
@@ -151,6 +153,15 @@ internal fun HomeScreen(
                 onSelect = { eventHandler(HomeEvent.OnLabelSelected(it)) }
             ) { eventHandler(HomeEvent.OnHideLabelPopup) }
         }
+
+        state.isProductOrderPopup.ifTrue {
+            ProductsOrderPopup(
+                productOrderSelected = state.productOrderSelected,
+                isProductOrderInverted = state.isProductOrderInverted
+            ) { orderBy, isOrderInverted ->
+                eventHandler(HomeEvent.OnProductOrderSelected(orderBy, isOrderInverted))
+            }
+        }
     }
 }
 
@@ -159,11 +170,11 @@ internal fun HomeScreen(
 private fun MovementLabelPopup(
     labelList: List<String>,
     onSelect: (String) -> Unit,
-    onClick: () -> Unit,
+    onClose: () -> Unit,
 ) {
     PopupDialog(
         title = stringResource(R.string.copy_select_label),
-        onClose = { onClick() }
+        onClose = { onClose() }
     ) {
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -186,11 +197,66 @@ private fun MovementLabelPopup(
     }
 }
 
+@Composable
+private fun ProductsOrderPopup(
+    productOrderSelected: ProductsOrderBy,
+    isProductOrderInverted: Boolean,
+    onClose: (ProductsOrderBy, Boolean) -> Unit
+) {
+
+    var orderBy by remember { mutableStateOf(productOrderSelected) }
+    var isOrderInverted by remember { mutableStateOf(isProductOrderInverted) }
+
+
+    PopupDialog(
+        title = "Ordenar por",
+        onClose = { onClose(orderBy, isOrderInverted) }
+    ) {
+
+        ProductsOrderBy.entries.forEach { order ->
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(
+                    text = order.text,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+                Checkbox(
+                    checked = orderBy == order,
+                    onCheckedChange = { orderBy = order }
+                )
+            }
+        }
+
+        HorizontalDivider()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Invertir",
+                modifier = Modifier.padding(8.dp)
+            )
+
+            Switch(
+                checked = isOrderInverted,
+                onCheckedChange = { isOrderInverted = it }
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBarHome(
     tabSelected: HomeTabs,
     isMovementsInverted: Boolean,
+    isProductOrderInverted: Boolean,
     eventHandler: (HomeEvent) -> Unit,
 ) {
     TopAppBar(
@@ -205,9 +271,11 @@ private fun TopBarHome(
         actions = {
 
             when (tabSelected) {
-                HomeTabs.PRODUCTS -> IconButton(onClick = { /*TODO*/ }) {
+                HomeTabs.PRODUCTS -> IconButton(onClick = { eventHandler(HomeEvent.OnOpenProductOrderPopup) }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_sort_down),
+                        painter = painterResource(
+                            id = if (isProductOrderInverted) R.drawable.ic_sort_up else R.drawable.ic_sort_down
+                        ),
                         contentDescription = null
                     )
                 }

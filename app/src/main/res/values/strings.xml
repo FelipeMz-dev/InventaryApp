@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">InventaryApp</string>
     <string name="copy_select_label">Selecciona una etiqueta</string>
+    <string name="copy_product_search">Buscar producto</string>
+    <string name="copy_press_again_to_exit">Presiona otra vez para salir</string>
 </resources>

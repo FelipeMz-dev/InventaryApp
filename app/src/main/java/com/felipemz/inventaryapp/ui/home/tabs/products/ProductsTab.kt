@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.FilterChip
@@ -25,11 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,23 +34,24 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.extensions.onColor
+import com.felipemz.inventaryapp.ui.home.HomeEvent
 
 @Composable
 internal fun InventoryTab(
-    isInventory: Boolean,
-    isFocusSearch: MutableState<Boolean>,
     categories: List<CategoryEntity>,
+    categorySelected: CategoryEntity,
+    isInventory: Boolean,
+    isFocusSearch: Boolean,
     products: List<ProductEntity>,
+    eventHandler: (HomeEvent) -> Unit,
 ) {
-
-    val text = remember { mutableStateOf(String()) }
-    val chipSelected = remember { mutableIntStateOf(0) }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 80.dp)
@@ -63,7 +61,8 @@ internal fun InventoryTab(
             SearchTextField(
                 isInventory = isInventory,
                 isFocusSearch = isFocusSearch,
-                text = text
+                onTextChange = { eventHandler(HomeEvent.OnChangeSearchText(it)) },
+                onFocusChange = { eventHandler(HomeEvent.OnFocusSearch(it)) }
             )
         }
 
@@ -71,8 +70,8 @@ internal fun InventoryTab(
             FilterChipCategories(
                 modifier = Modifier.fillMaxWidth(),
                 chipList = categories,
-                chipSelected = chipSelected
-            )
+                chipSelected = categorySelected,
+            ) { eventHandler(HomeEvent.OnCategorySelected(it)) }
         }
 
         items(products) { item ->
@@ -91,23 +90,25 @@ internal fun InventoryTab(
 private fun FilterChipCategories(
     modifier: Modifier,
     chipList: List<CategoryEntity>,
-    chipSelected: MutableIntState
+    chipSelected: CategoryEntity,
+    onSelectChip: (CategoryEntity) -> Unit,
 ) = LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-    itemsIndexed(chipList) { index, item ->
+    items(chipList) { item ->
         FilterChip(
             modifier = modifier.padding(
                 start = if (item == chipList.first()) 12.dp else 0.dp,
                 end = if (item == chipList.last()) 12.dp else 0.dp
             ),
             shape = CircleShape,
-            border = if (index == chipSelected.intValue) {
+            border = if (item == chipSelected) {
                 BorderStroke(
                     width = 2.dp,
-                    color = if (item == chipList.first() || item == chipList.last()) MaterialTheme.colorScheme.primary
-                    else colorResource(id = item.color)
+                    color = if (item == chipList.first()) {
+                        MaterialTheme.colorScheme.primary
+                    } else colorResource(id = item.color)
                 )
             } else null,
-            colors = if (item == chipList.first() || item == chipList.last()) {
+            colors = if (item == chipList.first()) {
                 FilterChipDefaults.filterChipColors().copy(
                     containerColor = Color.Gray.copy(alpha = 0.4f),
                     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -120,20 +121,12 @@ private fun FilterChipCategories(
                 labelColor = MaterialTheme.colorScheme.onSurface,
                 selectedLabelColor = colorResource(id = item.color).onColor()
             ),
-            trailingIcon = {
-                if (item == chipList.last()) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle,
-                        contentDescription = null
-                    )
-                }
-            },
-            selected = index == chipSelected.intValue,
-            onClick = { chipSelected.intValue = index },
+            selected = item == chipSelected,
+            onClick = { onSelectChip(item) },
             label = {
                 Text(
                     text = item.name,
-                    fontWeight = if (index == chipSelected.intValue) FontWeight.Black else FontWeight.Light
+                    fontWeight = if (item == chipSelected) FontWeight.Black else FontWeight.Light
                 )
             }
         )
@@ -143,11 +136,13 @@ private fun FilterChipCategories(
 @Composable
 private fun SearchTextField(
     isInventory: Boolean,
-    isFocusSearch: MutableState<Boolean>,
-    text: MutableState<String>,
+    isFocusSearch: Boolean,
+    onFocusChange: (Boolean) -> Unit,
+    onTextChange: (String) -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
+    var text by remember { mutableStateOf(String()) }
 
     TextField(
         modifier = Modifier
@@ -156,18 +151,27 @@ private fun SearchTextField(
                 horizontal = 12.dp,
                 vertical = 8.dp
             )
-            .onFocusChanged { isFocusSearch.value = it.isFocused },
-        value = text.value,
-        onValueChange = { text.value = it },
-        placeholder = { Text("Buscar producto") },
+            .onFocusChanged { onFocusChange(it.isFocused) },
+        value = text,
+        onValueChange = {
+            text = it
+            onTextChange(it)
+        },
+        placeholder = { Text(stringResource(R.string.copy_product_search)) },
         shape = CircleShape,
         leadingIcon = {
-            LeadingSearch(isFocusSearch.value) {
+            LeadingSearch(isFocusSearch) {
                 focusManager.clearFocus()
-                text.value = String()
+                text = String()
+                onTextChange(String())
             }
         },
-        trailingIcon = { TrailingSearch(isFocusSearch.value, text) },
+        trailingIcon = {
+            TrailingSearch(isFocusSearch) {
+                text = String()
+                onTextChange(String())
+            }
+        },
         singleLine = true,
         enabled = isInventory,
         colors = TextFieldDefaults.colors().copy(
@@ -201,13 +205,13 @@ private fun LeadingSearch(
 @Composable
 private fun TrailingSearch(
     isFocusSearch: Boolean,
-    text: MutableState<String>
+    onClean: () -> Unit,
 ) = if (isFocusSearch) {
     Icon(
         modifier = Modifier
             .padding(end = 6.dp)
             .clip(CircleShape)
-            .clickable { text.value = String() }
+            .clickable { onClean() }
             .padding(4.dp),
         imageVector = Icons.Rounded.Clear,
         contentDescription = null

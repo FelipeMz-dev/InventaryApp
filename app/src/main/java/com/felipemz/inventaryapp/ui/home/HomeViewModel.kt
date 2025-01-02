@@ -8,27 +8,29 @@ import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.enums.MovementType
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
+import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
+import kotlinx.coroutines.Dispatchers
 
 class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
 
     private val _movements = mutableStateOf<List<MovementItemEntity>>(emptyList())
-
+    private val _products = mutableStateOf<List<ProductEntity>>(emptyList())
+    private val allCategory = CategoryEntity(name = "Todos")
     private val fakeChips = listOf(
-        CategoryEntity(name = "Todos"),
-        CategoryEntity(name = "Alimentos", color = R.color.lime),
-        CategoryEntity(name = "Bebidas", color = R.color.blue),
-        CategoryEntity(name = "Cuidado Personal", color = R.color.pink),
-        CategoryEntity(name = "Electrónicos", color = R.color.teal),
-        CategoryEntity(name = "Hogar", color = R.color.orange),
-        CategoryEntity(name = "Limpieza", color = R.color.purple),
-        CategoryEntity(name = "Mascotas", color = R.color.green),
-        CategoryEntity(name = "Otros", color = R.color.red_dark),
-        CategoryEntity(name = "Más")
+        CategoryEntity(position = 1, name = "Alimentos", color = R.color.lime),
+        CategoryEntity(position = 2, name = "Bebidas", color = R.color.blue),
+        CategoryEntity(position = 3, name = "Cuidado Personal", color = R.color.pink),
+        CategoryEntity(position = 4, name = "Electrónicos", color = R.color.teal),
+        CategoryEntity(position = 5, name = "Hogar", color = R.color.orange),
+        CategoryEntity(position = 6, name = "Limpieza", color = R.color.purple),
+        CategoryEntity(position = 7, name = "Mascotas", color = R.color.green),
+        CategoryEntity(position = 8, name = "Otros", color = R.color.red_dark)
     )
 
     private val fakeProducts = listOf(
         ProductEntity(
+            id = 1,
             name = "Fresa delicia",
             information = "sin información",
             categoryColor = R.color.red_dark,
@@ -37,6 +39,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
         ),
         ProductEntity(
+            id = 6,
             name = "Fresa Natural",
             information = "sin información",
             categoryColor = R.color.red_dark,
@@ -45,6 +48,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
         ),
         ProductEntity(
+            id = 3,
             name = "Delicia mini",
             information = "sin información",
             categoryColor = R.color.red_dark,
@@ -53,6 +57,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
         ),
         ProductEntity(
+            id = 4,
             name = "Coca Cola",
             information = "sin información",
             categoryColor = R.color.blue,
@@ -61,6 +66,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.EmojiImage("\uD83C\uDF7A")
         ),
         ProductEntity(
+            id = 5,
             name = "Shampoo",
             information = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.pink,
@@ -69,6 +75,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.EmojiImage("\uD83D\uDC4D")
         ),
         ProductEntity(
+            id = 8,
             name = "Audífonos",
             information = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.teal,
@@ -77,6 +84,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.PhatImage("")
         ),
         ProductEntity(
+            id = 9,
             name = "Cargador",
             information = "Aquí",
             categoryColor = R.color.teal,
@@ -85,6 +93,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.PhatImage("")
         ),
         ProductEntity(
+            id = 7,
             name = "Escoba",
             information = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.orange,
@@ -93,6 +102,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.LetterImage("Es")
         ),
         ProductEntity(
+            id = 1,
             name = "Detergente",
             information = "para la losa",
             categoryColor = R.color.purple,
@@ -101,6 +111,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             image = ProductTypeImage.LetterImage("De")
         ),
         ProductEntity(
+            id = 10,
             name = "Comida para perro",
             information = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.green,
@@ -187,11 +198,14 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
 
     init {
         _movements.value = fakeMovements
+        _products.value = fakeProducts
+        orderProducts(ProductsOrderBy.CATEGORY, false)
     }
 
     override fun initState() = HomeState(
-        categories = fakeChips,
-        products = fakeProducts,
+        categories = listOf(allCategory).plus(fakeChips),
+        categorySelected = allCategory,
+        products = _products.value,
         movements = _movements.value,
         movementLabelList = fakeLabelList,
         totalAmount = fakeMovements.sumBy {
@@ -206,12 +220,72 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
-                is HomeEvent.OnCategorySelected -> {}
+                is HomeEvent.OnFocusSearch -> updateState { it.copy(isSearchFocused = event.isFocus) }
+                is HomeEvent.OnChangeSearchText -> changeSearchText(event.text)
+                is HomeEvent.OnCategorySelected -> categorySelected(event.category)
                 is HomeEvent.OnMovementsInverted -> movementsInverted(event.isInverted)
                 is HomeEvent.OnHideLabelPopup -> hideLabelPopup()
                 is HomeEvent.OnMovementFilterSelected -> movementFilterSelected(event.filter)
                 is HomeEvent.OnLabelSelected -> labelSelected(event.label)
+                is HomeEvent.OnProductOrderSelected -> orderProducts(event.orderBy, event.isInverted)
+                is HomeEvent.OnOpenProductOrderPopup -> updateState { it.copy(isProductOrderPopup = true) }
+                else -> Unit
             }
+        }
+    }
+
+    private fun orderProducts(
+        orderBy: ProductsOrderBy,
+        isInverted: Boolean
+    ) {
+        updateState {
+            it.copy(
+                productOrderSelected = orderBy,
+                isProductOrderInverted = isInverted,
+                isProductOrderPopup = false,
+            )
+        }
+        val sortedProducts = when (orderBy) {
+            ProductsOrderBy.CATEGORY -> _products.value.sortedBy { fakeChips.findLast { chip -> chip.color == it.categoryColor }?.position ?: 0 }
+            ProductsOrderBy.NAME -> _products.value.sortedBy { it.name }
+            ProductsOrderBy.PRICE -> _products.value.sortedBy { it.price }
+            ProductsOrderBy.STOCK -> _products.value.sortedBy { it.quantity ?: 0 }
+            else -> _products.value.sortedBy { it.id }
+        }
+        val orderedProducts = if (isInverted) sortedProducts.reversed() else sortedProducts
+        _products.value = orderedProducts
+        when {
+            state.value.searchText.isNotEmpty() -> changeSearchText(state.value.searchText)
+            state.value.categorySelected != allCategory -> categorySelected(state.value.categorySelected)
+            else -> updateState { it.copy(products = orderedProducts) }
+        }
+    }
+
+    private fun changeSearchText(text: String) = execute(Dispatchers.IO) {
+        val filteredProducts = _products.value.filter { product ->
+            val matchesCategory = state.value.categorySelected == allCategory || product.categoryColor == state.value.categorySelected.color
+            val matchesSearchText = product.name.contains(text, ignoreCase = true)
+            matchesCategory && matchesSearchText
+        }
+        updateState {
+            it.copy(
+                products = filteredProducts,
+                searchText = text
+            )
+        }
+    }
+
+    private fun categorySelected(category: CategoryEntity) = execute(Dispatchers.IO) {
+        val filteredProducts = _products.value.filter { product ->
+            val matchesSearchText = state.value.searchText.isEmpty() || product.name.contains(state.value.searchText, ignoreCase = true)
+            val matchesCategory = category == allCategory || product.categoryColor == category.color
+            matchesSearchText && matchesCategory
+        }
+        updateState { state ->
+            state.copy(
+                categorySelected = category,
+                products = filteredProducts
+            )
         }
     }
 
