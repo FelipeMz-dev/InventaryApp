@@ -16,6 +16,7 @@ data class HomeState(
     val movements: List<MovementItemEntity> = emptyList(),
     val movementLabelList: List<String> = emptyList(),
     val currentDate: String = "Lun. 30 de diciembre",
+    val movementFilterText: String = String(),
     val totalAmount: Int = 0,
     val movementFilterSelected: MovementsFilterChip = MovementsFilterChip.ALL,
     val movementLabelSelected: String? = null,

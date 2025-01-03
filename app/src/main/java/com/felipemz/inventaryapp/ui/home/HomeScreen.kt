@@ -209,15 +209,18 @@ private fun ProductsOrderPopup(
 
 
     PopupDialog(
-        title = "Ordenar por",
+        title = stringResource(R.string.copy_order_by),
         onClose = { onClose(orderBy, isOrderInverted) }
     ) {
 
         ProductsOrderBy.entries.forEach { order ->
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { orderBy = order },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
                 Text(
@@ -235,11 +238,14 @@ private fun ProductsOrderPopup(
         HorizontalDivider()
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { isOrderInverted = !isOrderInverted },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Invertir",
+                text = stringResource(R.string.copy_inverter),
                 modifier = Modifier.padding(8.dp)
             )
 
@@ -259,6 +265,13 @@ private fun TopBarHome(
     isProductOrderInverted: Boolean,
     eventHandler: (HomeEvent) -> Unit,
 ) {
+
+    val productsIcon = remember(isProductOrderInverted) {
+        derivedStateOf {
+            if (isProductOrderInverted) R.drawable.ic_sort_up else R.drawable.ic_sort_down
+        }
+    }
+
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
         title = {
@@ -273,9 +286,7 @@ private fun TopBarHome(
             when (tabSelected) {
                 HomeTabs.PRODUCTS -> IconButton(onClick = { eventHandler(HomeEvent.OnOpenProductOrderPopup) }) {
                     Icon(
-                        painter = painterResource(
-                            id = if (isProductOrderInverted) R.drawable.ic_sort_up else R.drawable.ic_sort_down
-                        ),
+                        imageVector = ImageVector.vectorResource(id = productsIcon.value),
                         contentDescription = null
                     )
                 }
@@ -284,7 +295,7 @@ private fun TopBarHome(
                 ) {
                     Icon(
                         modifier = Modifier.graphicsLayer(if (isMovementsInverted) -1f else 1f),
-                        painter = painterResource(id = R.drawable.sort_vertical_svgrepo_com),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.sort_vertical_svgrepo_com),
                         contentDescription = null
                     )
                 }

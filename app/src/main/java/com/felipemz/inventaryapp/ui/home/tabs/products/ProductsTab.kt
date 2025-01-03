@@ -19,6 +19,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -41,6 +42,7 @@ import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.extensions.onColor
+import com.felipemz.inventaryapp.ui.commons.FilterChipRow
 import com.felipemz.inventaryapp.ui.home.HomeEvent
 
 @Composable
@@ -92,46 +94,28 @@ private fun FilterChipCategories(
     chipList: List<CategoryEntity>,
     chipSelected: CategoryEntity,
     onSelectChip: (CategoryEntity) -> Unit,
-) = LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-    items(chipList) { item ->
-        FilterChip(
-            modifier = modifier.padding(
-                start = if (item == chipList.first()) 12.dp else 0.dp,
-                end = if (item == chipList.last()) 12.dp else 0.dp
-            ),
-            shape = CircleShape,
-            border = if (item == chipSelected) {
-                BorderStroke(
-                    width = 2.dp,
-                    color = if (item == chipList.first()) {
-                        MaterialTheme.colorScheme.primary
-                    } else colorResource(id = item.color)
-                )
-            } else null,
-            colors = if (item == chipList.first()) {
-                FilterChipDefaults.filterChipColors().copy(
-                    containerColor = Color.Gray.copy(alpha = 0.4f),
-                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary
-                )
-            } else FilterChipDefaults.filterChipColors().copy(
-                containerColor = colorResource(id = item.color).copy(alpha = 0.15f),
-                selectedContainerColor = colorResource(id = item.color),
-                labelColor = MaterialTheme.colorScheme.onSurface,
-                selectedLabelColor = colorResource(id = item.color).onColor()
-            ),
-            selected = item == chipSelected,
-            onClick = { onSelectChip(item) },
-            label = {
-                Text(
-                    text = item.name,
-                    fontWeight = if (item == chipSelected) FontWeight.Black else FontWeight.Light
-                )
-            }
+) = FilterChipRow(
+    modifier = modifier,
+    colors = {
+        if (it == chipList.first()) {
+            FilterChipDefaults.filterChipColors().copy(
+                containerColor = Color.Gray.copy(alpha = 0.4f),
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary
+            )
+        } else FilterChipDefaults.filterChipColors().copy(
+            containerColor = colorResource(id = it.color).copy(alpha = 0.15f),
+            selectedContainerColor = colorResource(id = it.color),
+            labelColor = MaterialTheme.colorScheme.onSurface,
+            selectedLabelColor = colorResource(id = it.color).onColor()
         )
-    }
-}
+    },
+    text = { it.name },
+    chipList = chipList,
+    chipSelected = chipSelected,
+    onSelectChip = onSelectChip
+)
 
 @Composable
 private fun SearchTextField(

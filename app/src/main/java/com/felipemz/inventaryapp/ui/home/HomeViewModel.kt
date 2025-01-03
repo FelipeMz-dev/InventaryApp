@@ -18,14 +18,14 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
     private val _products = mutableStateOf<List<ProductEntity>>(emptyList())
     private val allCategory = CategoryEntity(name = "Todos")
     private val fakeChips = listOf(
-        CategoryEntity(position = 1, name = "Alimentos", color = R.color.lime),
+        CategoryEntity(position = 1, name = "Alimentos", color = R.color.red_dark),
         CategoryEntity(position = 2, name = "Bebidas", color = R.color.blue),
         CategoryEntity(position = 3, name = "Cuidado Personal", color = R.color.pink),
         CategoryEntity(position = 4, name = "Electrónicos", color = R.color.teal),
         CategoryEntity(position = 5, name = "Hogar", color = R.color.orange),
         CategoryEntity(position = 6, name = "Limpieza", color = R.color.purple),
         CategoryEntity(position = 7, name = "Mascotas", color = R.color.green),
-        CategoryEntity(position = 8, name = "Otros", color = R.color.red_dark)
+        CategoryEntity(position = 8, name = "Otros", color = R.color.lime)
     )
 
     private val fakeProducts = listOf(

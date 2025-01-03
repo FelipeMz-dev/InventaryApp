@@ -3,4 +3,7 @@
     <string name="copy_select_label">Selecciona una etiqueta</string>
     <string name="copy_product_search">Buscar producto</string>
     <string name="copy_press_again_to_exit">Presiona otra vez para salir</string>
+    <string name="copy_order_by">Ordenar por</string>
+    <string name="copy_inverter">Invertir</string>
+    <string name="copy_search">Buscar</string>
 </resources>
