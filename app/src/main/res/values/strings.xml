@@ -6,4 +6,7 @@
     <string name="copy_order_by">Ordenar por</string>
     <string name="copy_inverter">Invertir</string>
     <string name="copy_search">Buscar</string>
+    <string name="copy_search_date">Buscar fecha</string>
+    <string name="copy_search_by">Buscar por %1$s</string>
+    <string name="copy_accept">Aceptar</string>
 </resources>

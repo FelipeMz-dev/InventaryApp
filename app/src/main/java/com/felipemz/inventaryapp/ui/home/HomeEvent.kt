@@ -5,12 +5,20 @@ import com.felipemz.inventaryapp.core.entitys.CategoryEntity
 import com.felipemz.inventaryapp.core.enums.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
+import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
+import com.felipemz.inventaryapp.core.models.RangeDateModel
 
 sealed interface HomeEvent : Event {
 
     object OnHideLabelPopup : HomeEvent
 
     object OnOpenProductOrderPopup : HomeEvent
+
+    object OpenReportsCalendarPopup : HomeEvent
+
+    object OnCloseReportsCalendarPopup : HomeEvent
+
+    object OnOpenCalendar : HomeEvent
 
     data class OnFocusSearch(val isFocus: Boolean) : HomeEvent
 
@@ -30,4 +38,8 @@ sealed interface HomeEvent : Event {
         val orderBy: ProductsOrderBy,
         val isInverted: Boolean
     ) : HomeEvent
+
+    data class OnReportsCustomFilterSelected(val filter: RangeDateModel) : HomeEvent
+
+    data class OnReportsFilterSelected(val filter: ReportsFilterDate) : HomeEvent
 }

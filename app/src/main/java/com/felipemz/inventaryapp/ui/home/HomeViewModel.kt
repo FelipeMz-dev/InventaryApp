@@ -224,11 +224,19 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
                 is HomeEvent.OnChangeSearchText -> changeSearchText(event.text)
                 is HomeEvent.OnCategorySelected -> categorySelected(event.category)
                 is HomeEvent.OnMovementsInverted -> movementsInverted(event.isInverted)
-                is HomeEvent.OnHideLabelPopup -> hideLabelPopup()
                 is HomeEvent.OnMovementFilterSelected -> movementFilterSelected(event.filter)
                 is HomeEvent.OnLabelSelected -> labelSelected(event.label)
+                is HomeEvent.OnHideLabelPopup -> hideLabelPopup()
+                is HomeEvent.OnCloseReportsCalendarPopup -> updateState { it.copy(isReportsCalendarPopup = false) }
                 is HomeEvent.OnProductOrderSelected -> orderProducts(event.orderBy, event.isInverted)
                 is HomeEvent.OnOpenProductOrderPopup -> updateState { it.copy(isProductOrderPopup = true) }
+                is HomeEvent.OpenReportsCalendarPopup -> updateState { it.copy(isReportsCalendarPopup = true) }
+                is HomeEvent.OnReportsCustomFilterSelected -> updateState {
+                    it.copy(reportsCustomFilterSelected = event.filter, reportsFilterChipSelected = null, isReportsCalendarPopup = false)
+                }
+                is HomeEvent.OnReportsFilterSelected -> updateState {
+                    it.copy(reportsFilterChipSelected = event.filter, reportsCustomFilterSelected = null)
+                }
                 else -> Unit
             }
         }

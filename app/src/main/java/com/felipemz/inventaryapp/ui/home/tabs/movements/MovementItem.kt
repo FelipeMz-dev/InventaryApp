@@ -15,13 +15,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,13 +36,15 @@ import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
 import com.felipemz.inventaryapp.core.enums.MovementType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
-import com.felipemz.inventaryapp.core.handler.PriceHandler
+import com.felipemz.inventaryapp.core.utils.PriceUtil
 
 @Composable
 fun MovementItem(
     modifier: Modifier,
     movement: MovementItemEntity,
+    movementColor: Color
 ) {
+
     Row(
         modifier = modifier.padding(6.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -44,14 +53,14 @@ fun MovementItem(
         Icon(
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    color = movementColor.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(10.dp)
                 )
                 .padding(8.dp)
                 .size(32.dp)
                 .graphicsLayer(scaleY = movement.type.scaleY),
-            painter = painterResource(movement.type.icon),
-            tint = colorResource(id = movement.type.color),
+            imageVector = ImageVector.vectorResource(movement.type.icon),
+            tint = movementColor,
             contentDescription = null
         )
 
@@ -113,52 +122,14 @@ fun MovementItem(
                 Text(
                     modifier = Modifier
                         .background(
-                            color = colorResource(movement.type.color).copy(alpha = 0.4f),
+                            color = movementColor.copy(alpha = 0.2f),
                             shape = CircleShape
                         )
                         .padding(horizontal = 6.dp),
-                    text = PriceHandler.formatPrice(movement.amount, isLess = movement.type == MovementType.MOVEMENT_EXPENSE),
+                    text = PriceUtil.formatPrice(movement.amount, isLess = movement.type == MovementType.MOVEMENT_EXPENSE),
                     fontWeight = FontWeight.Bold
                 )
             }
         }
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun Preview() {
-    Column {
-        MovementItem(
-            modifier = Modifier.fillMaxWidth(),
-            movement = MovementItemEntity(
-                type = MovementType.MOVEMENT_SALE,
-                number = 1,
-                date = "12/12/2021",
-                time = "12:00 am",
-                amount = 10000,
-                labels = listOf("label1", "label2")
-            )
-        )
-        MovementItem(
-            modifier = Modifier.fillMaxWidth(),
-            movement = MovementItemEntity(
-                type = MovementType.MOVEMENT_EXPENSE,
-                number = 1,
-                date = "12/12/2021",
-                time = "1:00 pm",
-                amount = 10000,
-                labels = listOf("rappy", "domicilios", "mesa 1", "mesa 2", "caja 1", "caja 2")
-            )
-        )
-        MovementItem(
-            modifier = Modifier.fillMaxWidth(),
-            movement = MovementItemEntity(
-                type = MovementType.MOVEMENT_PENDING,
-                date = "12/12/2021",
-                time = "2:00 pm",
-                amount = 10000
-            )
-        )
     }
 }

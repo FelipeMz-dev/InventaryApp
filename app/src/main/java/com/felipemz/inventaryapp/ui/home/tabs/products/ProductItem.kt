@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.extensions.onColor
-import com.felipemz.inventaryapp.core.handler.PriceHandler
+import com.felipemz.inventaryapp.core.utils.PriceUtil
 
 @Composable
 internal fun ProductItem(
@@ -90,7 +90,7 @@ private fun NameAndPrice(product: ProductEntity) = Row {
                 shape = CircleShape
             )
             .padding(horizontal = 6.dp),
-        text = PriceHandler.formatPrice(product.price),
+        text = PriceUtil.formatPrice(product.price),
         fontWeight = FontWeight.Bold,
     )
 }

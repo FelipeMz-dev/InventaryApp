@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
-import com.felipemz.inventaryapp.core.handler.PriceHandler
+import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.FilterChipRow
 import com.felipemz.inventaryapp.ui.home.HomeEvent
 import kotlin.math.absoluteValue
@@ -72,7 +72,8 @@ internal fun MovementsTab(
                     .fillMaxWidth()
                     .clickable { }
                     .padding(6.dp),
-                movement = movement
+                movement = movement,
+                movementColor = movement.type.color?.let { colorResource(id = it) } ?: MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -124,7 +125,7 @@ private fun HeaderMovements(
                 )
                 .padding(horizontal = 6.dp),
             style = MaterialTheme.typography.bodySmall,
-            text = PriceHandler.formatPrice(total.absoluteValue, isLess = total < 0),
+            text = PriceUtil.formatPrice(total.absoluteValue, isLess = total < 0),
             fontWeight = FontWeight.Bold
         )
     }

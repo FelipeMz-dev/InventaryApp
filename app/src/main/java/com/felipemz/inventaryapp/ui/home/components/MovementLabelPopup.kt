@@ -19,7 +19,7 @@ import com.felipemz.inventaryapp.ui.commons.PopupDialog
 
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
-private fun MovementLabelPopup(
+internal fun MovementLabelPopup(
     labelList: List<String>,
     onSelect: (String) -> Unit,
     onClose: () -> Unit,

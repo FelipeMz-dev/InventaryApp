@@ -16,7 +16,9 @@
         <activity
             android:name=".ui.home.HomeActivity"
             android:exported="true"
-            android:theme="@style/Theme.InventaryApp">
+            android:theme="@style/Theme.InventaryApp"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

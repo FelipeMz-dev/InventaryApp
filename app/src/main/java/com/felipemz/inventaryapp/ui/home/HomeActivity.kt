@@ -1,15 +1,19 @@
 package com.felipemz.inventaryapp.ui.home
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
+import java.util.Date
 
 class HomeActivity : AppCompatActivity() {
 
@@ -38,6 +42,19 @@ class HomeActivity : AppCompatActivity() {
 
     private fun eventHandler(event: HomeEvent) {
         when (event) {
+            is HomeEvent.OnOpenCalendar -> {
+                val date = Date()
+                val datePicker = DatePickerDialog(
+                    this,
+                    { _: DatePicker?, year: Int, month: Int, day: Int ->
+
+                    },
+                    date.year,
+                    date.month,
+                    date.day
+                )
+                datePicker.show()
+            }
             else -> viewModel.eventHandler(event)
         }
     }

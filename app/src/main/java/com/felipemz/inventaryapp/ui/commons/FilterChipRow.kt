@@ -32,7 +32,7 @@ fun <T> FilterChipRow(
     trailingIcon: ((T) -> (@Composable () -> Unit)?)? = null,
     border: ((T) -> BorderStroke?)? = null,
     chipList: List<T>,
-    chipSelected: T,
+    chipSelected: T?,
     onSelectChip: (T) -> Unit,
 ) = LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
     items(chipList) { item ->
