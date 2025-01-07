@@ -1,9 +1,9 @@
-package com.felipemz.inventaryapp.core.handler
+package com.felipemz.inventaryapp.core.utils
 
 import java.text.NumberFormat
 import java.util.Locale
 
-object PriceHandler {
+object PriceUtil {
 
     fun formatPrice(amount: Int, isLess: Boolean = false): String {
         val colombianLocale = Locale("es", "CO")
