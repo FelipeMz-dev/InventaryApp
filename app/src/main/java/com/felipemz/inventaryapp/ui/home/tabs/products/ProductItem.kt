@@ -17,6 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +30,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
@@ -86,7 +90,7 @@ private fun NameAndPrice(product: ProductEntity) = Row {
     Text(
         modifier = Modifier
             .background(
-                color = Color.Green.copy(alpha = 0.5f),
+                color = Color.Green.copy(alpha = 0.4f),
                 shape = CircleShape
             )
             .padding(horizontal = 6.dp),
@@ -96,14 +100,21 @@ private fun NameAndPrice(product: ProductEntity) = Row {
 }
 
 @Composable
-private fun ImageAndCounter(
+internal fun ImageAndCounter(
     image: ProductTypeImage,
     quantity: Int?,
     colorCategory: Color,
+    size: Dp = 42.dp,
+    spaceCounter: Dp = 4.dp,
 ) = Box(contentAlignment = Alignment.TopEnd) {
 
     ImageByType(
         modifier = Modifier
+            .padding(
+                end = spaceCounter,
+                bottom = spaceCounter,
+                top = spaceCounter
+            )
             .clip(CircleShape)
             .border(
                 width = 2.dp,
@@ -111,8 +122,9 @@ private fun ImageAndCounter(
                 shape = CircleShape
             )
             .padding(4.dp)
-            .size(40.dp),
-        image = image
+            .size(size),
+        image = image,
+        size = size,
     )
 
     quantity?.let {
@@ -134,44 +146,49 @@ private fun ImageAndCounter(
 private fun ImageByType(
     modifier: Modifier,
     image: ProductTypeImage,
-) = when (image) {
-    is ProductTypeImage.LetterImage -> Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+    size: Dp,
+    backgroundColor: Color = MaterialTheme.colorScheme.primary
+) {
+
+    val backgroundModifier by remember {
+        derivedStateOf {
+            Modifier.background(
+                color = backgroundColor.copy(alpha = 0.2f),
                 shape = CircleShape
             )
-    ) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = image.letter,
-            fontWeight = FontWeight.Black,
-            fontSize = 16.sp
-        )
+        }
     }
-    is ProductTypeImage.EmojiImage -> Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                shape = CircleShape
+
+    when (image) {
+        is ProductTypeImage.LetterImage -> Box(
+            modifier = modifier
+                .fillMaxSize()
+                .then(backgroundModifier)
+        ) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = image.letter,
+                fontWeight = FontWeight.Black,
+                fontSize = (size.value - 24).sp
             )
-    ) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = image.emoji,
-            fontSize = 20.sp
+        }
+        is ProductTypeImage.EmojiImage -> Box(
+            modifier = modifier
+                .fillMaxSize()
+                .then(backgroundModifier)
+        ) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = image.emoji,
+                fontSize = (size.value - 20).sp
+            )
+        }
+        is ProductTypeImage.PhatImage -> Image(
+            modifier = modifier.then(backgroundModifier),
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = null
         )
     }
-    is ProductTypeImage.PhatImage -> Image(
-        modifier = modifier.background(
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-            shape = CircleShape
-        ),
-        imageVector = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
-        contentDescription = null
-    )
 }
 
 sealed interface ProductTypeImage {
