@@ -2,6 +2,7 @@ package com.felipemz.inventaryapp.ui.home
 
 import com.felipemz.inventaryapp.core.base.Event
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
+import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.enums.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
@@ -42,4 +43,6 @@ sealed interface HomeEvent : Event {
     data class OnReportsCustomFilterSelected(val filter: RangeDateModel) : HomeEvent
 
     data class OnReportsFilterSelected(val filter: ReportsFilterDate) : HomeEvent
+
+    data class OnOpenProduct(val product: ProductEntity) : HomeEvent
 }

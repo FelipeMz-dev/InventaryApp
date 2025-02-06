@@ -1,5 +1,6 @@
 package com.felipemz.inventaryapp.ui.home.tabs.products
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
@@ -36,7 +39,9 @@ import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.extensions.onColor
+import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.core.utils.PriceUtil
+import java.io.File
 
 @Composable
 internal fun ProductItem(
@@ -65,7 +70,7 @@ internal fun ProductItem(
             Row(modifier = Modifier.height(IntrinsicSize.Max)) {
 
                 Text(
-                    text = product.information,
+                    text = product.description,
                     color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -101,27 +106,28 @@ private fun NameAndPrice(product: ProductEntity) = Row {
 
 @Composable
 internal fun ImageAndCounter(
+    modifier: Modifier = Modifier,
     image: ProductTypeImage,
     quantity: Int?,
     colorCategory: Color,
-    size: Dp = 42.dp,
+    size: Dp = 48.dp,
     spaceCounter: Dp = 4.dp,
 ) = Box(contentAlignment = Alignment.TopEnd) {
 
     ImageByType(
-        modifier = Modifier
+        modifier = modifier
             .padding(
                 end = spaceCounter,
                 bottom = spaceCounter,
                 top = spaceCounter
             )
-            .clip(CircleShape)
             .border(
                 width = 2.dp,
                 color = colorCategory,
                 shape = CircleShape
             )
             .padding(4.dp)
+            .clip(CircleShape)
             .size(size),
         image = image,
         size = size,
@@ -147,13 +153,13 @@ private fun ImageByType(
     modifier: Modifier,
     image: ProductTypeImage,
     size: Dp,
-    backgroundColor: Color = MaterialTheme.colorScheme.primary
+    backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer
 ) {
 
     val backgroundModifier by remember {
         derivedStateOf {
             Modifier.background(
-                color = backgroundColor.copy(alpha = 0.2f),
+                color = backgroundColor,
                 shape = CircleShape
             )
         }
@@ -167,12 +173,17 @@ private fun ImageByType(
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = image.letter,
+                text = image.letter.ifEmpty { "⚠" },
                 fontWeight = FontWeight.Black,
                 fontSize = (size.value - 24).sp
             )
         }
-        is ProductTypeImage.EmojiImage -> Box(
+        is ProductTypeImage.EmojiImage -> if (image.emoji.isEmpty()) {
+            EmptyImage(
+                modifier = modifier.then(backgroundModifier),
+                typeImage = image
+            )
+        } else Box(
             modifier = modifier
                 .fillMaxSize()
                 .then(backgroundModifier)
@@ -180,21 +191,58 @@ private fun ImageByType(
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = image.emoji,
-                fontSize = (size.value - 20).sp
+                fontSize = (size.value - 18).sp
             )
         }
-        is ProductTypeImage.PhatImage -> Image(
-            modifier = modifier.then(backgroundModifier),
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = null
-        )
+        is ProductTypeImage.PhatImage -> {
+
+            val bitmap by remember(image.path) {
+                derivedStateOf {
+                    tryOrDefault(null) {
+                        val inputStream = File(image.path).inputStream()
+                        inputStream.use { BitmapFactory.decodeStream(it) }
+                    }
+                }
+            }
+
+            bitmap?.let {
+                Image(
+                    modifier = modifier.then(backgroundModifier),
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null
+                )
+            } ?: EmptyImage(
+                modifier = modifier.then(backgroundModifier),
+                typeImage = image
+            )
+        }
     }
 }
+
+@Composable
+private fun EmptyImage(
+    modifier: Modifier,
+    typeImage: ProductTypeImage
+) = Icon(
+    modifier = modifier.padding(if (typeImage is ProductTypeImage.PhatImage) 8.dp else 4.dp),
+    imageVector = when (typeImage) {
+        is ProductTypeImage.EmojiImage -> ImageVector.vectorResource(id = R.drawable.ic_emoji_empty)
+        else -> ImageVector.vectorResource(id = R.drawable.ic_image_empty)
+    },
+    tint = MaterialTheme.colorScheme.primary,
+    contentDescription = null
+)
 
 sealed interface ProductTypeImage {
     data class LetterImage(val letter: String) : ProductTypeImage
     data class EmojiImage(val emoji: String) : ProductTypeImage
     data class PhatImage(val path: String) : ProductTypeImage
+
+    fun ifNotEmpty(default: ProductTypeImage): ProductTypeImage = when (this) {
+        is LetterImage -> if (letter.isEmpty()) default else this
+        is EmojiImage -> if (emoji.isEmpty()) default else this
+        is PhatImage -> if (path.isEmpty()) default else this
+    }
 }
 
 @Preview
@@ -204,7 +252,7 @@ private fun Preview() {
         modifier = Modifier,
         product = ProductEntity(
             name = "Fresa delicia",
-            information = "Aquí va toda la información del producto / sin información",
+            description = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.red_dark,
             quantity = 8,
             price = 999900000,

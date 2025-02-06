@@ -38,3 +38,11 @@ inline fun <T> T?.ifNotNull(block: (T) -> Unit): Unit? {
 fun <T> T?.orDefault(default: T): T {
     return this ?: default
 }
+
+fun <T> tryOrDefault(default: T, block: () -> T): T {
+    return try {
+        block()
+    } catch (e: Exception) {
+        default
+    }
+}

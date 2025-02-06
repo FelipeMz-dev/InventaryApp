@@ -10,5 +10,6 @@ enum class ReportsType(
     SALES_REPORTS("Reportes de ventas", R.drawable.ic_sales),
     EXPENSES_REPORTS("Reportes de gastos", R.drawable.ic_expenses),
     PRODUCTS_RATING("Productos más vendidos", R.drawable.ic_rating_products),
-    CATEGORIES_RATING("Categorias más vendidas", R.drawable.ic_category)
+    CATEGORIES_RATING("Categorias más vendidas", R.drawable.ic_category),
+    LABELS_RATING("Etiquetas más vendidas", R.drawable.ic_label),
 }

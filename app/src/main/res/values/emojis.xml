@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="emoji_title">
+        <item>🍔</item>
+        <item>💡</item>
+        <item>🐵</item>
+        <item>✈️</item>
+        <item>⚽</item>
+    </string-array>
+    <string-array name="string_food">
+        <item>Frutas</item>
+        <item>Verduras</item>
+        <item>Comidas preparadas</item>
+        <item>Comida asiática</item>
+        <item>Dulces y postres</item>
+        <item>Bebidas y vajilla</item>
+    </string-array>
+    <string-array name="emoji_food">
+        <item>🍇 🍈 🍉 🍊 🍋 🍋‍🟩 🍌 🍍 🥭 🍎 🍏 🍐 🍑 🍒 🍓 🫐 🥝 🍅 🫒 🥥 🧅</item>
+        <item>🥑 🍆 🥔 🥕 🌽 🌶 🫑 🥒 🥬 🥦 🧄 🧅 🥜 🌰 🍄‍🟫 ‍🫘 🫚 🫛</item>
+        <item>🍞 🥐 🥖 🫓 🥟 🥯 🥞 🧇 🧀 🍖 🍗 🥩 🥓 🍔 🍟 🍕 🌭 🥪 🌮 🌯 🫔 🥙 🧆 🥚 🍳 🥘 🍲 🫕 🥣 🥗 🍿 🧈 🧂 🥫 🍝</item>
+        <item>🍱 🍘 🍙 🍚 🍛 🍜 🍠 🍢 🍣 🍤 🍥 🥮 🍡 🥠 🥡</item>
+        <item>🍦 🍧 🍨 🍩 🍪 🥨 🎂 🍰 🧁 🥧 🍫 🍬 🍭 🍮 🍯</item>
+        <item>🍼 🥛 ☕ 🫖 🍵 🍶 🍾 🍷 🍸 🍹 🍺 🍻 🥂 🥃 🫗 🥤 🧋 🧃 🧉 🥢 🍽 🍴 🥄 🔪 🫙 🏺 🧊</item>
+    </string-array>
+    <string-array name="string_object">
+        <item>Ropa y apariencia</item>
+        <item>Música y sonido</item>
+        <item>Informática y audiovisual</item>
+        <item>Oficina y papelería</item>
+        <item>Dinero y tiempo</item>
+        <item>Herramientas y artículos del hogar</item>
+    </string-array>
+    <string-array name="emoji_object">
+        <item>🎀 🎗 👓 🕶 🥽 🥼 🦺 👔 👕 👖 🧣 🧤 🧥 🧦 👗 👘 🥻 🩱 🩲 🩳 👙 👚 🪭 👛 👜 👝 🛍 🎒 🩴 👞 👟 🥾 🥿 👠 👡 🩰 👢 🪮 👑 👒 🎩 🎓 🧢 🪖 ⛑ 📿 💄 💍 💎 🦯</item>
+        <item>🔇 🔈 🔉 🔊 📢 📣 📯 🔔 🔕 🎼 🎵 🎶 🎙 🎚 🎛 🎤 🎧 📻 🎷 🪗 🎸 🎹 🎺 🎻 🪕 🥁 🪘 🪇 🪈</item>
+        <item>📱 📲 ☎️ 📞 📟 📠 🔋 🪫 🔌 💻 🖥 🖨 ⌨️ 🖱 🖲 💽 💾 💿 📀 🎥 🎞 📽 🎬 📺 📷 📸 📹 📼</item>
+        <item>📔 📕 📖 📗 📘 📙 📚 📓 📒 📃 📜 📄 📰 🗞️ 📑 🔖 🏷️ ✉️ 📧 📨 📩 📤 📥 📦 📫 📪 📬 📭 📮 🗳️ ✏️ ✒️ 🖋️ 🖊️ 🖌️ 🖍️ 📝 💼 📁 📂 🗂️ 🗒️ 🗓️ 📇 📈 📉 📊 📋 📌 📍 📎 🖇️ 📏 📐 ✂️ 🗃️ 🗄️ 🗑️</item>
+        <item>⌛ ⏳ ⌚ ⏰ ⏱️ ⏲️ 🕰️ 🕛 🕧 🕐 🕜 🕑 🕝 🕒 🕞 🕓 🕟 🕔 🕠 🕕 🕡 🕖 🕢 🕗 🕣 🕘 🕤 🕙 🕥 🕚 🕦 🧮 💰 🪙 💴 💵 💶 💷 💸 💳 🧾 💹</item>
+        <item>🧳 🌡️ 🧸 🧶 🪢 🔍 🔎 🕯️ 💡 🔦 🔒 🔓 🔏 🔐 🔑 🗝️ 🔨 🪓 ⛏️ ⚒️ 🛠️ 🗡️ ⚔️ 💣 🪃 🏹 🛡️ 🪚 🔧 🪛 🔩 ⚙️🗜️ ⚖️ 🔗 ⛓️‍💥 ⛓️ 🪝 🧰 🧲 🪜 ⚗️ 🧪 🧫 🔬 🔭 📡 💉 🩹 🩼 🩺 🩻 🚪 🪞 🪟 🛏️ 🛋️ 🪑 🚽 🪠 🚿 🛁 🪤 🪒 🧴 🧷 🧹 🧺 🧻 🪣 🧼 🫧 🪥 🧽 🧯 🛒</item>
+    </string-array>
+    <string-array name="string_activity">
+        <item>Eventos y celebraciones</item>
+        <item>Deportes y premios</item>
+        <item>Juegos y cultura</item>
+    </string-array>
+    <string-array name="emoji_activity">
+        <item>🎃 🎄 🎆 🎇 🧨 ✨ 🎈 🎉 🎊 🎋 🎍 🎎 🎏 🎐 🎑 🧧 🎁 🎟️ 🎫 🏮 🪔</item>
+        <item>🎖️ 🏆 🏅 🥇 🥈 🥉 ⚽ ⚾ 🥎 🏀 🏐 🏈 🏉 🎾 🥏 🎳 🏏 🏑 🏒 🥍 🏓 🏸 🥊 🥋 🥅 ⛳ ⛸️ 🎣 🤿 🎽 🎿 🛷 🥌 🎯</item>
+        <item>🪀 🪁 🔫 🎱 🔮 🪄 🎮 🕹️ 🎰 🎲 🧩 🪅 🪩 🪆 ♠️ ♥️ ♦️ ♣️ ♟️ 🃏 🀄 🎴 🎭 🖼️ 🎨</item>
+    </string-array>
+    <string-array name="string_travel">
+        <item>Mapas y geografía</item>
+        <item>Edificios y lugares</item>
+        <item>Viajes por tierra</item>
+        <item>Viajes por aire y por mar</item>
+    </string-array>
+    <string-array name="emoji_travel">
+        <item>🌍 🌎 🌏 🌐 🗺️ 🗾 🧭 🏔️ ⛰️ 🌋 🗻 🏕️ 🏖️ 🏜️ 🏝️ 🏞️</item>
+        <item>🏟️ 🏛️ 🏗 🧱 🛖 🏘️ 🏚️ 🏠 🏡 🏢 🏣 🏤 🏥 🏦 🏨 🏩 🏪 🏫 🏬 🏭 🏯 🏰 💒 🗼 🗽 ⛪ 🕌 🛕 🕍 ⛩️ 🕋 ⛲ ⛺ 🌁 🌃 🏙️ 🌄 🌅 🌆 🌇 🌉 ♨️ 🎠 🛝 🎡 🎢 💈 🎪 🛎️ 🗿</item>
+        <item>🚂 🚃 🚄 🚅 🚆 🚇 🚈 🚉 🚊 🚝 🚞 🚋 🚌 🚍 🚎 🚐 🚑 🚒 🚓 🚔 🚕 🚖 🚗 🚘 🚙 🛻 🚚 🚛 🚜 🏎️ 🏍️ 🛵 🦽 🦼 🛺 🚲 🛴 🛹 🛼 🚏 🛣️ 🛤️ 🛢️ ⛽ 🛞 🚨 🚥 🚦 🛑 🚧</item>
+        <item>⚓ 🛟 ⛵ 🛶 🚤 🛳️ ⛴️ 🛥️ 🚢 ✈️ 🛩️ 🛫 🛬 🪂 💺 🚁 🚟 🚠 🚡 🛰️ 🚀 🛸</item>
+    </string-array>
+    <string-array name="string_nature">
+        <item>Animales terrestres y marsupiales</item>
+        <item>Aves</item>
+        <item>Animales marinos y reptiles</item>
+        <item>Insectos</item>
+        <item>Plantas, flores y naturaleza</item>
+        <item>Cielo y tiempo</item>
+        <item>Manos y partes del cuerpo</item>
+        <item>Profesiones y actividades</item>
+        <item>Emociones y fantasía</item>
+    </string-array>
+    <string-array name="emoji_nature">
+        <item>🐵 🐒 🦍 🦧 🐶 🐕 🦮 🐕‍🦺 🐩 🐺 🦊 🦝 🐱 🐈 🐈‍⬛ 🦁 🐯 🐅 🐆 🐴 🫎 🫏 🐎 🦄 🦓 🦌 🦬 🐮 🐂 🐃 🐄 🐷 🐖 🐗 🐽 🐏 🐑 🐐 🐪 🐫 🦙 🦒 🐘 🦣 🦏 🦛 🐭 🐁 🐀 🐹 🐰 🐇 🐿️ 🦫 🦔 🦇 🐻 🐻‍❄️ 🐨 🐼 🦥 🦦 🦨 🦘 🦡 🐾</item>
+        <item>🦃 🐔 🐓 🐣 🐤 🐥 🐦 🐧 🕊️ 🦅 🦆 🦢 🦉 🦤 🪶 🦩 🦚 🦜 🪽 🐦‍⬛ 🪿 🐦‍🔥 🪹 🪺</item>
+        <item>🐸 🐊 🐢 🦎 🐍 🐲 🐉 🦕 🦖 🐳 🐋 🐬 🦭 🐟 🐠 🐡 🦈 🐙 🐚 🪸 🪼 🦀 🦞 🦐 🦑 🦪</item>
+        <item>🐌 🦋 🐛 🐜 🐝 🪲 🐞 🦗 🪳 🕷️ 🕸️ 🦂 🦟 🪰 🪱 🦠</item>
+        <item>💐 🌸 💮 🪷 🏵️ 🌹 🥀 🌺 🌻 🌼 🌷 🪻 🌱 🪴 🌲 🌳 🌴 🌵 🌾 🌿 ☘️ 🍀 🍁 🍂 🍃 🍄 🪨 🪵</item>
+        <item>🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘 🌙 🌚 🌛 🌜 ☀️ 🌝 🌞 🪐 ⭐ 🌟 🌠 🌌 ☁️ ⛅ ⛈️ 🌤️ 🌥️ 🌦️ 🌧️ 🌨️ 🌩️ 🌪️ 🌫️ 🌬️ 🌀 🌈 🌂 ☂️ ☔ ⛱️ ⚡ ❄️ ☃️ ⛄ ☄️ 🔥 💧 🌊</item>
+        <item>🤚 👏 👍 👎 ✊ 🙌 👐 🤝 🙏 ✍️ 🤳 💅 💪 🦾 🦿 🦵 🦶 👣 👀 👁️ 🧠 👂 🦻 👃 🫁 👅 👄 💋 🩸 🧬</item>
+        <item>🧑‍⚕️ 🧑‍🎓 🧑‍🏫 🧑‍⚖️ 🧑‍🌾 🧑‍🍳 🧑‍🔧 🧑‍🏭 🧑‍💼 🧑‍🔬 🧑‍💻 🧑‍🎤 🧑‍🎨 🧑‍✈️ 🧑‍🚀 👩‍🚒 👮‍♀️ 🕵️‍♀️️ 💂‍♀️ 🥷 👷️ 🫅 🤴 🤵️ 👰️ 🎅 🦸️ 🦹 🧙‍♂️ 🧚‍♀️ 🧛️ 🧜‍♂️ 🧜‍♀️ 🧝️ 🧞‍♂️ 🧟 🧌 👯 🤱 💆 💇️ 🧑‍🦯 🧑‍🦽 💃 🕺 🕴️ 🧖 🧗 🤺 🏇 ⛷️ 🏂 🏌️ 🏄 🚣 🏊 ⛹️ 🏋️ 🚴 🚵 🤸 🤼 🤽️ 🤾 🤹 🧘 🛀 🛌</item>
+        <item>😀 😇 😍 🤑 🥴 😵 😵‍💫 🤯 🥱 🤠 🥳 🥸 😎 🤓 🧐 😷 🤒 🤕 🤢 🤮 🤧 🥵 🥶 🤬 👿 😈 💀 ☠️ 💩 🤡 👹 👺 👻 👽 👾 🤖 🙈 🙉 🙊</item>
+    </string-array>
+
+</resources>

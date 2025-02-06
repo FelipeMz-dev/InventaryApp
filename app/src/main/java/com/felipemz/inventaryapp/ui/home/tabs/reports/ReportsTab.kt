@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
 import com.felipemz.inventaryapp.core.entitys.CategoryRatingEntity
+import com.felipemz.inventaryapp.core.entitys.LabelRatingEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.entitys.ProductRatingEntity
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
@@ -63,13 +64,19 @@ internal fun ReportsTab(
                         reportType = it,
                         totalValue = 1000,
                         intervals = fakeProductsRating
-                    )
+                    ) {}
                     ReportsType.CATEGORIES_RATING  -> ReportRatingItem(
                         modifier = Modifier.fillMaxWidth(),
                         reportType = it,
                         totalValue = 1000,
                         intervals = fakeCategoriesRating
-                    )
+                    ) {}
+                    ReportsType.LABELS_RATING  -> ReportRatingItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        reportType = it,
+                        totalValue = 1000,
+                        intervals = fakeLabelsRating
+                    ) {}
                     else -> ReportItem(
                         modifier = Modifier.fillMaxWidth(),
                         reportType = it,
@@ -89,6 +96,34 @@ private val fakeIntervals = listOf(
     Pair("de las 18:00 a las 24:00", 300)
 )
 
+private val fakeLabelsRating = listOf(
+    LabelRatingEntity(
+        label = "Promoción Promoción Promoción Promoción",
+        rating = 100,
+        totalValue = 300000
+    ),
+    LabelRatingEntity(
+        label = "Domicilio",
+        rating = 98,
+        totalValue = 200000
+    ),
+    LabelRatingEntity(
+        label = "Oferta",
+        rating = 90,
+        totalValue = 100000
+    ),
+    LabelRatingEntity(
+        label = "Descuento",
+        rating = 87,
+        totalValue = 10000
+    ),
+    LabelRatingEntity(
+        label = "Gratis",
+        rating = 60,
+        totalValue = 1000
+    )
+)
+
 private val fakeCategoriesRating = listOf(
     CategoryRatingEntity(
         category = CategoryEntity(
@@ -96,7 +131,8 @@ private val fakeCategoriesRating = listOf(
             name = "Comida",
             color = R.color.red_dark
         ),
-        rating = 100
+        rating = 100,
+        totalValue = 10000
     ),
     CategoryRatingEntity(
         category = CategoryEntity(
@@ -104,7 +140,8 @@ private val fakeCategoriesRating = listOf(
             name = "Bebida",
             color = R.color.blue
         ),
-        rating = 98
+        rating = 98,
+        totalValue = 14000
     ),
     CategoryRatingEntity(
         category = CategoryEntity(
@@ -112,7 +149,8 @@ private val fakeCategoriesRating = listOf(
             name = "Hogar",
             color = R.color.pink
         ),
-        rating = 90
+        rating = 90,
+        totalValue = 20000
     ),
     CategoryRatingEntity(
         category = CategoryEntity(
@@ -120,7 +158,8 @@ private val fakeCategoriesRating = listOf(
             name = "Tecnología",
             color = R.color.teal
         ),
-        rating = 87
+        rating = 87,
+        totalValue = 20500
     ),
     CategoryRatingEntity(
         category = CategoryEntity(
@@ -128,7 +167,8 @@ private val fakeCategoriesRating = listOf(
             name = "Accesorios",
             color = R.color.orange
         ),
-        rating = 60
+        rating = 60,
+        totalValue = 1200
     )
 )
 
@@ -137,7 +177,7 @@ private val fakeProductsRating = listOf(
         product = ProductEntity(
             id = 3,
             name = "Delicia mini",
-            information = "sin información",
+            description = "sin información",
             categoryColor = R.color.red_dark,
             quantity = null,
             price = 9000,
@@ -150,7 +190,7 @@ private val fakeProductsRating = listOf(
         product = ProductEntity(
             id = 4,
             name = "Coca Cola",
-            information = "sin información",
+            description = "sin información",
             categoryColor = R.color.blue,
             quantity = 14,
             price = 5000,
@@ -163,7 +203,7 @@ private val fakeProductsRating = listOf(
         product = ProductEntity(
             id = 5,
             name = "Shampoo",
-            information = "Aquí va toda la información del producto / sin información",
+            description = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.pink,
             quantity = 3,
             price = 15000,
@@ -176,7 +216,7 @@ private val fakeProductsRating = listOf(
         product = ProductEntity(
             id = 8,
             name = "Audífonos",
-            information = "Aquí va toda la información del producto / sin información",
+            description = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.teal,
             quantity = 5,
             price = 50000,
@@ -189,7 +229,7 @@ private val fakeProductsRating = listOf(
         product = ProductEntity(
             id = 9,
             name = "Cargador",
-            information = "Aquí",
+            description = "Aquí",
             categoryColor = R.color.teal,
             quantity = 6,
             price = 25000,

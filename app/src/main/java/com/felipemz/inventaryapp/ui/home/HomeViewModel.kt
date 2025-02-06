@@ -32,7 +32,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 1,
             name = "Fresa delicia",
-            information = "sin información",
+            description = "sin información",
             categoryColor = R.color.red_dark,
             quantity = null,
             price = 11000,
@@ -41,7 +41,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 6,
             name = "Fresa Natural",
-            information = "sin información",
+            description = "sin información",
             categoryColor = R.color.red_dark,
             quantity = null,
             price = 10000,
@@ -50,7 +50,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 3,
             name = "Delicia mini",
-            information = "sin información",
+            description = "sin información",
             categoryColor = R.color.red_dark,
             quantity = null,
             price = 9000,
@@ -59,7 +59,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 4,
             name = "Coca Cola",
-            information = "sin información",
+            description = "sin información",
             categoryColor = R.color.blue,
             quantity = 14,
             price = 5000,
@@ -68,7 +68,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 5,
             name = "Shampoo",
-            information = "Aquí va toda la información del producto / sin información",
+            description = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.pink,
             quantity = 3,
             price = 15000,
@@ -77,7 +77,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 8,
             name = "Audífonos",
-            information = "Aquí va toda la información del producto / sin información",
+            description = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.teal,
             quantity = 5,
             price = 50000,
@@ -86,7 +86,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 9,
             name = "Cargador",
-            information = "Aquí",
+            description = "Aquí",
             categoryColor = R.color.teal,
             quantity = 6,
             price = 25000,
@@ -95,7 +95,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 7,
             name = "Escoba",
-            information = "Aquí va toda la información del producto / sin información",
+            description = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.orange,
             quantity = 2,
             price = 20000,
@@ -104,7 +104,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 1,
             name = "Detergente",
-            information = "para la losa",
+            description = "para la losa",
             categoryColor = R.color.purple,
             quantity = 1,
             price = 10000,
@@ -113,7 +113,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         ProductEntity(
             id = 10,
             name = "Comida para perro",
-            information = "Aquí va toda la información del producto / sin información",
+            description = "Aquí va toda la información del producto / sin información",
             categoryColor = R.color.green,
             quantity = 4,
             price = 30000,

@@ -11,4 +11,9 @@ object PriceUtil {
         val formattedAmount = currencyFormatter.format(amount)
         return "${if (isLess) "- " else String()}$ $formattedAmount"
     }
+
+    fun getValue(
+        price: String,
+        default: Int = 0
+    ) = price.replace(Regex("[^0-9]"), "").toIntOrNull() ?: default
 }

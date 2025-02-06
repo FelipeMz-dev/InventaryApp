@@ -3,22 +3,29 @@ package com.felipemz.inventaryapp.ui.home.tabs.reports
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.entitys.BaseRatingEntity
 import com.felipemz.inventaryapp.core.entitys.CategoryRatingEntity
+import com.felipemz.inventaryapp.core.entitys.LabelRatingEntity
 import com.felipemz.inventaryapp.core.entitys.ProductRatingEntity
 import com.felipemz.inventaryapp.core.enums.ReportsType
 import com.felipemz.inventaryapp.core.utils.PriceUtil
@@ -32,6 +39,7 @@ internal fun ReportRatingItem(
     reportType: ReportsType,
     totalValue: Int,
     intervals: List<BaseRatingEntity>,
+    onSeeMore: () -> Unit
 ) = Column(
     modifier = modifier.padding(
         horizontal = 12.dp,
@@ -71,20 +79,38 @@ internal fun ReportRatingItem(
                         )
                         .size(24.dp)
                 )
+                is LabelRatingEntity -> Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentWidth(Alignment.Start)
+                        .padding(vertical = 2.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape
+                        )
+                        .padding(horizontal = 6.dp),
+                    text = it.label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
                 else -> Unit
             }
 
-            Text(
-                modifier = Modifier.weight(1f),
-                text = when (it) {
-                    is ProductRatingEntity -> it.product.name
-                    is CategoryRatingEntity -> it.category.name
-                    else -> String()
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2
-            )
+            if (it !is LabelRatingEntity) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = when (it) {
+                        is ProductRatingEntity -> it.product.name
+                        is CategoryRatingEntity -> it.category.name
+                        else -> String()
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2
+                )
+            }
 
             Text(
                 text = "(${it.rating})",
@@ -108,7 +134,7 @@ internal fun ReportRatingItem(
         modifier = Modifier.fillMaxWidth(),
         text = "Ver más",
         enabled = true
-    ) { }
+    ) { onSeeMore() }
 
     HorizontalDotDivider(
         modifier = Modifier

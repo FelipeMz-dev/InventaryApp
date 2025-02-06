@@ -1,16 +1,18 @@
 package com.felipemz.inventaryapp.ui.home
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
+import com.felipemz.inventaryapp.ui.product.ProductFormActivity
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
 import java.util.Date
@@ -55,6 +57,14 @@ class HomeActivity : AppCompatActivity() {
                 )
                 datePicker.show()
             }
+            is HomeEvent.OnFAB -> startActivity(
+                Intent(this, ProductFormActivity::class.java)
+            )
+            is HomeEvent.OnOpenProduct -> startActivity(
+                Intent(this, ProductFormActivity::class.java).putExtras(
+                    Bundle().apply { putInt(KEY_PRODUCT_ID, event.product.id) }
+                )
+            )
             else -> viewModel.eventHandler(event)
         }
     }
