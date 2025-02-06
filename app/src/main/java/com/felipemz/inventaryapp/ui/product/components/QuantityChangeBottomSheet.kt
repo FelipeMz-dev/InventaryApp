@@ -27,10 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifNotNull
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent
-import com.felipemz.inventaryapp.ui.product.QuantityType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

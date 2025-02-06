@@ -25,4 +25,7 @@
     <string name="copy_search_image">Buscar imagen</string>
     <string name="copy_take_photo">Tomar foto</string>
     <string name="copy_retry">Reintentar</string>
+    <string name="copy_quantities_dots">Cantidades:</string>
+    <string name="copy_quantity_type_dots">Tipo de cantidad:</string>
+    <string name="copy_quantity_dots">Cantidad:</string>
 </resources>
