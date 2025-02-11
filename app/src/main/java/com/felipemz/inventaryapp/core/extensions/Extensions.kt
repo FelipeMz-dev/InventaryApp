@@ -30,8 +30,21 @@ fun Any?.isNull(): Boolean {
     return this == null
 }
 
+fun Any?.isNotNull(): Boolean {
+    return this != null
+}
+
+inline fun <T> List<T>.ifNotEmpty(block: (List<T>) -> Unit) {
+    if (this.isNotEmpty()) block(this)
+}
+
 inline fun <T> T?.ifNotNull(block: (T) -> Unit): Unit? {
     if (this != null) block(this) else return null
+    return Unit
+}
+
+inline fun <T> T?.ifNull(block: () -> Unit): Unit? {
+    if (this == null) block() else return null
     return Unit
 }
 

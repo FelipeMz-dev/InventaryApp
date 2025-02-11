@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 fun TextButtonUnderline(
     modifier: Modifier = Modifier,
     text: String,
-    enabled: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) = Text(
     modifier = modifier

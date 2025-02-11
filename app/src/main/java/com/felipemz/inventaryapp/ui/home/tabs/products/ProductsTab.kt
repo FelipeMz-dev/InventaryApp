@@ -48,7 +48,7 @@ import com.felipemz.inventaryapp.ui.home.HomeEvent
 @Composable
 internal fun InventoryTab(
     categories: List<CategoryEntity>,
-    categorySelected: CategoryEntity,
+    categorySelected: CategoryEntity?,
     isInventory: Boolean,
     isFocusSearch: Boolean,
     products: List<ProductEntity>,
@@ -92,27 +92,27 @@ internal fun InventoryTab(
 private fun FilterChipCategories(
     modifier: Modifier,
     chipList: List<CategoryEntity>,
-    chipSelected: CategoryEntity,
-    onSelectChip: (CategoryEntity) -> Unit,
+    chipSelected: CategoryEntity?,
+    onSelectChip: (CategoryEntity?) -> Unit,
 ) = FilterChipRow(
     modifier = modifier,
     colors = {
-        if (it == chipList.first()) {
+        it?.let {
             FilterChipDefaults.filterChipColors().copy(
+                containerColor = colorResource(id = it.color).copy(alpha = 0.15f),
+                selectedContainerColor = colorResource(id = it.color),
+                labelColor = MaterialTheme.colorScheme.onSurface,
+                selectedLabelColor = colorResource(id = it.color).onColor()
+            )
+        } ?: FilterChipDefaults.filterChipColors().copy(
                 containerColor = Color.Gray.copy(alpha = 0.4f),
                 selectedContainerColor = MaterialTheme.colorScheme.primary,
                 selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
                 selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary
-            )
-        } else FilterChipDefaults.filterChipColors().copy(
-            containerColor = colorResource(id = it.color).copy(alpha = 0.15f),
-            selectedContainerColor = colorResource(id = it.color),
-            labelColor = MaterialTheme.colorScheme.onSurface,
-            selectedLabelColor = colorResource(id = it.color).onColor()
         )
     },
-    text = { it.name },
-    chipList = chipList,
+    text = { it?.name ?: "Todos" },
+    chipList = listOf(null).plus(chipList),
     chipSelected = chipSelected,
     onSelectChip = onSelectChip
 )

@@ -1,7 +1,8 @@
 package com.felipemz.inventaryapp.ui.product.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,13 +31,18 @@ internal fun CommonTitledColumn(
     modifier: Modifier,
     title: String,
     concealable: Boolean = false,
-    isMandatory: Boolean = true,
+    isMandatory: Boolean? = true,
     visible: Boolean = true,
     thumbContent: (@Composable () -> Unit)? = null,
+    onOpen: (suspend () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
 
     var visibility by remember(visible) { mutableStateOf(visible) }
+
+    LaunchedEffect(key1 = visibility) {
+        visibility.ifTrue { onOpen?.invoke() }
+    }
 
     Column(modifier = modifier) {
 
@@ -50,8 +57,12 @@ internal fun CommonTitledColumn(
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = if (isMandatory) " *" else " (Opcional)",
-                color = if (isMandatory) MaterialTheme.colorScheme.error
+                text = when (isMandatory) {
+                    true -> " *"
+                    false -> " (Opcional)"
+                    else -> String()
+                },
+                color = if (isMandatory == true) MaterialTheme.colorScheme.error
                 else MaterialTheme.colorScheme.outline
             )
 
@@ -63,7 +74,11 @@ internal fun CommonTitledColumn(
             }
         }
 
-        AnimatedVisibility(visible = visibility) {
+        if (!concealable && visibility) Column { content() }
+        else AnimatedVisibility(visible = visibility) {
+            LaunchedEffect(transition.currentState) {
+                (transition.currentState == EnterExitState.Visible).ifTrue { onOpen?.invoke() }
+            }
             Column { content() }
         }
     }

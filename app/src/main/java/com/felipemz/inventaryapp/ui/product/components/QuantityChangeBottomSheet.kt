@@ -41,7 +41,6 @@ internal fun QuantityChangeBottomSheet(
 ) {
 
     var quantity by remember { mutableIntStateOf(0) }
-    val enabled by remember(quantity) { derivedStateOf { quantity > 0 } }
     val sum by remember(quantity) {
         derivedStateOf {
             if (currentQuantity > 0) {
@@ -75,39 +74,57 @@ internal fun QuantityChangeBottomSheet(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+            Actions(
+                quantity = quantity,
+                sum = sum,
+                quantityType = quantityType,
+                onSelect = onSelect
+            )
+        }
+    }
+}
 
-                Text(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer)
-                        .clickable(enabled = enabled) { onSelect(quantity) }
-                        .padding(horizontal = 8.dp, vertical = 2.dp),
-                    text = "Cambiar $quantity/${quantityType.initial}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
-                    fontWeight = FontWeight.Bold,
-                    textDecoration = TextDecoration.Underline
-                )
+@Composable
+private fun Actions(
+    quantity: Int,
+    sum: Int?,
+    quantityType: QuantityType,
+    onSelect: (Int) -> Unit,
+) {
 
-                sum.ifNotNull {
-                    Text(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer)
-                            .clickable(enabled = enabled) { onSelect(it) }
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                        text = "Sumar $it/${quantityType.initial}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
-                        fontWeight = FontWeight.Bold,
-                        textDecoration = TextDecoration.Underline
-                    )
-                }
-            }
+    val enabled by remember(quantity) { derivedStateOf { quantity > 0 } }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+
+        Text(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer)
+                .clickable(enabled = enabled) { onSelect(quantity) }
+                .padding(horizontal = 8.dp, vertical = 2.dp),
+            text = "Asignar $quantity/${quantityType.initial}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
+            fontWeight = FontWeight.Bold,
+            textDecoration = TextDecoration.Underline
+        )
+
+        sum.ifNotNull {
+            Text(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer)
+                    .clickable(enabled = enabled) { onSelect(it) }
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                text = "Sumar $it/${quantityType.initial}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
+                fontWeight = FontWeight.Bold,
+                textDecoration = TextDecoration.Underline
+            )
         }
     }
 }

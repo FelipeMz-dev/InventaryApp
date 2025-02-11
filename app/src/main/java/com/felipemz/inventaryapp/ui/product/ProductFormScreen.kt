@@ -1,51 +1,43 @@
 package com.felipemz.inventaryapp.ui.product
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.entitys.PackageProductType
+import com.felipemz.inventaryapp.core.entitys.ProductEntity
+import com.felipemz.inventaryapp.core.entitys.toProductSelectedEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
+import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 import com.felipemz.inventaryapp.ui.product.components.CategoryField
 import com.felipemz.inventaryapp.ui.product.components.CommonTitledColumn
 import com.felipemz.inventaryapp.ui.product.components.DescriptionField
 import com.felipemz.inventaryapp.ui.product.components.EmojiSelectorBottomSheet
+import com.felipemz.inventaryapp.ui.product.components.IdProductField
 import com.felipemz.inventaryapp.ui.product.components.ImageField
 import com.felipemz.inventaryapp.ui.product.components.ImageSelectorBottomSheet
 import com.felipemz.inventaryapp.ui.product.components.NameField
+import com.felipemz.inventaryapp.ui.product.components.PackageField
 import com.felipemz.inventaryapp.ui.product.components.PriceField
 import com.felipemz.inventaryapp.ui.product.components.QuantityChangeBottomSheet
 import com.felipemz.inventaryapp.ui.product.components.QuantityField
@@ -57,9 +49,16 @@ internal fun ProductFormScreen(
     eventHandler: (ProductFormEvent) -> Unit,
 ) {
 
+    val scrollState = rememberScrollState()
     var showEmojiPopup by remember { mutableStateOf(false) }
     var showImagePopup by remember { mutableStateOf(false) }
-    var shoQuantityPopup by remember { mutableStateOf(false) }
+    var showQuantityPopup by remember { mutableStateOf(false) }
+    var showPackagePopup by remember { mutableStateOf(false) }
+    var showProductsPopup by remember { mutableStateOf(false) }
+
+    val moveToFinal = remember {
+        suspend { scrollState.animateScrollTo(scrollState.maxValue) }
+    }
 
     when {
         showImagePopup -> ImageSelectorBottomSheet(
@@ -76,13 +75,25 @@ internal fun ProductFormScreen(
                 showEmojiPopup = false
             }
         )
-        shoQuantityPopup -> QuantityChangeBottomSheet(
+        showQuantityPopup -> QuantityChangeBottomSheet(
             currentQuantity = state.quantity,
             quantityType = state.quantityType ?: QuantityType.UNIT,
-            onDismiss = { shoQuantityPopup = false },
+            onDismiss = { showQuantityPopup = false },
             onSelect = {
                 eventHandler(ProductFormEvent.OnQuantityChanged(it))
-                shoQuantityPopup = false
+                showQuantityPopup = false
+            }
+        )
+        showProductsPopup -> ProductsAddBottomSheet(
+            productList = state.productList,
+            listSelected = when(state.packageType){
+                is PackageProductType.Pack -> state.packageType.products.map { it.toProductSelectedEntity() }
+                is PackageProductType.Package -> listOfNotNull(state.packageType.product?.toProductSelectedEntity())
+                else -> emptyList()
+            },
+            onDismiss = { showProductsPopup = false },
+            onSelect = {
+                eventHandler(ProductFormEvent.OnAddProductToPack(it))
             }
         )
     }
@@ -92,32 +103,29 @@ internal fun ProductFormScreen(
         topBar = {
             TopBarProduct(
                 onBack = { eventHandler(ProductFormEvent.OnBack) },
-                onDelete = { eventHandler(ProductFormEvent.OnProductDeleted) },
                 isNewProduct = state.isNewProduct
             )
         },
         bottomBar = {
-            Button(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                onClick = { eventHandler(ProductFormEvent.OnProductSaved) },
-                enabled = state.name.isNotBlank() && state.price > 0 && state.category != null
-            ) { Text(text = stringResource(R.string.copy_save)) }
+            BottomBarProductForm(
+                enable = state.name.isNotBlank() && state.price > 0 && state.category != null,
+                action = { eventHandler(ProductFormEvent.OnProductSaved) }
+            )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(12.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(horizontal = 12.dp)
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            Text(
-                text = getIdString(state.idProduct),
-                fontWeight = FontWeight.Bold,
-            )
+            IdProductField(
+                modifier = Modifier.fillMaxWidth(),
+                idProduct = state.idProduct,
+                isNewProduct = state.isNewProduct
+            ) { eventHandler(ProductFormEvent.OnProductDeleted) }
 
             NameField(
                 modifier = Modifier.fillMaxWidth(),
@@ -152,37 +160,64 @@ internal fun ProductFormScreen(
 
             DescriptionField(
                 modifier = Modifier.fillMaxWidth(),
-                description = state.description
+                description = state.description,
+                onOpen = { moveToFinal() }
             ) { eventHandler(ProductFormEvent.OnDescriptionChanged(it)) }
 
             HorizontalDotDivider(modifier = Modifier.fillMaxWidth())
 
-            QuantityField(
+            CommonTitledColumn(
                 modifier = Modifier.fillMaxWidth(),
-                quantityType = state.quantityType,
-                quantity = state.quantity,
-                onAdd = { shoQuantityPopup = true }
-            ) { eventHandler(ProductFormEvent.OnQuantityTypeChanged(it)) }
+                title = stringResource(R.string.copy_advanced),
+                isMandatory = null,
+                visible = false,
+                concealable = true,
+                onOpen = { moveToFinal() }
+            ) {
+
+                QuantityField(
+                    modifier = Modifier.fillMaxWidth(),
+                    quantityType = state.quantityType,
+                    isNotPackage = state.packageType.isNull(),
+                    quantity = state.quantity,
+                    onAdd = { showQuantityPopup = true },
+                    onOpen = { moveToFinal() }
+                ) {
+                    eventHandler(ProductFormEvent.OnQuantityTypeChanged(it))
+                }
+
+                PackageField(
+                    modifier = Modifier.fillMaxWidth(),
+                    packageType = state.packageType,
+                    isNotQuantity = state.quantityType.isNull(),
+                    onAdd = { showProductsPopup = true },
+                    onOpen = { moveToFinal() },
+                    onClick = { },
+                ) {
+                    eventHandler(ProductFormEvent.OnPackageTypeChanged(it))
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun getIdString(id: Int?) = buildAnnotatedString {
-    append(stringResource(R.string.copy_id_dots))
-    withStyle(
-        style = SpanStyle(
-            fontWeight = FontWeight.Light,
-            textDecoration = TextDecoration.Underline,
-            color = MaterialTheme.colorScheme.outline
-        ),
-    ) {
-        append(
-            id?.toString()?.padStart(
-                length = 6,
-                padChar = '0'
-            ) ?: stringResource(R.string.copy_autogenerated)
-        )
+private fun BottomBarProductForm(
+    enable: Boolean,
+    action: () -> Unit,
+) {
+    BottomAppBar {
+        Button(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+            onClick = action,
+            enabled = enable
+        ) {
+            Text(
+                text = stringResource(R.string.copy_save),
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
-

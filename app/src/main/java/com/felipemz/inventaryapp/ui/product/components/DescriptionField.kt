@@ -22,6 +22,7 @@ import com.felipemz.inventaryapp.R
 internal fun DescriptionField(
     modifier: Modifier,
     description: String,
+    onOpen: suspend () -> Unit,
     onChange: (String) -> Unit
 ) {
 
@@ -32,7 +33,8 @@ internal fun DescriptionField(
         title = stringResource(R.string.copy_description_dots),
         concealable = true,
         visible = false,
-        isMandatory = false
+        isMandatory = false,
+        onOpen = onOpen
     ) {
         OutlinedTextField(
             modifier = modifier,

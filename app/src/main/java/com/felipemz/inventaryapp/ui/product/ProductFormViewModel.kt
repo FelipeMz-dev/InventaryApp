@@ -1,23 +1,18 @@
 package com.felipemz.inventaryapp.ui.product
 
-import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.core.entitys.CategoryEntity
+import com.felipemz.inventaryapp.core.entitys.PackageProductType
+import com.felipemz.inventaryapp.core.entitys.ProductEntity
+import com.felipemz.inventaryapp.core.entitys.toProductPackEntity
+import com.felipemz.inventaryapp.core.entitys.toProductSelectedEntity
+import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.ui.commons.fakeChips
+import com.felipemz.inventaryapp.ui.commons.fakeProducts
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 import com.felipemz.inventaryapp.ui.product.ProductFormEvent.*
 
 class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>() {
 
-    private val fakeChips = listOf(
-        CategoryEntity(position = 1, name = "Alimentos", color = R.color.red_dark),
-        CategoryEntity(position = 2, name = "Bebidas", color = R.color.blue),
-        CategoryEntity(position = 3, name = "Cuidado Personal", color = R.color.pink),
-        CategoryEntity(position = 4, name = "Electrónicos", color = R.color.teal),
-        CategoryEntity(position = 5, name = "Hogar", color = R.color.orange),
-        CategoryEntity(position = 6, name = "Limpieza", color = R.color.purple),
-        CategoryEntity(position = 7, name = "Mascotas", color = R.color.green),
-        CategoryEntity(position = 8, name = "Otros", color = R.color.lime)
-    )
 
     private val  initialState = ProductFormState(
         categories = fakeChips,
@@ -25,7 +20,8 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
             ProductTypeImage.LetterImage(String()),
             ProductTypeImage.EmojiImage(String()),
             ProductTypeImage.PhatImage(String())
-        )
+        ),
+        productList = fakeProducts
     )
 
     override fun initState() = initialState
@@ -42,8 +38,29 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
                 is OnImageChanged -> imageChanged(event.image)
                 is OnQuantityTypeChanged -> quantityTypeChanged(event.quantityType)
                 is OnQuantityChanged -> { updateState { it.copy(quantity = event.quantity) } }
+                is OnPackageTypeChanged -> packageTypeChanged(event.packageType)
+                is OnAddProductToPack -> addProductToPack(event.productEntity)
                 else -> Unit
             }
+        }
+    }
+
+    private fun addProductToPack(productEntity: ProductEntity) {
+        updateState {
+            it.copy(
+                packageType = when (it.packageType) {
+                    is PackageProductType.Pack -> {
+                        val products = it.packageType.products.toMutableList()
+                        products.add(productEntity.toProductPackEntity())
+                        PackageProductType.Pack(products)
+                    }
+                    is PackageProductType.Package -> {
+                        val product = productEntity.toProductPackEntity()
+                        PackageProductType.Package(product)
+                    }
+                    else -> null
+                }
+            )
         }
     }
 
@@ -51,6 +68,17 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         updateState {
             it.copy(
                 quantityType = quantityType,
+                quantity = 0,
+                packageType = null,
+            )
+        }
+    }
+
+    private fun packageTypeChanged(packageType: PackageProductType?) {
+        updateState {
+            it.copy(
+                packageType = packageType,
+                quantityType = null,
                 quantity = 0
             )
         }

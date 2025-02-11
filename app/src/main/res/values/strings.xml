@@ -28,4 +28,5 @@
     <string name="copy_quantities_dots">Cantidades:</string>
     <string name="copy_quantity_type_dots">Tipo de cantidad:</string>
     <string name="copy_quantity_dots">Cantidad:</string>
+    <string name="copy_advanced">Avanzado</string>
 </resources>

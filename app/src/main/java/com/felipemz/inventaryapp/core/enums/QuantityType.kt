@@ -5,7 +5,7 @@ enum class QuantityType(
     val initial: String
 ) {
     UNIT("Unidad", "u"),
-    OUNCE("Onza", "Oz"),
+    OUNCE("Onza", "oz"),
     GRAM("Gramo", "g"),
     KILOGRAM("Kilogramo", "Kg"),
     MILLIGRAM("Miligramo", "mg"),

@@ -32,8 +32,10 @@ import com.felipemz.inventaryapp.core.extensions.isNull
 internal fun QuantityField(
     modifier: Modifier,
     quantityType: QuantityType?,
+    isNotPackage: Boolean,
     quantity: Int = 0,
     onAdd: () -> Unit,
+    onOpen: suspend () -> Unit,
     onSelect: (QuantityType?) -> Unit = {},
 ) {
 
@@ -46,8 +48,10 @@ internal fun QuantityField(
         concealable = true,
         isMandatory = false,
         visible = toggle,
+        onOpen = onOpen,
         thumbContent = {
             Switch(
+                enabled = isNotPackage,
                 checked = toggle,
                 onCheckedChange = {
                     if (it) onSelect(QuantityType.UNIT) else onSelect(null)
@@ -112,7 +116,7 @@ private fun QuantityValueField(
     quantityType: QuantityType?,
     action: () -> Unit,
 ) {
-    Row {
+    Row(verticalAlignment = Alignment.CenterVertically) {
 
         Text(
             text = stringResource(R.string.copy_quantity_dots),
@@ -137,10 +141,7 @@ private fun QuantityTypeField(
     quantityType: QuantityType?,
     action: () -> Unit,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
 
         Text(
             text = stringResource(R.string.copy_quantity_type_dots),

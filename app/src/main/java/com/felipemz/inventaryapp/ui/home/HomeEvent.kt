@@ -27,7 +27,7 @@ sealed interface HomeEvent : Event {
 
     data class OnChangeSearchText(val text: String) : HomeEvent
 
-    data class OnCategorySelected(val category: CategoryEntity) : HomeEvent
+    data class OnCategorySelected(val category: CategoryEntity?) : HomeEvent
 
     data class OnMovementFilterSelected(val filter: MovementsFilterChip) : HomeEvent
 

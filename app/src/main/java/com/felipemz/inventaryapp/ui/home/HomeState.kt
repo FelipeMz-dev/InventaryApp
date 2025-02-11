@@ -13,7 +13,7 @@ data class HomeState(
     val searchText: String = String(),
     val isSearchFocused: Boolean = false,
     val categories: List<CategoryEntity> = emptyList(),
-    val categorySelected: CategoryEntity = CategoryEntity(),
+    val categorySelected: CategoryEntity? = null,
     val products: List<ProductEntity> = emptyList(),
     val movements: List<MovementItemEntity> = emptyList(),
     val movementLabelList: List<String> = emptyList(),
