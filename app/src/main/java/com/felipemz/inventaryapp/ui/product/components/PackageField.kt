@@ -7,19 +7,29 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.core.entitys.PackageProductType
+import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.entitys.PackageProductModel
 import com.felipemz.inventaryapp.core.entitys.ProductPackEntity
 import com.felipemz.inventaryapp.core.enums.PackageType
 import com.felipemz.inventaryapp.core.extensions.isNotNull
@@ -28,17 +38,18 @@ import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 @Composable
 internal fun PackageField(
     modifier: Modifier,
-    packageType: PackageProductType?,
+    packageType: PackageProductModel?,
     isNotQuantity: Boolean,
     onAdd: () -> Unit,
     onOpen: suspend () -> Unit,
     onClick: (ProductPackEntity) -> Unit,
-    onSelect: (PackageProductType?) -> Unit
+    onDelete: (ProductPackEntity) -> Unit,
+    onSelect: (PackageProductModel?) -> Unit
 ) {
 
     CommonTitledColumn(
         modifier = modifier,
-        title = "Agrupación:",
+        title = stringResource(R.string.copy_agrupation_dots),
         isMandatory = false,
         visible = packageType.isNotNull(),
         concealable = true,
@@ -48,7 +59,7 @@ internal fun PackageField(
                 enabled = isNotQuantity,
                 checked = packageType.isNotNull(),
                 onCheckedChange = { state ->
-                    onSelect(PackageProductType.Package().takeIf { state })
+                    onSelect(PackageProductModel.Package().takeIf { state })
                 }
             )
         }
@@ -60,7 +71,7 @@ internal fun PackageField(
         ) {
 
             Text(
-                text = "Tipo:",
+                text = stringResource(R.string.copy_type_dots),
                 color = MaterialTheme.colorScheme.outline
             )
 
@@ -68,8 +79,8 @@ internal fun PackageField(
 
                 val packType = remember {
                     when (type) {
-                        PackageType.PACKAGE -> PackageProductType.Package()
-                        PackageType.PACk -> PackageProductType.Pack()
+                        PackageType.PACKAGE -> PackageProductModel.Package()
+                        PackageType.PACk -> PackageProductModel.Pack()
                     }
                 }
 
@@ -92,8 +103,11 @@ internal fun PackageField(
         }
 
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Row(
@@ -108,8 +122,8 @@ internal fun PackageField(
 
                 Text(
                     text = when (packageType) {
-                        is PackageProductType.Pack -> "Cantidades:"
-                        is PackageProductType.Package -> "Cantidad:"
+                        is PackageProductModel.Pack -> "Cantidades:"
+                        is PackageProductModel.Package -> "Cantidad:"
                         else -> String()
                     },
                     color = MaterialTheme.colorScheme.outline,
@@ -118,11 +132,20 @@ internal fun PackageField(
 
             ProductRelated(
                 modifier = Modifier.fillMaxWidth(),
-                productType = packageType ?: PackageProductType.Pack(),
-                onClick = onClick
+                productType = packageType ?: PackageProductModel.Pack(),
+                onClick = onClick,
+                onDelete = onDelete
             )
 
-            TextButtonUnderline(text = "Agregar") { onAdd() }
+            TextButtonUnderline(
+                text = when (packageType) {
+                    is PackageProductModel.Pack -> "Agregar productos"
+                    is PackageProductModel.Package -> packageType.product?.let {
+                        "Cambiar producto"
+                    } ?: "Seleccionar producto"
+                    else -> String()
+                }
+            ) { onAdd() }
         }
     }
 }
@@ -130,8 +153,9 @@ internal fun PackageField(
 @Composable
 private fun ProductRelated(
     modifier: Modifier,
-    productType: PackageProductType,
+    productType: PackageProductModel,
     onClick: (ProductPackEntity) -> Unit,
+    onDelete: (ProductPackEntity) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -142,27 +166,84 @@ private fun ProductRelated(
             .padding(horizontal = 4.dp)
     ) {
         when (productType) {
-            is PackageProductType.Pack -> productType.products.let {
+            is PackageProductModel.Pack -> productType.products.let {
                 it.forEach { product ->
-                    Text(
-                        text = "${product.name} x${product.quantity}/${product.quantityType?.text}",
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable { onClick(product) }
-                    )
+                    ProductPackageItem(
+                        product = product,
+                        onClick = { onClick(product) }
+                    ) { onDelete(product) }
                 }
                 it.ifEmpty {
                     Text(text = "No hay productos relacionados")
                 }
             }
-            is PackageProductType.Package -> productType.product.let {
+            is PackageProductModel.Package -> productType.product.let {
                 it?.let { product ->
-                    Text(
-                        text = "${product.name} x${product.quantity}/${product.quantityType?.text}",
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable { onClick(product) }
-                    )
+                    ProductPackageItem(
+                        product = product,
+                        onClick = { onClick(product) }
+                    ) { onDelete(product) }
                 } ?: Text(text = "No hay producto relacionado")
             }
+        }
+    }
+}
+
+@Composable
+private fun ProductPackageItem(
+    product: ProductPackEntity,
+    onClick: () -> Unit,
+    onDismiss: () -> Unit
+) {
+
+    val state = rememberSwipeToDismissBoxState()
+
+    LaunchedEffect(state.currentValue) {
+        if (state.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            onDismiss()
+            state.snapTo(SwipeToDismissBoxValue.Settled)
+        }
+    }
+
+    SwipeToDismissBox(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(4.dp),
+        state = state,
+        enableDismissFromStartToEnd = false,
+        backgroundContent = {
+            Icon(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.End),
+                imageVector = Icons.Default.Delete,
+                tint = MaterialTheme.colorScheme.error,
+                contentDescription = null
+            )
+        }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = product.name,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .padding(horizontal = 4.dp),
+                text = "${product.quantity}/${product.quantityType?.initial}"
+            )
         }
     }
 }

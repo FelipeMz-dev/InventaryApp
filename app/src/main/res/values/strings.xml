@@ -29,4 +29,6 @@
     <string name="copy_quantity_type_dots">Tipo de cantidad:</string>
     <string name="copy_quantity_dots">Cantidad:</string>
     <string name="copy_advanced">Avanzado</string>
+    <string name="copy_agrupation_dots">Agrupación:</string>
+    <string name="copy_type_dots">Tipo:</string>
 </resources>

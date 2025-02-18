@@ -14,7 +14,7 @@ data class ProductEntity(
     val category: CategoryEntity = CategoryEntity(),
     val quantityType: QuantityType? = null,
     val quantity: Int? = null,
-    val packageType: PackageProductType? = null,
+    val packageType: PackageProductModel? = null,
 )
 
 data class ProductPackEntity(
@@ -26,32 +26,32 @@ data class ProductPackEntity(
     val quantityType: QuantityType? = null,
 )
 
-data class ProductSelectedEntity(
-    val id: Int,
-    val quantity: Int,
+data class ProductSelectionEntity(
+    val id: Int = 0,
+    val quantity: Int = 0,
 )
 
-fun ProductEntity.toProductPackEntity(): ProductPackEntity = ProductPackEntity(
+fun ProductEntity.toProductPackEntity(quantity: Int): ProductPackEntity = ProductPackEntity(
     id = this.id,
     name = this.name,
     price = this.price,
-    quantity = this.quantity ?: 0,
+    quantity = quantity,
     quantityType = this.quantityType ?: QuantityType.UNIT
 )
 
-fun ProductEntity.toProductSelectedEntity(): ProductSelectedEntity = ProductSelectedEntity(
+fun ProductEntity.toProductSelectedEntity(quantity: Int): ProductSelectionEntity = ProductSelectionEntity(
     id = this.id,
-    quantity = this.quantity ?: 0
+    quantity = quantity
 )
 
-fun ProductPackEntity.toProductSelectedEntity(): ProductSelectedEntity = ProductSelectedEntity(
+fun ProductPackEntity.toProductSelectedEntity(): ProductSelectionEntity = ProductSelectionEntity(
     id = this.id,
     quantity = this.quantity
 )
 
-sealed interface PackageProductType {
-    data class Package(val product: ProductPackEntity? = null): PackageProductType
-    data class Pack(val products: List<ProductPackEntity> = emptyList()) : PackageProductType
+sealed interface PackageProductModel {
+    data class Package(val product: ProductPackEntity? = null): PackageProductModel
+    data class Pack(val products: List<ProductPackEntity> = emptyList()) : PackageProductModel
 
     fun getPackageType(): PackageType = when (this) {
         is Package -> PackageType.PACKAGE

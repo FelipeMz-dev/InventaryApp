@@ -81,7 +81,7 @@ internal fun InventoryTab(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { eventHandler(HomeEvent.OnOpenProduct(item)) }
-                    .padding(6.dp),
+                    .padding(horizontal = 6.dp),
                 product = item
             )
         }

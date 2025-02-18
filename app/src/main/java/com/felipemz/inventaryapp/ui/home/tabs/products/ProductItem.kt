@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,15 +43,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
+import com.felipemz.inventaryapp.core.entitys.ProductSelectionEntity
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import java.io.File
 
 @Composable
 internal fun ProductItem(
     modifier: Modifier,
     product: ProductEntity,
+    selection: ProductSelectionEntity? = null,
+    onSelectionChange: ((ProductSelectionEntity) -> Unit)? = null
 ) {
     Row(
         modifier = modifier.padding(8.dp),
@@ -67,8 +76,66 @@ internal fun ProductItem(
 
             NameAndPrice(product)
 
-            Row(modifier = Modifier.height(IntrinsicSize.Max)) {
+            selection?.let {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
 
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = "Total: ${PriceUtil.formatPrice(product.price * it.quantity)}",
+                        color = MaterialTheme.colorScheme.outline
+                    )
+
+                    Icon(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable {
+                                onSelectionChange?.invoke(
+                                    it.copy(quantity = it.quantity - 1)
+                                )
+                            }
+                            .padding(4.dp)
+                            .size(16.dp),
+                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        contentDescription = null
+                    )
+
+                    TextButtonUnderline(text = "${it.quantity}") {}
+
+                    Icon(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable {
+                                onSelectionChange?.invoke(
+                                    it.copy(quantity = it.quantity + 1)
+                                )
+                            }
+                            .padding(4.dp)
+                            .size(16.dp),
+                        imageVector = Icons.Default.KeyboardArrowRight,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        contentDescription = null
+                    )
+
+                    Icon(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable {
+                                onSelectionChange?.invoke(it.copy(quantity = 0))
+                            }
+                            .padding(4.dp)
+                            .size(20.dp),
+                        imageVector = Icons.Default.Clear,
+                        tint = MaterialTheme.colorScheme.outline,
+                        contentDescription = null
+                    )
+                }
+            } ?: Row(modifier = Modifier.height(IntrinsicSize.Max)) {
                 Text(
                     text = product.description,
                     color = Color.Gray,
@@ -95,7 +162,7 @@ private fun NameAndPrice(product: ProductEntity) = Row {
     Text(
         modifier = Modifier
             .background(
-                color = Color.Green.copy(alpha = 0.4f),
+                color = MaterialTheme.colorScheme.secondaryContainer,
                 shape = CircleShape
             )
             .padding(horizontal = 6.dp),
@@ -238,11 +305,13 @@ sealed interface ProductTypeImage {
     data class EmojiImage(val emoji: String) : ProductTypeImage
     data class PhatImage(val path: String) : ProductTypeImage
 
-    fun ifNotEmpty(default: ProductTypeImage): ProductTypeImage = when (this) {
-        is LetterImage -> if (letter.isEmpty()) default else this
-        is EmojiImage -> if (emoji.isEmpty()) default else this
-        is PhatImage -> if (path.isEmpty()) default else this
-    }
+    fun ifNotEmpty(default: ProductTypeImage) = default.takeIf {
+        when (this) {
+            is LetterImage -> letter.isEmpty()
+            is EmojiImage -> emoji.isEmpty()
+            is PhatImage -> path.isEmpty()
+        }
+    } ?: this
 }
 
 @Preview

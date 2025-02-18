@@ -21,14 +21,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.entitys.PackageProductType
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.entitys.toProductSelectedEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnAddProductToPack
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnBack
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnCategoryChanged
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnDescriptionChanged
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnImageChanged
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnNameChanged
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnOpenProduct
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnPackageTypeChanged
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnPriceChanged
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnProductDeleted
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnProductSaved
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnQuantityChanged
+import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnQuantityTypeChanged
 import com.felipemz.inventaryapp.ui.product.components.CategoryField
 import com.felipemz.inventaryapp.ui.product.components.CommonTitledColumn
 import com.felipemz.inventaryapp.ui.product.components.DescriptionField
@@ -53,7 +63,6 @@ internal fun ProductFormScreen(
     var showEmojiPopup by remember { mutableStateOf(false) }
     var showImagePopup by remember { mutableStateOf(false) }
     var showQuantityPopup by remember { mutableStateOf(false) }
-    var showPackagePopup by remember { mutableStateOf(false) }
     var showProductsPopup by remember { mutableStateOf(false) }
 
     val moveToFinal = remember {
@@ -64,14 +73,14 @@ internal fun ProductFormScreen(
         showImagePopup -> ImageSelectorBottomSheet(
             onDismiss = { showImagePopup = false },
             onSelect = {
-                eventHandler(ProductFormEvent.OnImageChanged(ProductTypeImage.PhatImage(it)))
+                eventHandler(OnImageChanged(ProductTypeImage.PhatImage(it)))
                 showImagePopup = false
             }
         )
         showEmojiPopup -> EmojiSelectorBottomSheet(
             onDismiss = { showEmojiPopup = false },
             onSelect = {
-                eventHandler(ProductFormEvent.OnImageChanged(ProductTypeImage.EmojiImage(it)))
+                eventHandler(OnImageChanged(ProductTypeImage.EmojiImage(it)))
                 showEmojiPopup = false
             }
         )
@@ -80,21 +89,15 @@ internal fun ProductFormScreen(
             quantityType = state.quantityType ?: QuantityType.UNIT,
             onDismiss = { showQuantityPopup = false },
             onSelect = {
-                eventHandler(ProductFormEvent.OnQuantityChanged(it))
+                eventHandler(OnQuantityChanged(it))
                 showQuantityPopup = false
             }
         )
         showProductsPopup -> ProductsAddBottomSheet(
             productList = state.productList,
-            listSelected = when(state.packageType){
-                is PackageProductType.Pack -> state.packageType.products.map { it.toProductSelectedEntity() }
-                is PackageProductType.Package -> listOfNotNull(state.packageType.product?.toProductSelectedEntity())
-                else -> emptyList()
-            },
+            selected = state.packageType,
             onDismiss = { showProductsPopup = false },
-            onSelect = {
-                eventHandler(ProductFormEvent.OnAddProductToPack(it))
-            }
+            onSelect = { eventHandler(OnAddProductToPack(it)) }
         )
     }
 
@@ -102,14 +105,14 @@ internal fun ProductFormScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopBarProduct(
-                onBack = { eventHandler(ProductFormEvent.OnBack) },
+                onBack = { eventHandler(OnBack) },
                 isNewProduct = state.isNewProduct
             )
         },
         bottomBar = {
             BottomBarProductForm(
                 enable = state.name.isNotBlank() && state.price > 0 && state.category != null,
-                action = { eventHandler(ProductFormEvent.OnProductSaved) }
+                action = { eventHandler(OnProductSaved) }
             )
         }
     ) { paddingValues ->
@@ -125,23 +128,23 @@ internal fun ProductFormScreen(
                 modifier = Modifier.fillMaxWidth(),
                 idProduct = state.idProduct,
                 isNewProduct = state.isNewProduct
-            ) { eventHandler(ProductFormEvent.OnProductDeleted) }
+            ) { eventHandler(OnProductDeleted) }
 
             NameField(
                 modifier = Modifier.fillMaxWidth(),
                 name = state.name
-            ) { eventHandler(ProductFormEvent.OnNameChanged(it)) }
+            ) { eventHandler(OnNameChanged(it)) }
 
             PriceField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.price
-            ) { eventHandler(ProductFormEvent.OnPriceChanged(it)) }
+            ) { eventHandler(OnPriceChanged(it)) }
 
             CategoryField(
                 modifier = Modifier.fillMaxWidth(),
                 category = state.category,
                 categories = state.categories
-            ) { eventHandler(ProductFormEvent.OnCategoryChanged(it)) }
+            ) { eventHandler(OnCategoryChanged(it)) }
 
             HorizontalDotDivider(modifier = Modifier.fillMaxWidth())
 
@@ -151,7 +154,7 @@ internal fun ProductFormScreen(
                 imageSelected = state.imageSelected,
                 category = state.category
             ) {
-                eventHandler(ProductFormEvent.OnImageChanged(it))
+                eventHandler(OnImageChanged(it))
                 showEmojiPopup = it is ProductTypeImage.EmojiImage
                 showImagePopup = it is ProductTypeImage.PhatImage
             }
@@ -162,41 +165,59 @@ internal fun ProductFormScreen(
                 modifier = Modifier.fillMaxWidth(),
                 description = state.description,
                 onOpen = { moveToFinal() }
-            ) { eventHandler(ProductFormEvent.OnDescriptionChanged(it)) }
+            ) { eventHandler(OnDescriptionChanged(it)) }
 
             HorizontalDotDivider(modifier = Modifier.fillMaxWidth())
 
-            CommonTitledColumn(
-                modifier = Modifier.fillMaxWidth(),
-                title = stringResource(R.string.copy_advanced),
-                isMandatory = null,
-                visible = false,
-                concealable = true,
-                onOpen = { moveToFinal() }
-            ) {
+            AdvancedField(
+                state = state,
+                onPackage = { showProductsPopup = true },
+                onQuantity = { showQuantityPopup = true },
+                onOpen = { moveToFinal() },
+                eventHandler = eventHandler
+            )
+        }
+    }
+}
 
-                QuantityField(
-                    modifier = Modifier.fillMaxWidth(),
-                    quantityType = state.quantityType,
-                    isNotPackage = state.packageType.isNull(),
-                    quantity = state.quantity,
-                    onAdd = { showQuantityPopup = true },
-                    onOpen = { moveToFinal() }
-                ) {
-                    eventHandler(ProductFormEvent.OnQuantityTypeChanged(it))
-                }
+@Composable
+private fun AdvancedField(
+    state: ProductFormState,
+    onQuantity: () -> Unit,
+    onPackage: () -> Unit,
+    onOpen: suspend () -> Unit,
+    eventHandler: (ProductFormEvent) -> Unit
+) {
+    CommonTitledColumn(
+        modifier = Modifier.fillMaxWidth(),
+        title = stringResource(R.string.copy_advanced),
+        isMandatory = null,
+        visible = false,
+        concealable = true,
+        onOpen = { onOpen() }
+    ) {
 
-                PackageField(
-                    modifier = Modifier.fillMaxWidth(),
-                    packageType = state.packageType,
-                    isNotQuantity = state.quantityType.isNull(),
-                    onAdd = { showProductsPopup = true },
-                    onOpen = { moveToFinal() },
-                    onClick = { },
-                ) {
-                    eventHandler(ProductFormEvent.OnPackageTypeChanged(it))
-                }
-            }
+        QuantityField(
+            modifier = Modifier.fillMaxWidth(),
+            quantityType = state.quantityType,
+            isNotPackage = state.packageType.isNull(),
+            quantity = state.quantity,
+            onAdd = onQuantity,
+            onOpen = { onOpen() }
+        ) {
+            eventHandler(OnQuantityTypeChanged(it))
+        }
+
+        PackageField(
+            modifier = Modifier.fillMaxWidth(),
+            packageType = state.packageType,
+            isNotQuantity = state.quantityType.isNull(),
+            onAdd = onPackage,
+            onOpen = { onOpen() },
+            onClick = { eventHandler(OnOpenProduct(it)) },
+            onDelete = { eventHandler(ProductFormEvent.OnDeleteProductFromPack(it)) },
+        ) {
+            eventHandler(OnPackageTypeChanged(it))
         }
     }
 }

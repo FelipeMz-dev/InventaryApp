@@ -92,7 +92,7 @@ val fakeProducts = listOf(
         image = ProductTypeImage.LetterImage("Es")
     ),
     ProductEntity(
-        id = 1,
+        id = 2,
         name = "Detergente",
         description = "para la losa",
         categoryColor = R.color.purple,
