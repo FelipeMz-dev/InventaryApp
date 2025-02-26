@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
-import com.felipemz.inventaryapp.ui.product.ProductFormActivity
+import com.felipemz.inventaryapp.ui.product_form.ProductFormActivity
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
 import java.util.Date

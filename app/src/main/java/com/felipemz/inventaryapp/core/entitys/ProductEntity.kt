@@ -31,6 +31,11 @@ data class ProductSelectionEntity(
     val quantity: Int = 0,
 )
 
+data class ProductQuantityEntity(
+    val product: ProductEntity? = null,
+    val quantity: Int = 0,
+)
+
 fun ProductEntity.toProductPackEntity(quantity: Int): ProductPackEntity = ProductPackEntity(
     id = this.id,
     name = this.name,

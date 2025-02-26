@@ -1,5 +1,6 @@
-package com.felipemz.inventaryapp.ui.product.components
+package com.felipemz.inventaryapp.ui.product_form.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -13,35 +14,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 
 @Composable
-internal fun DescriptionField(
+internal fun NameField(
     modifier: Modifier,
-    description: String,
-    onOpen: suspend () -> Unit,
-    onChange: (String) -> Unit
+    name: String,
+    onChange: (String) -> Unit,
 ) {
 
-    var text by remember(description) { mutableStateOf(description) }
+    var text by remember(name) { mutableStateOf(name) }
 
     CommonTitledColumn(
         modifier = modifier,
-        title = stringResource(R.string.copy_description_dots),
-        concealable = true,
-        visible = false,
-        isMandatory = false,
-        onOpen = onOpen
+        title = stringResource(id = R.string.copy_name_dots)
     ) {
         OutlinedTextField(
-            modifier = modifier,
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             value = text,
             onValueChange = {
-                val newText = it.trimStart()
+                val newText = it.filter { char -> char.isLetterOrDigit() || char.isWhitespace() }.trimStart()
                 text = newText
                 onChange(newText)
             },
@@ -58,10 +55,10 @@ internal fun DescriptionField(
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            maxLines = 6,
-            minLines = 4,
+            singleLine = true
         )
     }
 }

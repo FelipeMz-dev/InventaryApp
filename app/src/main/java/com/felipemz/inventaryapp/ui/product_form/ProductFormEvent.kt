@@ -1,11 +1,8 @@
-package com.felipemz.inventaryapp.ui.product
+package com.felipemz.inventaryapp.ui.product_form
 
 import com.felipemz.inventaryapp.core.base.Event
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
-import com.felipemz.inventaryapp.core.entitys.PackageProductModel
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.entitys.ProductPackEntity
-import com.felipemz.inventaryapp.core.entitys.ProductSelectionEntity
+import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
@@ -33,11 +30,11 @@ sealed interface ProductFormEvent : Event {
 
     data class OnQuantityChanged(val quantity: Int) : ProductFormEvent
 
-    data class OnPackageTypeChanged(val packageType: PackageProductModel?) : ProductFormEvent
+    data class OnSubProductSelect(val product: ProductQuantityEntity?) : ProductFormEvent
 
-    data class OnOpenProduct(val product: ProductPackEntity) : ProductFormEvent
+    data class OnOpenProduct(val product: ProductQuantityEntity) : ProductFormEvent
 
-    data class OnAddProductToPack(val product: ProductSelectionEntity) : ProductFormEvent
+    data class OnPackageProductSelect(val product: ProductQuantityEntity?) : ProductFormEvent
 
-    data class OnDeleteProductFromPack(val product: ProductPackEntity) : ProductFormEvent
+    data class OnCompositionProductSelect(val product: ProductQuantityEntity?) : ProductFormEvent
 }

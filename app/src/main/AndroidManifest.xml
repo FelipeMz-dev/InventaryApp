@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.product.ProductFormActivity"
+            android:name=".ui.product_form.ProductFormActivity"
             android:showOnLockScreen="true"
             android:theme="@style/Theme.InventaryApp"
             android:turnScreenOn="true"/>

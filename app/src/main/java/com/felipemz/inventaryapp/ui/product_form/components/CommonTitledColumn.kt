@@ -1,8 +1,7 @@
-package com.felipemz.inventaryapp.ui.product.components
+package com.felipemz.inventaryapp.ui.product_form.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterExitState
-import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row

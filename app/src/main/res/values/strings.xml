@@ -31,4 +31,7 @@
     <string name="copy_advanced">Avanzado</string>
     <string name="copy_agrupation_dots">Agrupación:</string>
     <string name="copy_type_dots">Tipo:</string>
+    <string name="copy_change_product">Cambiar producto</string>
+    <string name="copy_select_product">Seleccionar producto</string>
+    <string name="copy_package_dots">Paquete:</string>
 </resources>

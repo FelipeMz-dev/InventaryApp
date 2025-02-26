@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product.components
+package com.felipemz.inventaryapp.ui.product_form.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

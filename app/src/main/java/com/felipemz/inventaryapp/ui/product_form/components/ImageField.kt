@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product.components
+package com.felipemz.inventaryapp.ui.product_form.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,13 +25,16 @@ internal fun ImageField(
     images: List<ProductTypeImage>,
     imageSelected: ProductTypeImage,
     category: CategoryEntity?,
+    onOpen: suspend () -> Unit,
     onSelect: (ProductTypeImage) -> Unit,
 ) {
     CommonTitledColumn(
         modifier = modifier,
         title = stringResource(R.string.copy_image_dots),
         concealable = true,
-        isMandatory = false
+        isMandatory = false,
+        visible = false,
+        onOpen = onOpen
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

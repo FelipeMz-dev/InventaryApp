@@ -1,9 +1,11 @@
-package com.felipemz.inventaryapp.ui.product
+package com.felipemz.inventaryapp.ui.product_form
 
 import com.felipemz.inventaryapp.core.base.State
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
 import com.felipemz.inventaryapp.core.entitys.PackageProductModel
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
+import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.core.entitys.ProductSelectionEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
@@ -25,4 +27,7 @@ data class ProductFormState(
     val quantityType: QuantityType? = null,
     val quantity: Int = 0,
     val packageType: PackageProductModel? = null,
+    val packageProduct: ProductQuantityEntity? = null,
+    val compositionProducts: List<ProductQuantityEntity>? = null,
+    val enableToSave: Boolean = false
 ): State

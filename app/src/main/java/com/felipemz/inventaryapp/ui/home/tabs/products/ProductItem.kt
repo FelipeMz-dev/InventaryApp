@@ -54,8 +54,8 @@ import java.io.File
 internal fun ProductItem(
     modifier: Modifier,
     product: ProductEntity,
-    selection: ProductSelectionEntity? = null,
-    onSelectionChange: ((ProductSelectionEntity) -> Unit)? = null
+    selection: Int? = null,
+    onSelectionChange: ((Int) -> Unit)? = null
 ) {
     Row(
         modifier = modifier.padding(8.dp),
@@ -84,7 +84,7 @@ internal fun ProductItem(
 
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = "Total: ${PriceUtil.formatPrice(product.price * it.quantity)}",
+                        text = "Total: ${PriceUtil.formatPrice(product.price * it)}",
                         color = MaterialTheme.colorScheme.outline
                     )
 
@@ -93,9 +93,7 @@ internal fun ProductItem(
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
                             .clickable {
-                                onSelectionChange?.invoke(
-                                    it.copy(quantity = it.quantity - 1)
-                                )
+                                onSelectionChange?.invoke(it - 1)
                             }
                             .padding(4.dp)
                             .size(16.dp),
@@ -104,34 +102,19 @@ internal fun ProductItem(
                         contentDescription = null
                     )
 
-                    TextButtonUnderline(text = "${it.quantity}") {}
+                    TextButtonUnderline(text = "$it") {}
 
                     Icon(
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
                             .clickable {
-                                onSelectionChange?.invoke(
-                                    it.copy(quantity = it.quantity + 1)
-                                )
+                                onSelectionChange?.invoke(it + 1)
                             }
                             .padding(4.dp)
                             .size(16.dp),
                         imageVector = Icons.Default.KeyboardArrowRight,
                         tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = null
-                    )
-
-                    Icon(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .clickable {
-                                onSelectionChange?.invoke(it.copy(quantity = 0))
-                            }
-                            .padding(4.dp)
-                            .size(20.dp),
-                        imageVector = Icons.Default.Clear,
-                        tint = MaterialTheme.colorScheme.outline,
                         contentDescription = null
                     )
                 }

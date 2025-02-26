@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product
+package com.felipemz.inventaryapp.ui.product_form
 
 import android.os.Bundle
 import android.view.WindowManager

@@ -1,5 +1,6 @@
-package com.felipemz.inventaryapp.ui.product
+package com.felipemz.inventaryapp.ui.product_form
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,49 +10,46 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
+import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnAddProductToPack
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnBack
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnCategoryChanged
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnDescriptionChanged
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnImageChanged
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnNameChanged
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnOpenProduct
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnPackageTypeChanged
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnPriceChanged
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnProductDeleted
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnProductSaved
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnQuantityChanged
-import com.felipemz.inventaryapp.ui.product.ProductFormEvent.OnQuantityTypeChanged
-import com.felipemz.inventaryapp.ui.product.components.CategoryField
-import com.felipemz.inventaryapp.ui.product.components.CommonTitledColumn
-import com.felipemz.inventaryapp.ui.product.components.DescriptionField
-import com.felipemz.inventaryapp.ui.product.components.EmojiSelectorBottomSheet
-import com.felipemz.inventaryapp.ui.product.components.IdProductField
-import com.felipemz.inventaryapp.ui.product.components.ImageField
-import com.felipemz.inventaryapp.ui.product.components.ImageSelectorBottomSheet
-import com.felipemz.inventaryapp.ui.product.components.NameField
-import com.felipemz.inventaryapp.ui.product.components.PackageField
-import com.felipemz.inventaryapp.ui.product.components.PriceField
-import com.felipemz.inventaryapp.ui.product.components.QuantityChangeBottomSheet
-import com.felipemz.inventaryapp.ui.product.components.QuantityField
-import com.felipemz.inventaryapp.ui.product.components.TopBarProduct
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
+import com.felipemz.inventaryapp.ui.product_form.components.CategoryField
+import com.felipemz.inventaryapp.ui.product_form.components.CommonTitledColumn
+import com.felipemz.inventaryapp.ui.product_form.components.CompositionField
+import com.felipemz.inventaryapp.ui.product_form.components.DescriptionField
+import com.felipemz.inventaryapp.ui.product_form.components.EmojiSelectorBottomSheet
+import com.felipemz.inventaryapp.ui.product_form.components.IdProductField
+import com.felipemz.inventaryapp.ui.product_form.components.ImageField
+import com.felipemz.inventaryapp.ui.product_form.components.ImageSelectorBottomSheet
+import com.felipemz.inventaryapp.ui.product_form.components.NameField
+import com.felipemz.inventaryapp.ui.product_form.components.PackageField
+import com.felipemz.inventaryapp.ui.product_form.components.PriceField
+import com.felipemz.inventaryapp.ui.product_form.components.ProductPackageItem
+import com.felipemz.inventaryapp.ui.product_form.components.QuantityChangeBottomSheet
+import com.felipemz.inventaryapp.ui.product_form.components.QuantityField
+import com.felipemz.inventaryapp.ui.product_form.components.TopBarProduct
 
 @Composable
 internal fun ProductFormScreen(
@@ -95,9 +93,11 @@ internal fun ProductFormScreen(
         )
         showProductsPopup -> ProductsAddBottomSheet(
             productList = state.productList,
-            selected = state.packageType,
+            selected = state.packageProduct?.let {
+                listOf(it)
+            } ?: state.compositionProducts ?: emptyList(),
             onDismiss = { showProductsPopup = false },
-            onSelect = { eventHandler(OnAddProductToPack(it)) }
+            onSelect = {eventHandler(OnSubProductSelect(it)) }
         )
     }
 
@@ -111,7 +111,7 @@ internal fun ProductFormScreen(
         },
         bottomBar = {
             BottomBarProductForm(
-                enable = state.name.isNotBlank() && state.price > 0 && state.category != null,
+                enable = state.enableToSave,
                 action = { eventHandler(OnProductSaved) }
             )
         }
@@ -152,7 +152,8 @@ internal fun ProductFormScreen(
                 modifier = Modifier.fillMaxWidth(),
                 images = state.images,
                 imageSelected = state.imageSelected,
-                category = state.category
+                category = state.category,
+                onOpen = { moveToFinal() }
             ) {
                 eventHandler(OnImageChanged(it))
                 showEmojiPopup = it is ProductTypeImage.EmojiImage
@@ -171,7 +172,7 @@ internal fun ProductFormScreen(
 
             AdvancedField(
                 state = state,
-                onPackage = { showProductsPopup = true },
+                onAddSubProduct = { showProductsPopup = true },
                 onQuantity = { showQuantityPopup = true },
                 onOpen = { moveToFinal() },
                 eventHandler = eventHandler
@@ -184,7 +185,7 @@ internal fun ProductFormScreen(
 private fun AdvancedField(
     state: ProductFormState,
     onQuantity: () -> Unit,
-    onPackage: () -> Unit,
+    onAddSubProduct: () -> Unit,
     onOpen: suspend () -> Unit,
     eventHandler: (ProductFormEvent) -> Unit
 ) {
@@ -200,25 +201,33 @@ private fun AdvancedField(
         QuantityField(
             modifier = Modifier.fillMaxWidth(),
             quantityType = state.quantityType,
-            isNotPackage = state.packageType.isNull(),
+            enabled = state.packageProduct.isNull() && state.compositionProducts.isNull(),
             quantity = state.quantity,
             onAdd = onQuantity,
             onOpen = { onOpen() }
-        ) {
-            eventHandler(OnQuantityTypeChanged(it))
-        }
+        ) { eventHandler(OnQuantityTypeChanged(it)) }
 
         PackageField(
             modifier = Modifier.fillMaxWidth(),
-            packageType = state.packageType,
+            packageProduct = state.packageProduct,
             isNotQuantity = state.quantityType.isNull(),
-            onAdd = onPackage,
-            onOpen = { onOpen() },
+            isNotComposition = state.compositionProducts.isNull(),
+            onAdd = onAddSubProduct,
+            onOpen = onOpen,
             onClick = { eventHandler(OnOpenProduct(it)) },
-            onDelete = { eventHandler(ProductFormEvent.OnDeleteProductFromPack(it)) },
-        ) {
-            eventHandler(OnPackageTypeChanged(it))
-        }
+            onSelect = { eventHandler(OnPackageProductSelect(it)) }
+        )
+
+        CompositionField(
+            modifier = Modifier.fillMaxWidth(),
+            compositionProducts = state.compositionProducts,
+            isNotQuantity = state.quantityType.isNull(),
+            isNotPackage = state.packageProduct.isNull(),
+            onAdd = onAddSubProduct,
+            onOpen = onOpen,
+            onClick = { eventHandler(OnOpenProduct(it)) },
+            onSelect = { eventHandler(OnCompositionProductSelect(it)) }
+        )
     }
 }
 
