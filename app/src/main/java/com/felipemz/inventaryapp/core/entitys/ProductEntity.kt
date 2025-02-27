@@ -1,6 +1,7 @@
 package com.felipemz.inventaryapp.core.entitys
 
 import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
 data class ProductEntity(
@@ -11,10 +12,9 @@ data class ProductEntity(
     val image: ProductTypeImage = ProductTypeImage.LetterImage(String()),
     val description: String = String(),
     val cost: Int = 0,
-    val quantityType: QuantityType? = null,
-    val quantity: Int? = null,
-    val packageProduct: ProductQuantityEntity? = null,
-    val compositionProducts: List<ProductQuantityEntity>? = null,
+    val quantityChart: ProductQuantityChart? = null,
+    val packageProduct: ProductSelectionEntity? = null,
+    val compositionProducts: List<ProductSelectionEntity>? = null,
 )
 
 data class ProductSelectionEntity(
@@ -25,4 +25,9 @@ data class ProductSelectionEntity(
 data class ProductQuantityEntity(
     val product: ProductEntity? = null,
     val quantity: Int = 0,
+)
+
+fun ProductQuantityEntity.toProductSelectionEntity() = ProductSelectionEntity(
+    id = product?.id ?: 0,
+    quantity = quantity,
 )

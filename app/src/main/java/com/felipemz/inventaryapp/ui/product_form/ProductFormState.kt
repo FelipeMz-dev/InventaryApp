@@ -23,5 +23,4 @@ data class ProductFormState(
     val packageProduct: ProductQuantityEntity? = null,
     val compositionProducts: List<ProductQuantityEntity>? = null,
     val enableToSave: Boolean = false,
-    val messenger: String? = null,
 ): State

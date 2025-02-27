@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
+import com.felipemz.inventaryapp.core.extensions.showToast
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
 
@@ -27,14 +28,16 @@ class ProductFormActivity : AppCompatActivity() {
         }
 
         initViewModel()
-
         setShowWhenLocked()
     }
 
     private fun initViewModel() {
         val bundle = intent.extras
-        val productId = bundle?.getInt(KEY_PRODUCT_ID) ?: 0
+        val productId = bundle?.getInt(KEY_PRODUCT_ID)
         eventHandler(ProductFormEvent.Init(productId))
+        viewModel.messengerLiveData.observe(this) { message ->
+            message?.also { showToast(it) }
+        }
     }
 
     private fun eventHandler(event: ProductFormEvent) {

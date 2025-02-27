@@ -8,7 +8,7 @@ import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
 sealed interface ProductFormEvent : Event {
 
-    data class Init(val productId: Int) : ProductFormEvent
+    data class Init(val productId: Int?) : ProductFormEvent
 
     data object OnBack : ProductFormEvent
 

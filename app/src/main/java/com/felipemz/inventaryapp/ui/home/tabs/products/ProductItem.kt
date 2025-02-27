@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.entitys.ProductSelectionEntity
+import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.core.utils.PriceUtil
@@ -65,7 +66,7 @@ internal fun ProductItem(
 
         ImageAndCounter(
             image = product.image,
-            quantity = product.quantity,
+            quantity = product.quantityChart?.quantity,
             colorCategory = colorResource(product.category.color)
         )
 
@@ -297,6 +298,11 @@ sealed interface ProductTypeImage {
     } ?: this
 }
 
+data class ProductQuantityChart(
+    val type: QuantityType = QuantityType.UNIT,
+    val quantity: Int = 0,
+)
+
 @Preview
 @Composable
 private fun Preview() {
@@ -305,7 +311,7 @@ private fun Preview() {
         product = ProductEntity(
             name = "Fresa delicia",
             description = "Aquí va toda la información del producto / sin información",
-            quantity = 8,
+            //quantityChart = 8,
             price = 999900000,
             image = ProductTypeImage.PhatImage("")
             //image = ProductTypeImage.EmojiImage("\uD83C\uDF53")

@@ -1,18 +1,25 @@
 package com.felipemz.inventaryapp.ui.product_form
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.core.entitys.toProductSelectionEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.ui.commons.fakeChips
 import com.felipemz.inventaryapp.ui.commons.fakeProducts
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
 
 class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>() {
+
+    private val messenger = MutableLiveData<String?>()
+    val messengerLiveData: LiveData<String?> = messenger
 
     private val initialState = ProductFormState(
         categories = fakeChips,
@@ -29,7 +36,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
-                is Init -> {}
+                is Init -> init(event.productId)
                 is OnProductDeleted -> deleteProduct()
                 is OnProductSaved -> saveProduct()
                 is OnNameChanged -> nameChanged(event.name)
@@ -48,15 +55,50 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         }
     }
 
+    private fun init(productId: Int?) {
+        val product = state.value.productList.firstOrNull { it.id == productId }
+        product?.let {
+            updateState { uiState ->
+                uiState.copy(
+                    originalProduct = product,
+                    price = product.price,
+                    category = product.category,
+                    description = product.description,
+                    cost = product.cost,
+                    quantityType = product.quantityChart?.type,
+                    quantity = product.quantityChart?.quantity ?: 0,
+                    packageProduct = getPackageProduct(product),
+                    compositionProducts = getCompositionProducts(product)
+                )
+            }
+            imageChanged(product.image)
+            nameChanged(product.name)
+        }
+    }
+
+    private fun getCompositionProducts(product: ProductEntity): List<ProductQuantityEntity>? {
+        return product.compositionProducts?.map { productSelection ->
+            ProductQuantityEntity(
+                product = state.value.productList.firstOrNull { it.id == productSelection.id },
+                quantity = productSelection.quantity
+            )
+        }
+    }
+    private fun getPackageProduct(product: ProductEntity): ProductQuantityEntity? {
+        return product.packageProduct?.let { productSelection ->
+            ProductQuantityEntity(
+                product = state.value.productList.firstOrNull { it.id == productSelection.id },
+                quantity = productSelection.quantity
+            )
+        }
+    }
+
     private fun nameChanged(name: String) {
-        updateState {
-            it.copy(
+        updateState { uiState ->
+            uiState.copy(
                 name = name,
-                images = state.value.images.map { image ->
-                    when (image) {
-                        is ProductTypeImage.LetterImage -> image.copy(name.take(2))
-                        else -> image
-                    }
+                images = state.value.images.map {
+                    if (it is ProductTypeImage.LetterImage) it.copy(name.take(2)) else it
                 }
             )
         }.invokeOnCompletion {
@@ -113,7 +155,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
                     ),
                     quantityType = QuantityType.UNIT,
                     quantity = tryOrDefault(0) {
-                        (packageProduct.product?.quantity ?: 0).floorDiv(packageProduct.quantity)
+                        (packageProduct.product?.quantityChart?.quantity ?: 0).floorDiv(packageProduct.quantity)
                     }
                 )
             } ?: uiState.copy(
@@ -157,7 +199,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
             uiState.copy(
                 quantity = tryOrDefault(0) {
                     uiState.compositionProducts?.minOf {
-                        (it.product?.quantity ?: 0).floorDiv(it.quantity)
+                        (it.product?.quantityChart?.quantity ?: 0).floorDiv(it.quantity)
                     } ?: 0
                 }
             )
@@ -183,20 +225,22 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
                 image = imageSelected,
                 description = description,
                 cost = cost,
-                quantityType = quantityType,
-                quantity = quantity,
-                packageProduct = packageProduct,
-                compositionProducts = compositionProducts
+                quantityChart = quantityType?.let {
+                    ProductQuantityChart(
+                        type = it,
+                        quantity = quantity
+                    )
+                },
+                packageProduct = packageProduct?.toProductSelectionEntity(),
+                compositionProducts = compositionProducts?.map { it.toProductSelectionEntity() }
             )
         }
-        updateState { it.copy(messenger = "Producto guardado") }.invokeOnCompletion {
-            updateState { initialState }
-        }
+        messenger.postValue("Producto guardado")
+        updateState { initialState }
     }
 
     private fun deleteProduct() {
-        updateState { it.copy(messenger = "Producto eliminado") }.invokeOnCompletion {
-            updateState { initialState }
-        }
+        messenger.postValue("Producto eliminado")
+        updateState { initialState }
     }
 }

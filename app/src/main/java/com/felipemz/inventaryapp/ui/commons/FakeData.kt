@@ -8,6 +8,8 @@ import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.entitys.ProductRatingEntity
 import com.felipemz.inventaryapp.core.enums.MovementType
+import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
 val fakeChips = listOf(
@@ -27,7 +29,7 @@ val fakeProducts = listOf(
         name = "Fresa delicia",
         description = "sin información",
         category = fakeChips[0],
-        quantity = null,
+        quantityChart = null,
         price = 11000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
     ),
@@ -36,7 +38,7 @@ val fakeProducts = listOf(
         name = "Fresa Natural",
         description = "sin información",
         category = fakeChips[0],
-        quantity = null,
+        quantityChart = null,
         price = 10000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
     ),
@@ -45,7 +47,7 @@ val fakeProducts = listOf(
         name = "Delicia mini",
         description = "sin información",
         category = fakeChips[0],
-        quantity = null,
+        quantityChart = null,
         price = 9000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
     ),
@@ -54,7 +56,7 @@ val fakeProducts = listOf(
         name = "Coca Cola",
         description = "sin información",
         category = fakeChips[1],
-        quantity = 14,
+        quantityChart = ProductQuantityChart(QuantityType.UNIT, 5),
         price = 5000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF7A")
     ),
@@ -63,7 +65,7 @@ val fakeProducts = listOf(
         name = "Shampoo",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[2],
-        quantity = 3,
+        quantityChart = ProductQuantityChart(QuantityType.UNIT, 3),
         price = 15000,
         image = ProductTypeImage.EmojiImage("\uD83D\uDC4D")
     ),
@@ -72,7 +74,7 @@ val fakeProducts = listOf(
         name = "Audífonos",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[3],
-        quantity = 5,
+        quantityChart = ProductQuantityChart(QuantityType.UNIT, 1),
         price = 50000,
         image = ProductTypeImage.PhatImage("")
     ),
@@ -81,7 +83,7 @@ val fakeProducts = listOf(
         name = "Cargador",
         description = "Aquí",
         category = fakeChips[3],
-        quantity = 6,
+        quantityChart = ProductQuantityChart(QuantityType.UNIT, 5),
         price = 25000,
         image = ProductTypeImage.PhatImage("")
     ),
@@ -90,7 +92,7 @@ val fakeProducts = listOf(
         name = "Escoba",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[4],
-        quantity = 2,
+        quantityChart = ProductQuantityChart(QuantityType.UNIT, 20),
         price = 20000,
         image = ProductTypeImage.LetterImage("Es")
     ),
@@ -99,7 +101,7 @@ val fakeProducts = listOf(
         name = "Detergente",
         description = "para la losa",
         category = fakeChips[5],
-        quantity = 1,
+        quantityChart = ProductQuantityChart(QuantityType.UNIT, 13),
         price = 10000,
         image = ProductTypeImage.LetterImage("De")
     ),
@@ -108,7 +110,7 @@ val fakeProducts = listOf(
         name = "Comida para perro",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[6],
-        quantity = 4,
+        quantityChart = ProductQuantityChart(QuantityType.GRAM, 10),
         price = 30000,
         image = ProductTypeImage.EmojiImage("\uD83D\uDC36")
     ),

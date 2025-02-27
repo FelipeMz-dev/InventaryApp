@@ -73,8 +73,6 @@ internal fun ProductFormScreen(
         suspend { scrollState.animateScrollTo(scrollState.maxValue) }
     }
 
-    MessengerToast(state.messenger)
-
     when {
         showImagePopup -> ImageSelectorBottomSheet(
             onDismiss = { showImagePopup = false },

@@ -83,7 +83,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             }
             ProductsOrderBy.NAME -> _products.value.sortedBy { it.name }
             ProductsOrderBy.PRICE -> _products.value.sortedBy { it.price }
-            ProductsOrderBy.STOCK -> _products.value.sortedBy { it.quantity ?: 0 }
+            ProductsOrderBy.STOCK -> _products.value.sortedBy { it.quantityChart?.quantity ?: 0 }
             else -> _products.value.sortedBy { it.id }
         }
         val orderedProducts = if (isInverted) sortedProducts.reversed() else sortedProducts

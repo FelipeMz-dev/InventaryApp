@@ -1,5 +1,8 @@
 package com.felipemz.inventaryapp.core.extensions
 
+import android.content.Context
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import java.time.Clock
@@ -58,4 +61,12 @@ fun <T> tryOrDefault(default: T, block: () -> T): T {
     } catch (e: Exception) {
         default
     }
+}
+
+fun Context.showToast(@StringRes message: Int) {
+    Toast.makeText(this, getString(message), Toast.LENGTH_SHORT).show()
+}
+
+fun Context.showToast(messageRes: String) {
+    Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
 }
