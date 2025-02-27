@@ -66,7 +66,7 @@ internal fun ProductItem(
         ImageAndCounter(
             image = product.image,
             quantity = product.quantity,
-            colorCategory = colorResource(product.categoryColor)
+            colorCategory = colorResource(product.category.color)
         )
 
         Column(
@@ -305,7 +305,6 @@ private fun Preview() {
         product = ProductEntity(
             name = "Fresa delicia",
             description = "Aquí va toda la información del producto / sin información",
-            categoryColor = R.color.red_dark,
             quantity = 8,
             price = 999900000,
             image = ProductTypeImage.PhatImage("")

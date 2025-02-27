@@ -67,7 +67,7 @@ internal fun ReportRatingItem(
                 is ProductRatingEntity -> ImageAndCounter(
                     image = it.product.image,
                     quantity = null,
-                    colorCategory = colorResource(id = it.product.categoryColor),
+                    colorCategory = colorResource(id = it.product.category.color),
                     size = 32.dp,
                 )
                 is CategoryRatingEntity -> Spacer(

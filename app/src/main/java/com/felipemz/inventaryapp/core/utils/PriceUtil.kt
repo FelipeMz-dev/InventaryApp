@@ -15,5 +15,9 @@ object PriceUtil {
     fun getValue(
         price: String,
         default: Int = 0
-    ) = price.replace(Regex("[^0-9]"), "").toIntOrNull() ?: default
+    ): Int {
+        val digits = price.replace(Regex("[^0-9]"), "")
+        digits.ifEmpty { return 0 }
+        return digits.toIntOrNull() ?: default
+    }
 }

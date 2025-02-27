@@ -2,8 +2,11 @@ package com.felipemz.inventaryapp.ui.commons
 
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
+import com.felipemz.inventaryapp.core.entitys.CategoryRatingEntity
+import com.felipemz.inventaryapp.core.entitys.LabelRatingEntity
 import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
+import com.felipemz.inventaryapp.core.entitys.ProductRatingEntity
 import com.felipemz.inventaryapp.core.enums.MovementType
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
@@ -23,7 +26,7 @@ val fakeProducts = listOf(
         id = 1,
         name = "Fresa delicia",
         description = "sin información",
-        categoryColor = R.color.red_dark,
+        category = fakeChips[0],
         quantity = null,
         price = 11000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
@@ -32,7 +35,7 @@ val fakeProducts = listOf(
         id = 6,
         name = "Fresa Natural",
         description = "sin información",
-        categoryColor = R.color.red_dark,
+        category = fakeChips[0],
         quantity = null,
         price = 10000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
@@ -41,7 +44,7 @@ val fakeProducts = listOf(
         id = 3,
         name = "Delicia mini",
         description = "sin información",
-        categoryColor = R.color.red_dark,
+        category = fakeChips[0],
         quantity = null,
         price = 9000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
@@ -50,7 +53,7 @@ val fakeProducts = listOf(
         id = 4,
         name = "Coca Cola",
         description = "sin información",
-        categoryColor = R.color.blue,
+        category = fakeChips[1],
         quantity = 14,
         price = 5000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF7A")
@@ -59,7 +62,7 @@ val fakeProducts = listOf(
         id = 5,
         name = "Shampoo",
         description = "Aquí va toda la información del producto / sin información",
-        categoryColor = R.color.pink,
+        category = fakeChips[2],
         quantity = 3,
         price = 15000,
         image = ProductTypeImage.EmojiImage("\uD83D\uDC4D")
@@ -68,7 +71,7 @@ val fakeProducts = listOf(
         id = 8,
         name = "Audífonos",
         description = "Aquí va toda la información del producto / sin información",
-        categoryColor = R.color.teal,
+        category = fakeChips[3],
         quantity = 5,
         price = 50000,
         image = ProductTypeImage.PhatImage("")
@@ -77,7 +80,7 @@ val fakeProducts = listOf(
         id = 9,
         name = "Cargador",
         description = "Aquí",
-        categoryColor = R.color.teal,
+        category = fakeChips[3],
         quantity = 6,
         price = 25000,
         image = ProductTypeImage.PhatImage("")
@@ -86,7 +89,7 @@ val fakeProducts = listOf(
         id = 7,
         name = "Escoba",
         description = "Aquí va toda la información del producto / sin información",
-        categoryColor = R.color.orange,
+        category = fakeChips[4],
         quantity = 2,
         price = 20000,
         image = ProductTypeImage.LetterImage("Es")
@@ -95,7 +98,7 @@ val fakeProducts = listOf(
         id = 2,
         name = "Detergente",
         description = "para la losa",
-        categoryColor = R.color.purple,
+        category = fakeChips[5],
         quantity = 1,
         price = 10000,
         image = ProductTypeImage.LetterImage("De")
@@ -104,7 +107,7 @@ val fakeProducts = listOf(
         id = 10,
         name = "Comida para perro",
         description = "Aquí va toda la información del producto / sin información",
-        categoryColor = R.color.green,
+        category = fakeChips[6],
         quantity = 4,
         price = 30000,
         image = ProductTypeImage.EmojiImage("\uD83D\uDC36")
@@ -183,5 +186,96 @@ val fakeMovements = listOf(
         time = "6:40 pm",
         amount = 1500,
         labels = listOf("rappy", "domicilios", "caja 1", "caja 2", "perdida")
+    )
+)
+
+val fakeIntervals = listOf(
+    Pair("de las 00:00 a las 06:00", 0),
+    Pair("de las 06:00 a las 12:00", 100),
+    Pair("de las 12:00 a las 18:00", 200),
+    Pair("de las 18:00 a las 24:00", 300)
+)
+
+val fakeLabelsRating = listOf(
+    LabelRatingEntity(
+        label = "Promoción Promoción Promoción Promoción",
+        rating = 100,
+        totalValue = 300000
+    ),
+    LabelRatingEntity(
+        label = "Domicilio",
+        rating = 98,
+        totalValue = 200000
+    ),
+    LabelRatingEntity(
+        label = "Oferta",
+        rating = 90,
+        totalValue = 100000
+    ),
+    LabelRatingEntity(
+        label = "Descuento",
+        rating = 87,
+        totalValue = 10000
+    ),
+    LabelRatingEntity(
+        label = "Gratis",
+        rating = 60,
+        totalValue = 1000
+    )
+)
+
+val fakeCategoriesRating = listOf(
+    CategoryRatingEntity(
+        category = fakeChips[0],
+        rating = 100,
+        totalValue = 10000
+    ),
+    CategoryRatingEntity(
+        category = fakeChips[1],
+        rating = 98,
+        totalValue = 14000
+    ),
+    CategoryRatingEntity(
+        category = fakeChips[2],
+        rating = 90,
+        totalValue = 20000
+    ),
+    CategoryRatingEntity(
+        category = fakeChips[3],
+        rating = 87,
+        totalValue = 20500
+    ),
+    CategoryRatingEntity(
+        category = fakeChips[4],
+        rating = 60,
+        totalValue = 1200
+    )
+)
+
+val fakeProductsRating = listOf(
+    ProductRatingEntity(
+        product = fakeProducts[0],
+        rating = 100,
+        totalValue = 10000
+    ),
+    ProductRatingEntity(
+        product = fakeProducts[3],
+        rating = 98,
+        totalValue = 14000
+    ),
+    ProductRatingEntity(
+        product = fakeProducts[4],
+        rating = 90,
+        totalValue = 20000
+    ),
+    ProductRatingEntity(
+        product = fakeProducts[5],
+        rating = 87,
+        totalValue = 20500
+    ),
+    ProductRatingEntity(
+        product = fakeProducts[6],
+        rating = 60,
+        totalValue = 1200
     )
 )

@@ -27,9 +27,9 @@ fun CompositionField(
     onClick: (ProductQuantityEntity) -> Unit,
     onSelect: (ProductQuantityEntity?) -> Unit
 ) {
-    CommonTitledColumn(
+    CommonFormField(
         modifier = modifier,
-        title = "Composición",
+        title = "Conjunto:",
         isMandatory = false,
         visible = compositionProducts.isNotNull(),
         concealable = true,

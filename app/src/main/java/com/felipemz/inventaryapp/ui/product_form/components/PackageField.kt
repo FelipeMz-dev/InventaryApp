@@ -4,16 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Switch
@@ -21,20 +18,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.entitys.PackageProductModel
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.entitys.ProductPackEntity
 import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
-import com.felipemz.inventaryapp.core.entitys.ProductSelectionEntity
-import com.felipemz.inventaryapp.core.enums.PackageType
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
@@ -50,7 +40,7 @@ fun PackageField(
     onClick: (ProductQuantityEntity) -> Unit,
     onSelect: (ProductQuantityEntity?) -> Unit
 ) {
-    CommonTitledColumn(
+    CommonFormField(
         modifier = modifier,
         title = stringResource(R.string.copy_package_dots),
         isMandatory = false,

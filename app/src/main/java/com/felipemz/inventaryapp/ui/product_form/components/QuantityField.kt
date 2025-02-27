@@ -42,7 +42,7 @@ internal fun QuantityField(
         derivedStateOf { quantityType.isNull().not() || !enabled }
     }
 
-    CommonTitledColumn(
+    CommonFormField(
         modifier = modifier,
         title = stringResource(R.string.copy_quantities_dots),
         concealable = true,

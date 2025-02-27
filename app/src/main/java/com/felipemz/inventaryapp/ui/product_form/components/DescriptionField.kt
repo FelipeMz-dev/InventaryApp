@@ -28,7 +28,7 @@ internal fun DescriptionField(
 
     var text by remember(description) { mutableStateOf(description) }
 
-    CommonTitledColumn(
+    CommonFormField(
         modifier = modifier,
         title = stringResource(R.string.copy_description_dots),
         concealable = true,

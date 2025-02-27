@@ -29,7 +29,7 @@ internal fun NameField(
 
     var text by remember(name) { mutableStateOf(name) }
 
-    CommonTitledColumn(
+    CommonFormField(
         modifier = modifier,
         title = stringResource(id = R.string.copy_name_dots)
     ) {

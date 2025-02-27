@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 
 @Composable
-internal fun CommonTitledColumn(
+internal fun CommonFormField(
     modifier: Modifier,
     title: String,
     concealable: Boolean = false,

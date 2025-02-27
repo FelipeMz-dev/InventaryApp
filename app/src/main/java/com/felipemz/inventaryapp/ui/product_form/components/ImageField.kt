@@ -28,7 +28,7 @@ internal fun ImageField(
     onOpen: suspend () -> Unit,
     onSelect: (ProductTypeImage) -> Unit,
 ) {
-    CommonTitledColumn(
+    CommonFormField(
         modifier = modifier,
         title = stringResource(R.string.copy_image_dots),
         concealable = true,

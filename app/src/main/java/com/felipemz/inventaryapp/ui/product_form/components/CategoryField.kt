@@ -42,7 +42,7 @@ internal fun CategoryField(
 
     var showDropCategory by remember { mutableStateOf(false) }
 
-    CommonTitledColumn(
+    CommonFormField(
         modifier = modifier,
         title = stringResource(R.string.copy_category_dots)
     ) {

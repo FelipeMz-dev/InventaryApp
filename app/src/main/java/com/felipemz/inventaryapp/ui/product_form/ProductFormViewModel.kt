@@ -2,6 +2,7 @@ package com.felipemz.inventaryapp.ui.product_form
 
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
+import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNotNull
@@ -9,18 +10,7 @@ import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.ui.commons.fakeChips
 import com.felipemz.inventaryapp.ui.commons.fakeProducts
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.Init
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCompositionProductSelect
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageProductSelect
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDeleted
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSubProductSelect
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
 
 class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>() {
 
@@ -40,12 +30,14 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         executeIntent { event ->
             when (event) {
                 is Init -> {}
-                is OnProductDeleted -> updateState { initialState }
+                is OnProductDeleted -> deleteProduct()
+                is OnProductSaved -> saveProduct()
                 is OnNameChanged -> nameChanged(event.name)
                 is OnPriceChanged -> priceChanged(event.price)
                 is OnCategoryChanged -> categoryChanged(event.category)
-                is OnDescriptionChanged -> updateState { it.copy(description = event.description) }
                 is OnImageChanged -> imageChanged(event.image)
+                is OnDescriptionChanged -> updateState { it.copy(description = event.description) }
+                is OnCostChanged -> updateState { it.copy(cost = event.cost) }
                 is OnQuantityTypeChanged -> quantityTypeChanged(event.quantityType)
                 is OnQuantityChanged -> updateState { it.copy(quantity = event.quantity) }
                 is OnPackageProductSelect -> packageProductSelected(event.product)
@@ -100,8 +92,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         updateState {
             it.copy(
                 quantityType = quantityType,
-                quantity = 0,
-                packageType = null,
+                quantity = 0
             )
         }
     }
@@ -180,5 +171,32 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
                 && packageProduct?.let { it.product.isNotNull() } ?: true
                 && compositionProducts?.isNotEmpty() ?: true
         updateState { it.copy(enableToSave = isEnable) }
+    }
+
+    private fun saveProduct() {
+        val product = with(state.value) {
+            ProductEntity(
+                id = originalProduct?.id ?: 0,
+                name = name,
+                price = price,
+                category = category ?: CategoryEntity(),
+                image = imageSelected,
+                description = description,
+                cost = cost,
+                quantityType = quantityType,
+                quantity = quantity,
+                packageProduct = packageProduct,
+                compositionProducts = compositionProducts
+            )
+        }
+        updateState { it.copy(messenger = "Producto guardado") }.invokeOnCompletion {
+            updateState { initialState }
+        }
+    }
+
+    private fun deleteProduct() {
+        updateState { it.copy(messenger = "Producto eliminado") }.invokeOnCompletion {
+            updateState { initialState }
+        }
     }
 }

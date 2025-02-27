@@ -78,7 +78,9 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             )
         }
         val sortedProducts = when (orderBy) {
-            ProductsOrderBy.CATEGORY -> _products.value.sortedBy { fakeChips.findLast { chip -> chip.color == it.categoryColor }?.position ?: 0 }
+            ProductsOrderBy.CATEGORY -> _products.value.sortedBy {
+                fakeChips.findLast { chip -> chip.color == it.category.color }?.position ?: 0
+            }
             ProductsOrderBy.NAME -> _products.value.sortedBy { it.name }
             ProductsOrderBy.PRICE -> _products.value.sortedBy { it.price }
             ProductsOrderBy.STOCK -> _products.value.sortedBy { it.quantity ?: 0 }
@@ -95,7 +97,8 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
 
     private fun changeSearchText(text: String) = execute(Dispatchers.IO) {
         val filteredProducts = _products.value.filter { product ->
-            val matchesCategory = state.value.categorySelected.isNull() || product.categoryColor == state.value.categorySelected?.color
+            val matchesCategory = state.value.categorySelected.isNull()
+                    || product.category.color == state.value.categorySelected?.color
             val matchesSearchText = product.name.contains(text, ignoreCase = true)
             matchesCategory && matchesSearchText
         }
@@ -109,8 +112,9 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
 
     private fun categorySelected(category: CategoryEntity?) = execute(Dispatchers.IO) {
         val filteredProducts = _products.value.filter { product ->
-            val matchesSearchText = state.value.searchText.isEmpty() || product.name.contains(state.value.searchText, ignoreCase = true)
-            val matchesCategory = category.isNull() || product.categoryColor == category?.color
+            val matchesSearchText = state.value.searchText.isEmpty()
+                    || product.name.contains(state.value.searchText, ignoreCase = true)
+            val matchesCategory = category.isNull() || product.category.color == category?.color
             matchesSearchText && matchesCategory
         }
         updateState { state ->
