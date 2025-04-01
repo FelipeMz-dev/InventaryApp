@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.extensions.isNotNull
@@ -59,11 +60,8 @@ fun CompositionField(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(horizontal = 4.dp),
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(color = MaterialTheme.colorScheme.surfaceContainerHigh),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 compositionProducts?.let { composition ->
@@ -74,6 +72,7 @@ fun CompositionField(
                             onChangeSelection = { value ->
                                 onSelect(product.copy(quantity = value))
                             },
+                            onQuantity = {},
                             onDelete = {
                                 onSelect(product.copy(quantity = 0))
                             }

@@ -54,8 +54,10 @@ import java.io.File
 @Composable
 internal fun ProductItem(
     modifier: Modifier,
+    isSmall: Boolean = false,
     product: ProductEntity,
     selection: Int? = null,
+    onQuantity: (() -> Unit)? = null,
     onSelectionChange: ((Int) -> Unit)? = null
 ) {
     Row(
@@ -66,8 +68,10 @@ internal fun ProductItem(
 
         ImageAndCounter(
             image = product.image,
+            size = if (isSmall) 40.dp else 48.dp,
             quantity = product.quantityChart?.quantity,
-            colorCategory = colorResource(product.category.color)
+            colorCategory = if (product.category.color == 0) MaterialTheme.colorScheme.secondaryContainer
+            else colorResource(product.category.color)
         )
 
         Column(
@@ -75,7 +79,11 @@ internal fun ProductItem(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
 
-            NameAndPrice(product)
+            NameAndPrice(
+                name = product.name,
+                price = product.price,
+                isSmall = isSmall
+            )
 
             selection?.let {
                 Row(
@@ -86,7 +94,10 @@ internal fun ProductItem(
                     Text(
                         modifier = Modifier.weight(1f),
                         text = "Total: ${PriceUtil.formatPrice(product.price * it)}",
-                        color = MaterialTheme.colorScheme.outline
+                        color = MaterialTheme.colorScheme.outline,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = if (isSmall) 14.sp else 16.sp
                     )
 
                     Icon(
@@ -103,7 +114,9 @@ internal fun ProductItem(
                         contentDescription = null
                     )
 
-                    TextButtonUnderline(text = "$it") {}
+                    TextButtonUnderline(
+                        text = "$it${product.quantityChart?.type?.initial?.let { "/$it" }.orEmpty()}"
+                    ) { onQuantity?.invoke() }
 
                     Icon(
                         modifier = Modifier
@@ -132,15 +145,19 @@ internal fun ProductItem(
 }
 
 @Composable
-private fun NameAndPrice(product: ProductEntity) = Row {
+private fun NameAndPrice(
+    name: String,
+    price: Int,
+    isSmall: Boolean,
+) = Row {
 
     Text(
         modifier = Modifier.weight(1f),
-        text = product.name,
+        text = name,
         fontWeight = FontWeight.Bold,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        fontSize = 18.sp
+        fontSize = if (isSmall) 16.sp else 18.sp
     )
 
     Text(
@@ -150,8 +167,9 @@ private fun NameAndPrice(product: ProductEntity) = Row {
                 shape = CircleShape
             )
             .padding(horizontal = 6.dp),
-        text = PriceUtil.formatPrice(product.price),
+        text = PriceUtil.formatPrice(price),
         fontWeight = FontWeight.Bold,
+        fontSize = if (isSmall) 14.sp else 16.sp
     )
 }
 

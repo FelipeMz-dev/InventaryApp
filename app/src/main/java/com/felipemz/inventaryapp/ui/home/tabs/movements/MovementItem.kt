@@ -15,26 +15,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
-import com.felipemz.inventaryapp.core.enums.MovementType
+import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 
@@ -126,7 +118,7 @@ fun MovementItem(
                             shape = CircleShape
                         )
                         .padding(horizontal = 6.dp),
-                    text = PriceUtil.formatPrice(movement.amount, isLess = movement.type == MovementType.MOVEMENT_EXPENSE),
+                    text = PriceUtil.formatPrice(movement.amount, isLess = movement.type == MovementItemType.MOVEMENT_EXPENSE),
                     fontWeight = FontWeight.Bold
                 )
             }

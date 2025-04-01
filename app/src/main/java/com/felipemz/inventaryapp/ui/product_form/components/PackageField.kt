@@ -28,6 +28,7 @@ import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
 @Composable
 fun PackageField(
@@ -87,6 +88,7 @@ fun PackageField(
                             onChangeSelection = { value ->
                                 onSelect(ProductQuantityEntity(product, value))
                             },
+                            onQuantity = {},
                             onDelete = {
                                 onSelect(ProductQuantityEntity(product, 0))
                             }
@@ -115,6 +117,7 @@ fun ProductPackageItem(
     product: ProductQuantityEntity,
     onClick: () -> Unit,
     onDelete: () -> Unit,
+    onQuantity: (ProductQuantityEntity) -> Unit,
     onChangeSelection: (Int) -> Unit
 ) {
 
@@ -130,8 +133,7 @@ fun ProductPackageItem(
     SwipeToDismissBox(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(4.dp),
+            .clickable { onClick() },
         state = state,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
@@ -150,9 +152,15 @@ fun ProductPackageItem(
         ProductItem(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
-            product = product.product ?: ProductEntity(),
+                .background(MaterialTheme.colorScheme.surfaceContainer),
+            isSmall = true,
+            product = product.product ?: ProductEntity(
+                name = "Valor sin concepto",
+                price = product.price,
+                image = ProductTypeImage.EmojiImage("\uD83D\uDCB0")
+            ),
             selection = product.quantity,
+            onQuantity = { onQuantity(product) },
             onSelectionChange = { onChangeSelection(it) }
         )
     }

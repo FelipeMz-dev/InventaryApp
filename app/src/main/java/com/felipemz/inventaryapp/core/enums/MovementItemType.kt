@@ -2,7 +2,7 @@ package com.felipemz.inventaryapp.core.enums
 
 import com.felipemz.inventaryapp.R
 
-enum class MovementType(
+enum class MovementItemType(
     val text: String,
     val icon: Int,
     val color: Int?,

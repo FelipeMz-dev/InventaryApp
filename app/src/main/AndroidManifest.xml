@@ -24,7 +24,6 @@
         <activity
             android:name=".ui.home.HomeActivity"
             android:exported="true"
-            android:showOnLockScreen="true"
             android:theme="@style/Theme.InventaryApp"
             android:turnScreenOn="true">
             <intent-filter>
@@ -35,6 +34,10 @@
         </activity>
         <activity
             android:name=".ui.product_form.ProductFormActivity"
+            android:theme="@style/Theme.InventaryApp"
+            android:turnScreenOn="true"/>
+        <activity
+            android:name=".ui.movements.MovementsActivity"
             android:showOnLockScreen="true"
             android:theme="@style/Theme.InventaryApp"
             android:turnScreenOn="true"/>

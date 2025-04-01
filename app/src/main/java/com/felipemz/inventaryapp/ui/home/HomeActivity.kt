@@ -12,6 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
+import com.felipemz.inventaryapp.core.enums.HomeTabs
+import com.felipemz.inventaryapp.ui.movements.MovementsActivity
 import com.felipemz.inventaryapp.ui.product_form.ProductFormActivity
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
@@ -57,9 +59,11 @@ class HomeActivity : AppCompatActivity() {
                 )
                 datePicker.show()
             }
-            is HomeEvent.OnFAB -> startActivity(
-                Intent(this, ProductFormActivity::class.java)
-            )
+            is HomeEvent.OnFAB -> when (event.tabSelected) {
+                HomeTabs.PRODUCTS -> startActivity(Intent(this, ProductFormActivity::class.java))
+                HomeTabs.MOVEMENTS -> startActivity(Intent(this, MovementsActivity::class.java))
+                else -> Unit
+            }
             is HomeEvent.OnOpenProduct -> startActivity(
                 Intent(this, ProductFormActivity::class.java).putExtras(
                     Bundle().apply { putInt(KEY_PRODUCT_ID, event.product.id) }

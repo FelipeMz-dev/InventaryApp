@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product_form
+package com.felipemz.inventaryapp.ui.movements
 
 import android.os.Bundle
 import android.view.WindowManager
@@ -6,42 +6,33 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
-import com.felipemz.inventaryapp.core.extensions.showToast
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent
+import com.felipemz.inventaryapp.ui.product_form.ProductFormScreen
+import com.felipemz.inventaryapp.ui.product_form.ProductFormViewModel
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
 
-class ProductFormActivity : AppCompatActivity() {
+class MovementsActivity : AppCompatActivity() {
 
-    private val viewModel: ProductFormViewModel by inject()
+    private val viewModel: MovementsViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setShowWhenLocked()
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
             InventaryAppTheme {
-                ProductFormScreen(
+                MovementsScreen(
                     state = state,
                     eventHandler = ::eventHandler
                 )
             }
         }
-
-        initViewModel()
     }
 
-    private fun initViewModel() {
-        val bundle = intent.extras
-        val productId = bundle?.getInt(KEY_PRODUCT_ID)
-        eventHandler(ProductFormEvent.Init(productId))
-        viewModel.messengerLiveData.observe(this) { message ->
-            message?.also { showToast(it) }
-        }
-    }
-
-    private fun eventHandler(event: ProductFormEvent) {
+    private fun eventHandler(event: MovementsEvent) {
         when (event) {
-            is ProductFormEvent.OnBack -> finish()
+            is MovementsEvent.OnBack -> finish()
             else -> viewModel.eventHandler(event)
         }
     }

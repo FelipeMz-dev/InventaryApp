@@ -7,7 +7,7 @@ import com.felipemz.inventaryapp.core.entitys.LabelRatingEntity
 import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
 import com.felipemz.inventaryapp.core.entitys.ProductRatingEntity
-import com.felipemz.inventaryapp.core.enums.MovementType
+import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
@@ -129,14 +129,14 @@ val fakeLabelList = listOf(
 
 val fakeMovements = listOf(
     MovementItemEntity(
-        type = MovementType.MOVEMENT_SALE,
+        type = MovementItemType.MOVEMENT_SALE,
         number = 1,
         date = "12/12/2021",
         time = "12:00 pm",
         amount = 10000,
     ),
     MovementItemEntity(
-        type = MovementType.MOVEMENT_SALE,
+        type = MovementItemType.MOVEMENT_SALE,
         number = 2,
         date = "12/12/2021",
         time = "1:40 pm",
@@ -144,7 +144,7 @@ val fakeMovements = listOf(
         labels = listOf("rappy", "domicilios", "mesa 1", "mesa 2", "caja 1", "caja 2")
     ),
     MovementItemEntity(
-        type = MovementType.MOVEMENT_SALE,
+        type = MovementItemType.MOVEMENT_SALE,
         number = 3,
         date = "12/12/2021",
         time = "2:00 pm",
@@ -152,14 +152,14 @@ val fakeMovements = listOf(
         labels = listOf("fiado"),
     ),
     MovementItemEntity(
-        type = MovementType.MOVEMENT_PENDING,
+        type = MovementItemType.MOVEMENT_PENDING,
         date = "12/12/2021",
         time = "4:00 pm",
         amount = 8000,
         labels = listOf("fiado", "caja 1", "caja 2")
     ),
     MovementItemEntity(
-        type = MovementType.MOVEMENT_EXPENSE,
+        type = MovementItemType.MOVEMENT_EXPENSE,
         number = 1,
         date = "12/12/2021",
         time = "4:20 pm",
@@ -167,14 +167,14 @@ val fakeMovements = listOf(
         labels = listOf("caja 1"),
     ),
     MovementItemEntity(
-        type = MovementType.MOVEMENT_SALE,
+        type = MovementItemType.MOVEMENT_SALE,
         number = 4,
         date = "12/12/2021",
         time = "5:30 pm",
         amount = 2000,
     ),
     MovementItemEntity(
-        type = MovementType.MOVEMENT_EXPENSE,
+        type = MovementItemType.MOVEMENT_EXPENSE,
         number = 2,
         date = "12/12/2021",
         time = "6:00 pm",
@@ -182,7 +182,7 @@ val fakeMovements = listOf(
         amount = 500,
     ),
     MovementItemEntity(
-        type = MovementType.MOVEMENT_SALE,
+        type = MovementItemType.MOVEMENT_SALE,
         number = 3,
         date = "12/12/2021",
         time = "6:40 pm",

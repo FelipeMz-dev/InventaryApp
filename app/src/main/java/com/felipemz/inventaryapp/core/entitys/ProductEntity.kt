@@ -25,6 +25,7 @@ data class ProductSelectionEntity(
 data class ProductQuantityEntity(
     val product: ProductEntity? = null,
     val quantity: Int = 0,
+    val price: Int = 0
 )
 
 fun ProductQuantityEntity.toProductSelectionEntity() = ProductSelectionEntity(

@@ -50,7 +50,7 @@ internal fun IdProductField(
 }
 
 @Composable
-private fun getIdString(id: Int?) = buildAnnotatedString {
+fun getIdString(id: Int?) = buildAnnotatedString {
     append(stringResource(R.string.copy_id_dots))
     withStyle(
         style = SpanStyle(

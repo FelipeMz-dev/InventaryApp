@@ -5,7 +5,7 @@ import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.entitys.CategoryEntity
 import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
 import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.enums.MovementType
+import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.extensions.isNotNull
@@ -34,8 +34,8 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         movementLabelList = fakeLabelList,
         totalAmount = fakeMovements.sumBy {
             when (it.type) {
-                MovementType.MOVEMENT_SALE -> it.amount
-                MovementType.MOVEMENT_EXPENSE -> -it.amount
+                MovementItemType.MOVEMENT_SALE -> it.amount
+                MovementItemType.MOVEMENT_EXPENSE -> -it.amount
                 else -> 0
             }
         }
@@ -156,9 +156,9 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
                 movements = _movements.value.filter {
                     when (filter) {
                         MovementsFilterChip.ALL -> true
-                        MovementsFilterChip.INCOME -> it.type == MovementType.MOVEMENT_SALE
-                        MovementsFilterChip.EXPENSE -> it.type == MovementType.MOVEMENT_EXPENSE
-                        MovementsFilterChip.PENDING -> it.type == MovementType.MOVEMENT_PENDING
+                        MovementsFilterChip.INCOME -> it.type == MovementItemType.MOVEMENT_SALE
+                        MovementsFilterChip.EXPENSE -> it.type == MovementItemType.MOVEMENT_EXPENSE
+                        MovementsFilterChip.PENDING -> it.type == MovementItemType.MOVEMENT_PENDING
                         MovementsFilterChip.LABEL -> it.labels.isEmpty()
                     }
                 }

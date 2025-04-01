@@ -1,48 +1,48 @@
 package com.felipemz.inventaryapp.ui.product_form
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.coerceIn
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.core.extensions.tryOrDefault
-import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBack
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCompositionProductSelect
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCostChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnOpenProduct
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageProductSelect
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDeleted
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSubProductSelect
 import com.felipemz.inventaryapp.ui.product_form.components.CategoryField
 import com.felipemz.inventaryapp.ui.product_form.components.CommonFormField
-import com.felipemz.inventaryapp.ui.product_form.components.CommonTrailingIcon
 import com.felipemz.inventaryapp.ui.product_form.components.CompositionField
 import com.felipemz.inventaryapp.ui.product_form.components.CostField
 import com.felipemz.inventaryapp.ui.product_form.components.DescriptionField
@@ -102,6 +102,7 @@ internal fun ProductFormScreen(
             selected = state.packageProduct?.let {
                 listOf(it)
             } ?: state.compositionProducts ?: emptyList(),
+            onQuantity = {  },
             onDismiss = { showProductsPopup = false },
             onSelect = {eventHandler(OnSubProductSelect(it)) }
         )
@@ -192,18 +193,6 @@ internal fun ProductFormScreen(
                 onOpen = { moveToFinal() },
                 eventHandler = eventHandler
             )
-        }
-    }
-}
-
-@Composable
-private fun MessengerToast(message: String?){
-
-    val context = LocalContext.current
-
-    LaunchedEffect(message) {
-        message?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
 }

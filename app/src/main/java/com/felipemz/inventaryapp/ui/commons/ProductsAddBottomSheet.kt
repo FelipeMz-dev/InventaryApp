@@ -31,8 +31,9 @@ import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
 internal fun ProductsAddBottomSheet(
     productList: List<ProductEntity>,
     selected: List<ProductQuantityEntity>,
+    onQuantity: (ProductQuantityEntity) -> Unit,
     onDismiss: () -> Unit,
-    onSelect: (ProductQuantityEntity?) -> Unit,
+    onSelect: (ProductQuantityEntity) -> Unit,
 ) {
 
     ModalBottomSheet(
@@ -67,6 +68,9 @@ internal fun ProductsAddBottomSheet(
                                 )
                             )
                         },
+                        onQuantity = {
+                            selectionValue?.let { onQuantity(ProductQuantityEntity(product, it)) }
+                        }
                     )
                 }
 
