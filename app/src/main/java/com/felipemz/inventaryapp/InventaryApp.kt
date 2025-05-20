@@ -1,6 +1,7 @@
 package com.felipemz.inventaryapp
 
 import android.app.Application
+import com.felipemz.inventaryapp.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -9,7 +10,7 @@ class InventaryApp : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@InventaryApp)
-            modules(appModule)
+            modules(viewModelModule)
         }
     }
 }
