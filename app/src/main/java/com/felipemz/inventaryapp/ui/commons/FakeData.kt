@@ -1,12 +1,12 @@
 package com.felipemz.inventaryapp.ui.commons
 
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.CategoryModel
-import com.felipemz.inventaryapp.model.CategoryRatingModel
-import com.felipemz.inventaryapp.model.LabelRatingModel
-import com.felipemz.inventaryapp.model.MovementItemModel
-import com.felipemz.inventaryapp.model.ProductModel
-import com.felipemz.inventaryapp.model.ProductRatingModel
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.CategoryRatingModel
+import com.felipemz.inventaryapp.domain.model.LabelRatingModel
+import com.felipemz.inventaryapp.domain.model.MovementItemModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductRatingModel
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart

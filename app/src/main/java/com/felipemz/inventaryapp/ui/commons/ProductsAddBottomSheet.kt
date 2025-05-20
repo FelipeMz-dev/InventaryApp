@@ -22,8 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.model.ProductModel
-import com.felipemz.inventaryapp.model.ProductQuantityModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
 
 @OptIn(ExperimentalMaterial3Api::class)

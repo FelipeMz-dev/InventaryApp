@@ -15,7 +15,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.ui.home.tabs.products.ImageAndCounter
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 

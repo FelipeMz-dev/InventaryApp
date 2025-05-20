@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault

@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.model
+package com.felipemz.inventaryapp.domain.model
 
 data class ProductRatingModel(
     override val rating: Int,

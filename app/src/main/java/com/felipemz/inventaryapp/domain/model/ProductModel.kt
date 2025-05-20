@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.model
+package com.felipemz.inventaryapp.domain.model
 
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage

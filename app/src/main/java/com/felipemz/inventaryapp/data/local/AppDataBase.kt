@@ -11,9 +11,9 @@ import com.felipemz.inventaryapp.data.local.dao.MovementDao
 import com.felipemz.inventaryapp.data.local.dao.ProductCompositionDao
 import com.felipemz.inventaryapp.data.local.dao.ProductDao
 import com.felipemz.inventaryapp.data.local.entity.ProductCompositionEntity
-import com.felipemz.inventaryapp.model.CategoryModel
-import com.felipemz.inventaryapp.model.MovementItemModel
-import com.felipemz.inventaryapp.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.MovementItemModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
 
 @Database(
     entities = [

@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.model.BaseRatingModel
-import com.felipemz.inventaryapp.model.CategoryRatingModel
-import com.felipemz.inventaryapp.model.LabelRatingModel
-import com.felipemz.inventaryapp.model.ProductRatingModel
+import com.felipemz.inventaryapp.domain.model.BaseRatingModel
+import com.felipemz.inventaryapp.domain.model.CategoryRatingModel
+import com.felipemz.inventaryapp.domain.model.LabelRatingModel
+import com.felipemz.inventaryapp.domain.model.ProductRatingModel
 import com.felipemz.inventaryapp.core.enums.ReportsType
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider

@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.model
+package com.felipemz.inventaryapp.domain.model
 
 data class LabelRatingModel(
     override val rating: Int = 0,

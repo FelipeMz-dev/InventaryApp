@@ -1,7 +1,7 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.model.ProductQuantityModel
+import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 
 sealed interface MovementsEvent : Event {
 
