@@ -37,7 +37,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductQuantityModel
 import com.felipemz.inventaryapp.core.enums.MovementStateType
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
@@ -62,7 +62,7 @@ internal fun MovementsScreen(
     var showProductsPopup by remember { mutableStateOf(false) }
     var showCalculatorPopup by remember { mutableStateOf(false) }
     var showDiscountPopup by remember { mutableStateOf(false) }
-    var showProductQuantityPopup by remember { mutableStateOf<ProductQuantityEntity?>(null) }
+    var showProductQuantityPopup by remember { mutableStateOf<ProductQuantityModel?>(null) }
 
     val fabActions: (MovementsActions) -> Unit = { action ->
         when (action) {
@@ -97,7 +97,7 @@ internal fun MovementsScreen(
                 eventHandler(IncrementCalculatorId)
                 eventHandler(
                     OnSelectProduct(
-                        ProductQuantityEntity(
+                        ProductQuantityModel(
                             price = it,
                             quantity = 1
                         )

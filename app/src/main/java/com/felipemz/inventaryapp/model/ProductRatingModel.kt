@@ -1,7 +1,7 @@
 package com.felipemz.inventaryapp.model
 
-data class ProductRatingEntity(
+data class ProductRatingModel(
     override val rating: Int,
     override val totalValue: Int = 0,
-    val product: ProductEntity = ProductEntity(),
-): BaseRatingEntity()
+    val product: ProductModel = ProductModel(),
+): BaseRatingModel()

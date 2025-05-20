@@ -22,18 +22,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.model.ProductEntity
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductModel
+import com.felipemz.inventaryapp.model.ProductQuantityModel
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProductsAddBottomSheet(
-    productList: List<ProductEntity>,
-    selected: List<ProductQuantityEntity>,
-    onQuantity: (ProductQuantityEntity) -> Unit,
+    productList: List<ProductModel>,
+    selected: List<ProductQuantityModel>,
+    onQuantity: (ProductQuantityModel) -> Unit,
     onDismiss: () -> Unit,
-    onSelect: (ProductQuantityEntity) -> Unit,
+    onSelect: (ProductQuantityModel) -> Unit,
 ) {
 
     ModalBottomSheet(
@@ -52,7 +52,7 @@ internal fun ProductsAddBottomSheet(
                             .fillMaxWidth()
                             .clickable {
                                 onSelect(
-                                    ProductQuantityEntity(
+                                    ProductQuantityModel(
                                         product = product,
                                         quantity = selectionValue?.let { it + 1 } ?: 1
                                     )
@@ -62,21 +62,21 @@ internal fun ProductsAddBottomSheet(
                         selection = selectionValue,
                         onSelectionChange = { value ->
                             onSelect(
-                                ProductQuantityEntity(
+                                ProductQuantityModel(
                                     product = product,
                                     quantity = value
                                 )
                             )
                         },
                         onQuantity = {
-                            selectionValue?.let { onQuantity(ProductQuantityEntity(product, it)) }
+                            selectionValue?.let { onQuantity(ProductQuantityModel(product, it)) }
                         }
                     )
                 }
 
                 selectionValue?.let {
                     SwiperItemProduct(
-                        onDelete = { onSelect(ProductQuantityEntity(product, 0)) }
+                        onDelete = { onSelect(ProductQuantityModel(product, 0)) }
                     ) { item() }
                 } ?: item()
             }

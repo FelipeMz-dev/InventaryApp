@@ -2,9 +2,9 @@ package com.felipemz.inventaryapp.ui.home
 
 import androidx.compose.runtime.mutableStateOf
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.model.CategoryEntity
-import com.felipemz.inventaryapp.model.MovementItemEntity
-import com.felipemz.inventaryapp.model.ProductEntity
+import com.felipemz.inventaryapp.model.CategoryModel
+import com.felipemz.inventaryapp.model.MovementItemModel
+import com.felipemz.inventaryapp.model.ProductModel
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
@@ -18,8 +18,8 @@ import kotlinx.coroutines.Dispatchers
 
 class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
 
-    private val _movements = mutableStateOf<List<MovementItemEntity>>(emptyList())
-    private val _products = mutableStateOf<List<ProductEntity>>(emptyList())
+    private val _movements = mutableStateOf<List<MovementItemModel>>(emptyList())
+    private val _products = mutableStateOf<List<ProductModel>>(emptyList())
 
     init {
         _movements.value = fakeMovements
@@ -110,7 +110,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         }
     }
 
-    private fun categorySelected(category: CategoryEntity?) = execute(Dispatchers.IO) {
+    private fun categorySelected(category: CategoryModel?) = execute(Dispatchers.IO) {
         val filteredProducts = _products.value.filter { product ->
             val matchesSearchText = state.value.searchText.isEmpty()
                     || product.name.contains(state.value.searchText, ignoreCase = true)

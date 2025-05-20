@@ -1,6 +1,6 @@
 package com.felipemz.inventaryapp.model
 
-data class CategoryEntity(
+data class CategoryModel(
     val id: Int = 0,
     val name: String = String(),
     val position: Int = 0,

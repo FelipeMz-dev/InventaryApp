@@ -25,7 +25,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.felipemz.inventaryapp.model.MovementItemEntity
+import com.felipemz.inventaryapp.model.MovementItemModel
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.utils.PriceUtil
@@ -33,7 +33,7 @@ import com.felipemz.inventaryapp.core.utils.PriceUtil
 @Composable
 fun MovementItem(
     modifier: Modifier,
-    movement: MovementItemEntity,
+    movement: MovementItemModel,
     movementColor: Color
 ) {
 

@@ -3,9 +3,9 @@ package com.felipemz.inventaryapp.ui.product_form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.model.CategoryEntity
-import com.felipemz.inventaryapp.model.ProductEntity
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.CategoryModel
+import com.felipemz.inventaryapp.model.ProductModel
+import com.felipemz.inventaryapp.model.ProductQuantityModel
 import com.felipemz.inventaryapp.model.toProductSelectionEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNotNull
@@ -76,17 +76,17 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         }
     }
 
-    private fun getCompositionProducts(product: ProductEntity): List<ProductQuantityEntity>? {
+    private fun getCompositionProducts(product: ProductModel): List<ProductQuantityModel>? {
         return product.compositionProducts?.map { productSelection ->
-            ProductQuantityEntity(
+            ProductQuantityModel(
                 product = state.value.productList.firstOrNull { it.id == productSelection.id },
                 quantity = productSelection.quantity
             )
         }
     }
-    private fun getPackageProduct(product: ProductEntity): ProductQuantityEntity? {
+    private fun getPackageProduct(product: ProductModel): ProductQuantityModel? {
         return product.packageProduct?.let { productSelection ->
-            ProductQuantityEntity(
+            ProductQuantityModel(
                 product = state.value.productList.firstOrNull { it.id == productSelection.id },
                 quantity = productSelection.quantity
             )
@@ -112,7 +112,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         }
     }
 
-    private fun categoryChanged(category: CategoryEntity) {
+    private fun categoryChanged(category: CategoryModel) {
         updateState { it.copy(category = category) }.invokeOnCompletion {
             validateEnableToSave()
         }
@@ -139,13 +139,13 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         }
     }
 
-    private fun subProductSelect(product: ProductQuantityEntity?) {
+    private fun subProductSelect(product: ProductQuantityModel?) {
         state.value.packageProduct?.product?.run {
             packageProductSelected(product)
         } ?: compositionProductSelect(product)
     }
 
-    private fun packageProductSelected(product: ProductQuantityEntity?) {
+    private fun packageProductSelected(product: ProductQuantityModel?) {
         updateState { uiState ->
             product?.let { packageProduct ->
                 uiState.copy(
@@ -168,7 +168,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         }
     }
 
-    private fun compositionProductSelect(product: ProductQuantityEntity?) {
+    private fun compositionProductSelect(product: ProductQuantityModel?) {
         updateState { uiState ->
             product?.let { compositionProduct ->
                 uiState.copy(
@@ -217,11 +217,11 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
 
     private fun saveProduct() {
         val product = with(state.value) {
-            ProductEntity(
+            ProductModel(
                 id = originalProduct?.id ?: 0,
                 name = name,
                 price = price,
-                category = category ?: CategoryEntity(),
+                category = category ?: CategoryModel(),
                 image = imageSelected,
                 description = description,
                 cost = cost,

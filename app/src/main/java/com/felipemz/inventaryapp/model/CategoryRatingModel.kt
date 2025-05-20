@@ -1,7 +1,7 @@
 package com.felipemz.inventaryapp.model
 
-data class CategoryRatingEntity(
+data class CategoryRatingModel(
     override val rating: Int = 0,
     override val  totalValue: Int = 0,
-    val category: CategoryEntity = CategoryEntity(),
-): BaseRatingEntity()
+    val category: CategoryModel = CategoryModel(),
+): BaseRatingModel()
