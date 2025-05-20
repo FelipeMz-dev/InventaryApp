@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.core.entitys
+package com.felipemz.inventaryapp.model
 
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 

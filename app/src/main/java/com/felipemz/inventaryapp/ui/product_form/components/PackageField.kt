@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem

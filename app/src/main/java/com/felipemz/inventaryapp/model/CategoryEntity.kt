@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.core.entitys
+package com.felipemz.inventaryapp.model
 
 data class CategoryEntity(
     val id: Int = 0,

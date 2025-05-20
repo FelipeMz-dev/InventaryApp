@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -42,8 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.entitys.ProductSelectionEntity
+import com.felipemz.inventaryapp.model.ProductEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault

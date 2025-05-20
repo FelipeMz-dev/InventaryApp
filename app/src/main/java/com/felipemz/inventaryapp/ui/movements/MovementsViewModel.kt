@@ -1,7 +1,7 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
 import com.felipemz.inventaryapp.core.utils.FormatDateUtil
 import com.felipemz.inventaryapp.ui.commons.fakeProducts

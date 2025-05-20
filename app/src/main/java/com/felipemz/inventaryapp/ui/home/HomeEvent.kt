@@ -1,8 +1,8 @@
 package com.felipemz.inventaryapp.ui.home
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.core.entitys.CategoryEntity
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
+import com.felipemz.inventaryapp.model.CategoryEntity
+import com.felipemz.inventaryapp.model.ProductEntity
 import com.felipemz.inventaryapp.core.enums.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy

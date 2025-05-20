@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.product_form.components.ProductPackageItem

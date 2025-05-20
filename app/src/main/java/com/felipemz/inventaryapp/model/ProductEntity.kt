@@ -1,6 +1,5 @@
-package com.felipemz.inventaryapp.core.entitys
+package com.felipemz.inventaryapp.model
 
-import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 

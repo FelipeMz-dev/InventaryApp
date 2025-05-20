@@ -3,10 +3,10 @@ package com.felipemz.inventaryapp.ui.product_form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.core.entitys.CategoryEntity
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
-import com.felipemz.inventaryapp.core.entitys.toProductSelectionEntity
+import com.felipemz.inventaryapp.model.CategoryEntity
+import com.felipemz.inventaryapp.model.ProductEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.toProductSelectionEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault

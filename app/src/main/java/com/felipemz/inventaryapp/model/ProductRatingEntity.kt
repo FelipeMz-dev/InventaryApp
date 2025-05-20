@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.core.entitys
+package com.felipemz.inventaryapp.model
 
 data class ProductRatingEntity(
     override val rating: Int,

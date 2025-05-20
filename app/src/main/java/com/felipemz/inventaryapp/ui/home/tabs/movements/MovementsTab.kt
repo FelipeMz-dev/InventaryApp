@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
+import com.felipemz.inventaryapp.model.MovementItemEntity
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.FilterChipRow

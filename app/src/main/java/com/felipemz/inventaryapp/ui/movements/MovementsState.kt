@@ -1,8 +1,8 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.State
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.enums.MovementStateType
 
 data class MovementsState(

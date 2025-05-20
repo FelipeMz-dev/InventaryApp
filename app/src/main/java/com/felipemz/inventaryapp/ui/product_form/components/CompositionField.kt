@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 

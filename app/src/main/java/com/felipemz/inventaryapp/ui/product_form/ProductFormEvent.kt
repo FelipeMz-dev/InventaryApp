@@ -1,8 +1,8 @@
 package com.felipemz.inventaryapp.ui.product_form
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.core.entitys.CategoryEntity
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.CategoryEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 

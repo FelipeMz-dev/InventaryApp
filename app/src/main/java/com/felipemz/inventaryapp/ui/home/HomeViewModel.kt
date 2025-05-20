@@ -2,9 +2,9 @@ package com.felipemz.inventaryapp.ui.home
 
 import androidx.compose.runtime.mutableStateOf
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.core.entitys.CategoryEntity
-import com.felipemz.inventaryapp.core.entitys.MovementItemEntity
-import com.felipemz.inventaryapp.core.entitys.ProductEntity
+import com.felipemz.inventaryapp.model.CategoryEntity
+import com.felipemz.inventaryapp.model.MovementItemEntity
+import com.felipemz.inventaryapp.model.ProductEntity
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy

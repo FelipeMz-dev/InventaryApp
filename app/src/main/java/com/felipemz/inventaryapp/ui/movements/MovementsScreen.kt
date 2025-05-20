@@ -37,7 +37,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.entitys.ProductQuantityEntity
+import com.felipemz.inventaryapp.model.ProductQuantityEntity
 import com.felipemz.inventaryapp.core.enums.MovementStateType
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifTrue

@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.core.entitys
+package com.felipemz.inventaryapp.model
 
 open class BaseRatingEntity(
     open val rating: Int = 0,
