@@ -29,15 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.CategoryEntity
+import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.core.extensions.onColor
 
 @Composable
 internal fun CategoryField(
     modifier: Modifier,
-    category: CategoryEntity?,
-    categories: List<CategoryEntity>,
-    onSelect: (CategoryEntity) -> Unit,
+    category: CategoryModel?,
+    categories: List<CategoryModel>,
+    onSelect: (CategoryModel) -> Unit,
 ) {
 
     var showDropCategory by remember { mutableStateOf(false) }
@@ -86,9 +86,9 @@ internal fun CategoryField(
 @Composable
 private fun CategoriesDropDownMenu(
     showDropCategory: Boolean,
-    categories: List<CategoryEntity>,
+    categories: List<CategoryModel>,
     onDismiss: () -> Unit,
-    onSelect: (CategoryEntity) -> Unit
+    onSelect: (CategoryModel) -> Unit
 ) = DropdownMenu(
     expanded = showDropCategory,
     onDismissRequest = { onDismiss() },

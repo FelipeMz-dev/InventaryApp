@@ -1,8 +1,8 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.State
-import com.felipemz.inventaryapp.model.ProductEntity
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 import com.felipemz.inventaryapp.core.enums.MovementStateType
 
 data class MovementsState(
@@ -10,8 +10,8 @@ data class MovementsState(
     val movementState: MovementStateType = MovementStateType.NEW_SALE,
     val movementNumber: Int = 0,
     val movementDate: String = String(),
-    val selectedProducts: List<ProductQuantityEntity> = emptyList(),
-    val productList: List<ProductEntity> = emptyList(),
+    val selectedProducts: List<ProductQuantityModel> = emptyList(),
+    val productList: List<ProductModel> = emptyList(),
     val total: Int = 0,
     val subTotal: Int = 0,
     val discount: Int = 0,
