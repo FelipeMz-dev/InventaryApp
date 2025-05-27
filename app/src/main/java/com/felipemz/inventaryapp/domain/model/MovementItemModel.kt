@@ -1,8 +1,8 @@
-package com.felipemz.inventaryapp.model
+package com.felipemz.inventaryapp.domain.model
 
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 
-data class MovementItemEntity(
+data class MovementItemModel(
     val type: MovementItemType = MovementItemType.MOVEMENT_PENDING,
     val number: Int? = null,
     val date: String = String(),

@@ -1,7 +1,7 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 
 sealed interface MovementsEvent : Event {
 
@@ -13,7 +13,7 @@ sealed interface MovementsEvent : Event {
 
     data object IncrementCalculatorId : MovementsEvent
 
-    data class OnSelectProduct(val product: ProductQuantityEntity) : MovementsEvent
+    data class OnSelectProduct(val product: ProductQuantityModel) : MovementsEvent
 
     data class OnChangeDiscount(val discount: Int) : MovementsEvent
 }

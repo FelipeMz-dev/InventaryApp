@@ -1,9 +1,9 @@
 package com.felipemz.inventaryapp.ui.home
 
 import com.felipemz.inventaryapp.core.base.State
-import com.felipemz.inventaryapp.model.CategoryEntity
-import com.felipemz.inventaryapp.model.MovementItemEntity
-import com.felipemz.inventaryapp.model.ProductEntity
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.MovementItemModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
@@ -12,10 +12,10 @@ import com.felipemz.inventaryapp.core.models.RangeDateModel
 data class HomeState(
     val searchText: String = String(),
     val isSearchFocused: Boolean = false,
-    val categories: List<CategoryEntity> = emptyList(),
-    val categorySelected: CategoryEntity? = null,
-    val products: List<ProductEntity> = emptyList(),
-    val movements: List<MovementItemEntity> = emptyList(),
+    val categories: List<CategoryModel> = emptyList(),
+    val categorySelected: CategoryModel? = null,
+    val products: List<ProductModel> = emptyList(),
+    val movements: List<MovementItemModel> = emptyList(),
     val movementLabelList: List<String> = emptyList(),
     val currentDate: String = "Lun. 30 de diciembre",
     val movementFilterText: String = String(),

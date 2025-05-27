@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.ProductEntity
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
@@ -33,13 +33,13 @@ import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 @Composable
 fun PackageField(
     modifier: Modifier,
-    packageProduct: ProductQuantityEntity?,
+    packageProduct: ProductQuantityModel?,
     isNotQuantity: Boolean,
     isNotComposition: Boolean,
     onAdd: () -> Unit,
     onOpen: suspend () -> Unit,
-    onClick: (ProductQuantityEntity) -> Unit,
-    onSelect: (ProductQuantityEntity?) -> Unit
+    onClick: (ProductQuantityModel) -> Unit,
+    onSelect: (ProductQuantityModel?) -> Unit
 ) {
     CommonFormField(
         modifier = modifier,
@@ -53,7 +53,7 @@ fun PackageField(
                 enabled = isNotQuantity && isNotComposition || packageProduct.isNotNull(),
                 checked = packageProduct.isNotNull(),
                 onCheckedChange = { state ->
-                    onSelect(ProductQuantityEntity().takeIf { state })
+                    onSelect(ProductQuantityModel().takeIf { state })
                 }
             )
         }
@@ -86,11 +86,11 @@ fun PackageField(
                             product = pack,
                             onClick = { onClick(pack) },
                             onChangeSelection = { value ->
-                                onSelect(ProductQuantityEntity(product, value))
+                                onSelect(ProductQuantityModel(product, value))
                             },
                             onQuantity = {},
                             onDelete = {
-                                onSelect(ProductQuantityEntity(product, 0))
+                                onSelect(ProductQuantityModel(product, 0))
                             }
                         )
                     } ?: Text(
@@ -114,10 +114,10 @@ fun PackageField(
 
 @Composable
 fun ProductPackageItem(
-    product: ProductQuantityEntity,
+    product: ProductQuantityModel,
     onClick: () -> Unit,
     onDelete: () -> Unit,
-    onQuantity: (ProductQuantityEntity) -> Unit,
+    onQuantity: (ProductQuantityModel) -> Unit,
     onChangeSelection: (Int) -> Unit
 ) {
 
@@ -154,7 +154,7 @@ fun ProductPackageItem(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceContainer),
             isSmall = true,
-            product = product.product ?: ProductEntity(
+            product = product.product ?: ProductModel(
                 name = "Valor sin concepto",
                 price = product.price,
                 image = ProductTypeImage.EmojiImage("\uD83D\uDCB0")

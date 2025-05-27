@@ -33,19 +33,19 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.CategoryEntity
-import com.felipemz.inventaryapp.model.ProductEntity
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.ui.commons.FilterChipRow
 import com.felipemz.inventaryapp.ui.home.HomeEvent
 
 @Composable
 internal fun InventoryTab(
-    categories: List<CategoryEntity>,
-    categorySelected: CategoryEntity?,
+    categories: List<CategoryModel>,
+    categorySelected: CategoryModel?,
     isInventory: Boolean,
     isFocusSearch: Boolean,
-    products: List<ProductEntity>,
+    products: List<ProductModel>,
     eventHandler: (HomeEvent) -> Unit,
 ) {
     LazyColumn(
@@ -85,9 +85,9 @@ internal fun InventoryTab(
 @Composable
 private fun FilterChipCategories(
     modifier: Modifier,
-    chipList: List<CategoryEntity>,
-    chipSelected: CategoryEntity?,
-    onSelectChip: (CategoryEntity?) -> Unit,
+    chipList: List<CategoryModel>,
+    chipSelected: CategoryModel?,
+    onSelectChip: (CategoryModel?) -> Unit,
 ) = FilterChipRow(
     modifier = modifier,
     colors = {

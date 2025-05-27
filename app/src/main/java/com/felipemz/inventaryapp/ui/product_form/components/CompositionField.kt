@@ -13,20 +13,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
+import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 
 @Composable
 fun CompositionField(
     modifier: Modifier,
-    compositionProducts: List<ProductQuantityEntity>?,
+    compositionProducts: List<ProductQuantityModel>?,
     isNotQuantity: Boolean,
     isNotPackage: Boolean,
     onAdd: () -> Unit,
     onOpen: suspend () -> Unit,
-    onClick: (ProductQuantityEntity) -> Unit,
-    onSelect: (ProductQuantityEntity?) -> Unit
+    onClick: (ProductQuantityModel) -> Unit,
+    onSelect: (ProductQuantityModel?) -> Unit
 ) {
     CommonFormField(
         modifier = modifier,
@@ -40,7 +40,7 @@ fun CompositionField(
                 enabled = isNotQuantity && isNotPackage || compositionProducts.isNotNull(),
                 checked = compositionProducts.isNotNull(),
                 onCheckedChange = { state ->
-                    onSelect(ProductQuantityEntity().takeIf { state })
+                    onSelect(ProductQuantityModel().takeIf { state })
                 }
             )
         }
