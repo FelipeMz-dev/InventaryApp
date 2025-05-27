@@ -14,7 +14,11 @@ data class ProductFormState(
     val originalProduct: ProductModel? = null,
     val productList: List<ProductModel> = emptyList(),
     val categories: List<CategoryModel> = emptyList(),
-    val images: List<ProductTypeImage> = emptyList(),
+    val images: List<ProductTypeImage> = listOf(
+        ProductTypeImage.LetterImage(String()),
+        ProductTypeImage.EmojiImage(String()),
+        ProductTypeImage.PhatImage(String())
+    ),
     val name: String = String(),
     val price: Int = 0,
     val category: CategoryModel? = null,

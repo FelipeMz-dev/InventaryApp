@@ -26,7 +26,7 @@ data class HomeState(
     val isShowLabelPopup: Boolean = false,
     val isProductOrderPopup: Boolean = false,
     val isReportsCalendarPopup: Boolean = false,
-    val productOrderSelected: ProductsOrderBy = ProductsOrderBy.CATEGORY,
+    val productOrderSelected: ProductsOrderBy = ProductsOrderBy.ID,
     val isProductOrderInverted: Boolean = false,
     val reportsFilterChipSelected: ReportsFilterDate? = ReportsFilterDate.TODAY,
     val reportsCustomFilterSelected: RangeDateModel? = null

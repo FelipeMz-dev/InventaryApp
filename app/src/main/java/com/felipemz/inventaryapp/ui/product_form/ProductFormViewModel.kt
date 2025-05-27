@@ -3,6 +3,7 @@ package com.felipemz.inventaryapp.ui.product_form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
+import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
@@ -58,16 +59,7 @@ class ProductFormViewModel(
     private val action = MutableLiveData<ProductFormAction>()
     val actionLiveData: LiveData<ProductFormAction> = action
 
-    private val initialState = ProductFormState(
-        categories = fakeChips,
-        images = listOf(
-            ProductTypeImage.LetterImage(String()),
-            ProductTypeImage.EmojiImage(String()),
-            ProductTypeImage.PhatImage(String())
-        ),
-    )
-
-    override fun initState() = initialState
+    override fun initState() = ProductFormState()
 
     override fun intentHandler() {
         executeIntent { event ->
@@ -254,7 +246,7 @@ class ProductFormViewModel(
                 action.postValue(ProductFormAction.OnCategoryChangeDone(product.id))
             } ?: run {
                 action.postValue(ProductFormAction.ShowMessage("Producto guardado"))
-                updateState { initialState }
+                cleanData()
             }
         }
     }
@@ -289,7 +281,7 @@ class ProductFormViewModel(
         state.value.originalProduct?.id?.let {
             deleteProductUseCase(it)
             action.postValue(ProductFormAction.ShowMessage("Producto eliminado"))
-            updateState { initialState }
+            cleanData()
         }
     }
 
@@ -343,5 +335,10 @@ class ProductFormViewModel(
                 )
             } else uiState
         }
+    }
+
+    private fun cleanData() {
+        updateState { ProductFormState() }
+        observeAllCategories()
     }
 }
