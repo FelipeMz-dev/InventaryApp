@@ -37,7 +37,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
+import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 import com.felipemz.inventaryapp.core.enums.MovementStateType
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
@@ -62,7 +62,7 @@ internal fun MovementsScreen(
     var showProductsPopup by remember { mutableStateOf(false) }
     var showCalculatorPopup by remember { mutableStateOf(false) }
     var showDiscountPopup by remember { mutableStateOf(false) }
-    var showProductQuantityPopup by remember { mutableStateOf<ProductQuantityModel?>(null) }
+    var showProductQuantityPopup by remember { mutableStateOf<ProductSelectionChart?>(null) }
 
     val fabActions: (MovementsActions) -> Unit = { action ->
         when (action) {
@@ -97,7 +97,7 @@ internal fun MovementsScreen(
                 eventHandler(IncrementCalculatorId)
                 eventHandler(
                     OnSelectProduct(
-                        ProductQuantityModel(
+                        ProductSelectionChart(
                             price = it,
                             quantity = 1
                         )
@@ -110,7 +110,7 @@ internal fun MovementsScreen(
     showProductQuantityPopup?.let { product ->
         QuantityChangeBottomSheet(
             currentQuantity = product.quantity,
-            quantityType = product.product?.quantityChart?.type ?: QuantityType.UNIT,
+            quantityType = product.product?.quantityModel?.type ?: QuantityType.UNIT,
             onDismiss = { showProductQuantityPopup = null },
             onSelect = {
                 eventHandler(OnSelectProduct(product.copy(quantity = it)))

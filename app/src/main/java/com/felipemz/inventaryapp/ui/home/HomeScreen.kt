@@ -39,6 +39,8 @@ internal fun HomeScreen(
     eventHandler: (HomeEvent) -> Unit,
 ) {
 
+    LaunchedEffect(Unit) { eventHandler(HomeEvent.Init) }
+
     val tabSelected = remember { mutableStateOf(HomeTabs.MOVEMENTS) }
     val pagerState = rememberPagerState(1) { HomeTabs.entries.size }
     val focusManager = LocalFocusManager.current

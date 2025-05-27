@@ -17,11 +17,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.ifTrue
+import com.felipemz.inventaryapp.ui.commons.CommonFormField
+import com.felipemz.inventaryapp.ui.commons.CommonTrailingIcon
 
 @Composable
 internal fun DescriptionField(
     modifier: Modifier,
     description: String,
+    isEnable: Boolean = true,
     onOpen: suspend () -> Unit,
     onChange: (String) -> Unit
 ) {
@@ -47,10 +51,12 @@ internal fun DescriptionField(
             },
             placeholder = { Text(text = stringResource(R.string.copy_write_here)) },
             trailingIcon = {
-                CommonTrailingIcon(
-                    isTextEmpty = text.isEmpty(),
-                    onEdit = onChange
-                )
+                isEnable.ifTrue {
+                    CommonTrailingIcon(
+                        isTextEmpty = text.isEmpty(),
+                        onEdit = onChange
+                    )
+                }
             },
             colors = OutlinedTextFieldDefaults.colors().copy(
                 unfocusedPlaceholderColor = MaterialTheme.colorScheme.outline,
@@ -60,6 +66,7 @@ internal fun DescriptionField(
                 keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences
             ),
+            enabled = isEnable,
             maxLines = 6,
             minLines = 4,
         )

@@ -54,7 +54,7 @@ internal fun HeadLineDatePicker(
             text = selectedDateMillis?.let {
                 FormatDateUtil.getOfCustomDate(it.toLocalDate())
             } ?: "No se ha seleccionado una fecha",
-            enabled = !selectedDateMillis.isNull()
+            isEnabled = !selectedDateMillis.isNull()
         ) { datePickerState.selectedDateMillis = null }
     }
 }

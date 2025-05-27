@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,11 +42,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import java.io.File
 
@@ -56,10 +57,13 @@ internal fun ProductItem(
     product: ProductModel,
     selection: Int? = null,
     onQuantity: (() -> Unit)? = null,
-    onSelectionChange: ((Int) -> Unit)? = null
+    onSelectionChange: ((Int) -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
     Row(
-        modifier = modifier.padding(8.dp),
+        modifier = modifier
+            .clickable { onClick?.invoke() }
+            .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -67,7 +71,7 @@ internal fun ProductItem(
         ImageAndCounter(
             image = product.image,
             size = if (isSmall) 40.dp else 48.dp,
-            quantity = product.quantityChart?.quantity,
+            quantity = product.quantityModel?.quantity,
             colorCategory = if (product.category.color == 0) MaterialTheme.colorScheme.secondaryContainer
             else colorResource(product.category.color)
         )
@@ -113,7 +117,7 @@ internal fun ProductItem(
                     )
 
                     TextButtonUnderline(
-                        text = "$it${product.quantityChart?.type?.initial?.let { "/$it" }.orEmpty()}"
+                        text = "$it${product.quantityModel?.type?.initial?.let { "/$it" }.orEmpty()}"
                     ) { onQuantity?.invoke() }
 
                     Icon(
@@ -132,7 +136,9 @@ internal fun ProductItem(
                 }
             } ?: Row(modifier = Modifier.height(IntrinsicSize.Max)) {
                 Text(
-                    text = product.description,
+                    text = product.description.takeUnless {
+                        it.isEmpty()
+                    } ?: stringResource(R.string.copy_without_information),
                     color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -299,38 +305,3 @@ private fun EmptyImage(
     tint = MaterialTheme.colorScheme.primary,
     contentDescription = null
 )
-
-sealed interface ProductTypeImage {
-    data class LetterImage(val letter: String) : ProductTypeImage
-    data class EmojiImage(val emoji: String) : ProductTypeImage
-    data class PhatImage(val path: String) : ProductTypeImage
-
-    fun ifNotEmpty(default: ProductTypeImage) = default.takeIf {
-        when (this) {
-            is LetterImage -> letter.isEmpty()
-            is EmojiImage -> emoji.isEmpty()
-            is PhatImage -> path.isEmpty()
-        }
-    } ?: this
-}
-
-data class ProductQuantityChart(
-    val type: QuantityType = QuantityType.UNIT,
-    val quantity: Int = 0,
-)
-
-@Preview
-@Composable
-private fun Preview() {
-    ProductItem(
-        modifier = Modifier,
-        product = ProductModel(
-            name = "Fresa delicia",
-            description = "Aquí va toda la información del producto / sin información",
-            //quantityChart = 8,
-            price = 999900000,
-            image = ProductTypeImage.PhatImage("")
-            //image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
-        )
-    )
-}

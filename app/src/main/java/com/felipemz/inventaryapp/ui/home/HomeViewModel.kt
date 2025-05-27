@@ -1,7 +1,6 @@
 package com.felipemz.inventaryapp.ui.home
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.viewModelScope
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.MovementItemModel
@@ -11,23 +10,21 @@ import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.data.local.entity.ProductEntity
+import com.felipemz.inventaryapp.domain.repository.ProductRepository
 import com.felipemz.inventaryapp.domain.usecase.GetAllProductsUseCase
-import com.felipemz.inventaryapp.domain.usecase.InsertProductUseCase
+import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateProductUseCase
+import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
+import com.felipemz.inventaryapp.domain.usecase.ObserveAllProductsUseCase
 import com.felipemz.inventaryapp.ui.commons.fakeChips
 import com.felipemz.inventaryapp.ui.commons.fakeLabelList
 import com.felipemz.inventaryapp.ui.commons.fakeMovements
 import com.felipemz.inventaryapp.ui.commons.fakeProducts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val getAllProductsUseCase: GetAllProductsUseCase,
-    private val insertProductUseCase: InsertProductUseCase
+    private val observeAllProductsUseCase: ObserveAllProductsUseCase,
+    private val observeAllCategoriesUseCase: ObserveAllCategoriesUseCase,
 ) : BaseViewModel<HomeState, HomeEvent>() {
 
     private val _movements = mutableStateOf<List<MovementItemModel>>(emptyList())
@@ -35,13 +32,10 @@ class HomeViewModel(
 
     init {
         _movements.value = fakeMovements
-        _products.value = fakeProducts
         orderProducts(ProductsOrderBy.CATEGORY, false)
     }
 
     override fun initState() = HomeState(
-        categories = fakeChips,
-        products = _products.value,
         movements = _movements.value,
         movementLabelList = fakeLabelList,
         totalAmount = fakeMovements.sumBy {
@@ -56,6 +50,7 @@ class HomeViewModel(
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
+                is HomeEvent.Init -> onInit()
                 is HomeEvent.OnFocusSearch -> updateState { it.copy(isSearchFocused = event.isFocus) }
                 is HomeEvent.OnChangeSearchText -> changeSearchText(event.text)
                 is HomeEvent.OnCategorySelected -> categorySelected(event.category)
@@ -68,7 +63,9 @@ class HomeViewModel(
                 is HomeEvent.OnOpenProductOrderPopup -> updateState { it.copy(isProductOrderPopup = true) }
                 is HomeEvent.OpenReportsCalendarPopup -> updateState { it.copy(isReportsCalendarPopup = true) }
                 is HomeEvent.OnReportsCustomFilterSelected -> updateState {
-                    it.copy(reportsCustomFilterSelected = event.filter, reportsFilterChipSelected = null, isReportsCalendarPopup = false) //TODO: refactor
+                    it.copy(
+                        reportsCustomFilterSelected = event.filter, reportsFilterChipSelected = null, isReportsCalendarPopup = false
+                    ) //TODO: refactor
                 }
                 is HomeEvent.OnReportsFilterSelected -> updateState {
                     it.copy(reportsFilterChipSelected = event.filter, reportsCustomFilterSelected = null)  //TODO: refactor
@@ -78,23 +75,21 @@ class HomeViewModel(
         }
     }
 
-    private fun loadAllProducts() {   //TODO: use this logic
-        //updateState { it.copy(isLoading = true, error = null) }
-        execute(Dispatchers.IO) {
-            getAllProductsUseCase()
-                //.catch { error -> updateState { it.copy(isLoading = false, error = error.message) } }
-                .collect { productList ->
-                    updateState {
-                        it.copy(products = productList, /*isLoading = false, error = null*/)
-                    }
-                }
+    private fun onInit() {
+        observeAllCategories()
+        observeAllProducts()
+    }
+
+    private fun observeAllCategories() = execute(Dispatchers.IO) {
+        observeAllCategoriesUseCase().collect { categories ->
+            updateState { it.copy(categories = categories) }
         }
     }
 
-    private fun insertProduct(product: ProductModel) {
-        execute(Dispatchers.IO) {
-            insertProductUseCase(product)
-            //eventHandler(ProductEvent.LoadAllProducts) // Refresca productos después de insertar
+    private fun observeAllProducts() = execute(Dispatchers.IO) {
+        observeAllProductsUseCase().collect { products ->
+            _products.value = products
+            updateState { it.copy(products = products) }
         }
     }
 
@@ -115,7 +110,7 @@ class HomeViewModel(
             }
             ProductsOrderBy.NAME -> _products.value.sortedBy { it.name }
             ProductsOrderBy.PRICE -> _products.value.sortedBy { it.price }
-            ProductsOrderBy.STOCK -> _products.value.sortedBy { it.quantityChart?.quantity ?: 0 }
+            ProductsOrderBy.STOCK -> _products.value.sortedBy { it.quantityModel?.quantity ?: 0 }
             else -> _products.value.sortedBy { it.id }
         }
         val orderedProducts = if (isInverted) sortedProducts.reversed() else sortedProducts

@@ -22,28 +22,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
+import com.felipemz.inventaryapp.domain.model.ProductTypeImage
+import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBack
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCompositionProductSelect
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCostChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDeleteCategory
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnInsertOrUpdateCategory
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnOpenProduct
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageProductSelect
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDeleted
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSubProductSelect
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTryDeleteProduct
+import com.felipemz.inventaryapp.ui.product_form.alert_dialog.AlertDialogProductForm
 import com.felipemz.inventaryapp.ui.product_form.components.CategoryField
-import com.felipemz.inventaryapp.ui.product_form.components.CommonFormField
-import com.felipemz.inventaryapp.ui.product_form.components.CompositionField
 import com.felipemz.inventaryapp.ui.product_form.components.CostField
 import com.felipemz.inventaryapp.ui.product_form.components.DescriptionField
 import com.felipemz.inventaryapp.ui.product_form.components.EmojiSelectorBottomSheet
@@ -99,14 +101,17 @@ internal fun ProductFormScreen(
         )
         showProductsPopup -> ProductsAddBottomSheet(
             productList = state.productList,
-            selected = state.packageProduct?.let {
-                listOf(it)
-            } ?: state.compositionProducts ?: emptyList(),
-            onQuantity = {  },
+            selected = state.packageProducts ?: emptyList(),
+            onQuantity = { },
             onDismiss = { showProductsPopup = false },
-            onSelect = {eventHandler(OnSubProductSelect(it)) }
+            onSelect = { eventHandler(OnSubProductSelect(it)) }
         )
     }
+
+    AlertDialogProductForm(
+        alertDialog = state.alertDialog,
+        eventHandler = eventHandler
+    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -134,23 +139,29 @@ internal fun ProductFormScreen(
             IdProductField(
                 modifier = Modifier.fillMaxWidth(),
                 idProduct = state.originalProduct?.id,
-                isNewProduct = state.originalProduct.isNull()
-            ) { eventHandler(OnProductDeleted) }
+                canDelete = state.originalProduct.isNotNull()
+                        && state.categoryIdToChange.isNull(),
+            ) { eventHandler(OnTryDeleteProduct) }
 
             NameField(
                 modifier = Modifier.fillMaxWidth(),
-                name = state.name
+                name = state.name,
+                isEnable = state.categoryIdToChange.isNull(),
             ) { eventHandler(OnNameChanged(it)) }
 
             PriceField(
                 modifier = Modifier.fillMaxWidth(),
-                value = state.price
+                value = state.price,
+                isEnable = state.categoryIdToChange.isNull(),
             ) { eventHandler(OnPriceChanged(it)) }
 
             CategoryField(
                 modifier = Modifier.fillMaxWidth(),
                 category = state.category,
-                categories = state.categories
+                categories = state.categories,
+                categoryIdToChange = state.categoryIdToChange,
+                onInsertOrUpdate = { eventHandler(OnInsertOrUpdateCategory(it)) },
+                onDelete = { eventHandler(OnDeleteCategory(it.id)) }
             ) { eventHandler(OnCategoryChanged(it)) }
 
             HorizontalDotDivider(modifier = Modifier.fillMaxWidth())
@@ -160,6 +171,7 @@ internal fun ProductFormScreen(
                 images = state.images,
                 imageSelected = state.imageSelected,
                 category = state.category,
+                isEnable = state.categoryIdToChange.isNull(),
                 onOpen = { moveToFinal() }
             ) {
                 eventHandler(OnImageChanged(it))
@@ -172,6 +184,7 @@ internal fun ProductFormScreen(
             DescriptionField(
                 modifier = Modifier.fillMaxWidth(),
                 description = state.description,
+                isEnable = state.categoryIdToChange.isNull(),
                 onOpen = { moveToFinal() }
             ) { eventHandler(OnDescriptionChanged(it)) }
 
@@ -180,6 +193,7 @@ internal fun ProductFormScreen(
             CostField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.cost,
+                isEnable = state.categoryIdToChange.isNull(),
                 onChange = { eventHandler(OnCostChanged(it)) },
                 onOpen = { moveToFinal() }
             )
@@ -217,7 +231,7 @@ private fun AdvancedField(
         QuantityField(
             modifier = Modifier.fillMaxWidth(),
             quantityType = state.quantityType,
-            enabled = state.packageProduct.isNull() && state.compositionProducts.isNull(),
+            isEnabled = state.packageProducts.isNull() || state.categoryIdToChange.isNull(),
             quantity = state.quantity,
             onAdd = onQuantity,
             onOpen = { onOpen() }
@@ -225,24 +239,12 @@ private fun AdvancedField(
 
         PackageField(
             modifier = Modifier.fillMaxWidth(),
-            packageProduct = state.packageProduct,
-            isNotQuantity = state.quantityType.isNull(),
-            isNotComposition = state.compositionProducts.isNull(),
+            compositionProducts = state.packageProducts,
+            isEnabled = state.quantityType.isNull() || state.categoryIdToChange.isNull(),
             onAdd = onAddSubProduct,
             onOpen = onOpen,
             onClick = { eventHandler(OnOpenProduct(it)) },
             onSelect = { eventHandler(OnPackageProductSelect(it)) }
-        )
-
-        CompositionField(
-            modifier = Modifier.fillMaxWidth(),
-            compositionProducts = state.compositionProducts,
-            isNotQuantity = state.quantityType.isNull(),
-            isNotPackage = state.packageProduct.isNull(),
-            onAdd = onAddSubProduct,
-            onOpen = onOpen,
-            onClick = { eventHandler(OnOpenProduct(it)) },
-            onSelect = { eventHandler(OnCompositionProductSelect(it)) }
         )
     }
 }
@@ -267,3 +269,4 @@ private fun BottomBarProductForm(
         }
     }
 }
+

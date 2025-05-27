@@ -81,7 +81,7 @@ fun ReportsCalendarPopup(
         TextButtonUnderline(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.copy_accept),
-            enabled = !dateSelected.isNull()
+            isEnabled = !dateSelected.isNull()
         ) {
             dateSelected?.let { onAccept(it) }
         }

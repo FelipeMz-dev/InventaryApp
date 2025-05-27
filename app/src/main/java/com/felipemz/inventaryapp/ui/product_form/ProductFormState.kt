@@ -1,13 +1,16 @@
 package com.felipemz.inventaryapp.ui.product_form
 
 import com.felipemz.inventaryapp.core.base.State
+import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
-import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
+import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
+import com.felipemz.inventaryapp.domain.model.ProductTypeImage
+import com.felipemz.inventaryapp.ui.product_form.alert_dialog.AlertDialogProductFormType
 
 data class ProductFormState(
+    val isLoading: Boolean = false,
+    val alertDialog: AlertDialogProductFormType? = null,
     val originalProduct: ProductModel? = null,
     val productList: List<ProductModel> = emptyList(),
     val categories: List<CategoryModel> = emptyList(),
@@ -20,7 +23,13 @@ data class ProductFormState(
     val cost: Int = 0,
     val quantityType: QuantityType? = null,
     val quantity: Int = 0,
-    val packageProduct: ProductQuantityModel? = null,
-    val compositionProducts: List<ProductQuantityModel>? = null,
+    val packageProducts: List<ProductSelectionChart>? = null,
     val enableToSave: Boolean = false,
-): State
+    val categoryIdToChange: Int? = null,
+) : State
+
+data class CategoryUseChart(
+    val usedId: Int,
+    val usesName: String,
+    val isChanged: Boolean = false,
+)

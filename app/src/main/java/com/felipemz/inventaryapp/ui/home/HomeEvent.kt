@@ -11,6 +11,8 @@ import com.felipemz.inventaryapp.core.models.RangeDateModel
 
 sealed interface HomeEvent : Event {
 
+    object Init : HomeEvent
+
     object OnHideLabelPopup : HomeEvent
 
     object OnOpenProductOrderPopup : HomeEvent

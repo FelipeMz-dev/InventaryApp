@@ -18,13 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.extensions.ifFalse
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 
 @Composable
 internal fun IdProductField(
     modifier: Modifier,
     idProduct: Int?,
-    isNewProduct: Boolean,
+    canDelete: Boolean,
     action: () -> Unit,
 ) {
     Row(
@@ -37,7 +37,7 @@ internal fun IdProductField(
             fontWeight = FontWeight.Bold,
         )
 
-        isNewProduct.ifFalse {
+        canDelete.ifTrue {
             IconButton(onClick = action) {
                 Icon(
                     imageVector = Icons.Rounded.Delete,

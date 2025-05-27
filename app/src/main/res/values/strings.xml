@@ -34,4 +34,5 @@
     <string name="copy_change_product">Cambiar producto</string>
     <string name="copy_select_product">Seleccionar producto</string>
     <string name="copy_package_dots">Paquete:</string>
+    <string name="copy_without_information">Sin información</string>
 </resources>
