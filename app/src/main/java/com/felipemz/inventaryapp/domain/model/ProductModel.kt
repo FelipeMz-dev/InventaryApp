@@ -1,33 +1,37 @@
 package com.felipemz.inventaryapp.domain.model
 
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
+import com.felipemz.inventaryapp.core.EMPTY_STRING
+import com.felipemz.inventaryapp.core.enums.QuantityType
 
 data class ProductModel(
     val id: Int = 0,
-    val name: String = String(),
+    val name: String = EMPTY_STRING,
     val price: Int = 0,
     val category: CategoryModel = CategoryModel(),
-    val image: ProductTypeImage = ProductTypeImage.LetterImage(String()),
-    val description: String = String(),
+    val image: ProductTypeImage = ProductTypeImage.LetterImage(EMPTY_STRING),
+    val description: String = EMPTY_STRING,
     val cost: Int = 0,
-    val quantityChart: ProductQuantityChart? = null,
-    val packageProduct: ProductSelectionModel? = null,
-    val compositionProducts: List<ProductSelectionModel>? = null,
+    val quantityModel: ProductQuantityModel? = null,
+    val packageProducts: List<ProductPackageModel>? = null,
 )
 
-data class ProductSelectionModel(
-    val id: Int = 0,
+data class ProductPackageModel(
+    val productId: Int = 0,
     val quantity: Int = 0,
 )
 
-data class ProductQuantityModel(
+data class ProductSelectionChart(
     val product: ProductModel? = null,
     val quantity: Int = 0,
     val price: Int = 0
 )
 
-fun ProductQuantityModel.toProductSelectionEntity() = ProductSelectionModel(
-    id = product?.id ?: 0,
+fun ProductSelectionChart.toProductPackageModel() = ProductPackageModel(
+    productId = product?.id ?: 0,
     quantity = quantity,
+)
+
+data class ProductQuantityModel(
+    val type: QuantityType = QuantityType.UNIT,
+    val quantity: Int = 0,
 )

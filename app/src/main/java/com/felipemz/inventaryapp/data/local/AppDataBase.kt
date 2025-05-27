@@ -8,19 +8,19 @@ import androidx.room.TypeConverters
 import com.felipemz.inventaryapp.core.DATABASE_NAME
 import com.felipemz.inventaryapp.data.local.dao.CategoryDao
 import com.felipemz.inventaryapp.data.local.dao.MovementDao
-import com.felipemz.inventaryapp.data.local.dao.ProductCompositionDao
+import com.felipemz.inventaryapp.data.local.dao.ProductPackageDao
 import com.felipemz.inventaryapp.data.local.dao.ProductDao
-import com.felipemz.inventaryapp.data.local.entity.ProductCompositionEntity
-import com.felipemz.inventaryapp.domain.model.CategoryModel
-import com.felipemz.inventaryapp.domain.model.MovementItemModel
-import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.data.local.entity.CategoryEntity
+import com.felipemz.inventaryapp.data.local.entity.MovementItemEntity
+import com.felipemz.inventaryapp.data.local.entity.ProductPackageEntity
+import com.felipemz.inventaryapp.data.local.entity.ProductEntity
 
 @Database(
     entities = [
-        ProductModel::class,
-        CategoryModel::class,
-        MovementItemModel::class,
-        ProductCompositionEntity::class,
+        ProductEntity::class,
+        CategoryEntity::class,
+        MovementItemEntity::class,
+        ProductPackageEntity::class,
     ],
     version = 1,
     exportSchema = false
@@ -30,7 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun categoryDao(): CategoryDao
     abstract fun movementDao(): MovementDao
-    abstract fun productCompositionDao(): ProductCompositionDao
+    abstract fun productCompositionDao(): ProductPackageDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

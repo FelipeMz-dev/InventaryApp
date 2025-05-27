@@ -2,8 +2,16 @@ package com.felipemz.inventaryapp.data.local
 
 import androidx.room.TypeConverter
 import com.felipemz.inventaryapp.core.enums.MovementItemType
+import com.felipemz.inventaryapp.core.enums.QuantityType
 
 class Converters {
+
+    @TypeConverter
+    fun toQuantityType(value: String) = QuantityType.valueOf(value)
+
+    @TypeConverter
+    fun fromQuantityType(type: QuantityType) = type.name
+
     @TypeConverter
     fun fromMovementItemType(value: MovementItemType): String = value.name
 
