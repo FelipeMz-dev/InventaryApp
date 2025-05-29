@@ -28,35 +28,20 @@ import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBack
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCostChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDeleteCategory
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnInsertOrUpdateCategory
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnOpenProduct
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageProductSelect
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSubProductSelect
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTryDeleteProduct
-import com.felipemz.inventaryapp.ui.product_form.alert_dialog.AlertDialogProductForm
-import com.felipemz.inventaryapp.ui.product_form.components.CategoryField
-import com.felipemz.inventaryapp.ui.product_form.components.CostField
-import com.felipemz.inventaryapp.ui.product_form.components.DescriptionField
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
+import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductForm
+import com.felipemz.inventaryapp.ui.product_form.field.CategoryField
+import com.felipemz.inventaryapp.ui.product_form.field.CostField
+import com.felipemz.inventaryapp.ui.product_form.field.DescriptionField
 import com.felipemz.inventaryapp.ui.product_form.components.EmojiSelectorBottomSheet
-import com.felipemz.inventaryapp.ui.product_form.components.IdProductField
-import com.felipemz.inventaryapp.ui.product_form.components.ImageField
+import com.felipemz.inventaryapp.ui.product_form.field.IdProductField
+import com.felipemz.inventaryapp.ui.product_form.field.ImageField
 import com.felipemz.inventaryapp.ui.product_form.components.ImageSelectorBottomSheet
-import com.felipemz.inventaryapp.ui.product_form.components.NameField
-import com.felipemz.inventaryapp.ui.product_form.components.PackageField
-import com.felipemz.inventaryapp.ui.product_form.components.PriceField
+import com.felipemz.inventaryapp.ui.product_form.field.NameField
+import com.felipemz.inventaryapp.ui.product_form.field.PackageField
+import com.felipemz.inventaryapp.ui.product_form.field.PriceField
 import com.felipemz.inventaryapp.ui.product_form.components.QuantityChangeBottomSheet
-import com.felipemz.inventaryapp.ui.product_form.components.QuantityField
+import com.felipemz.inventaryapp.ui.product_form.field.QuantityField
 import com.felipemz.inventaryapp.ui.product_form.components.TopBarProduct
 
 @Composable
@@ -161,7 +146,8 @@ internal fun ProductFormScreen(
                 categories = state.categories,
                 categoryIdToChange = state.categoryIdToChange,
                 onInsertOrUpdate = { eventHandler(OnInsertOrUpdateCategory(it)) },
-                onDelete = { eventHandler(OnDeleteCategory(it.id)) }
+                onDelete = { eventHandler(OnDeleteCategory(it.id)) },
+                onSort = { from, to -> eventHandler(OnSortCategories(from, to)) },
             ) { eventHandler(OnCategoryChanged(it)) }
 
             HorizontalDotDivider(modifier = Modifier.fillMaxWidth())

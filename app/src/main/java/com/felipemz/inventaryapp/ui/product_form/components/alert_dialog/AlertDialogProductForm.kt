@@ -1,21 +1,25 @@
-package com.felipemz.inventaryapp.ui.product_form.alert_dialog
+package com.felipemz.inventaryapp.ui.product_form.components.alert_dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import com.felipemz.inventaryapp.core.extensions.toIdString
 import com.felipemz.inventaryapp.ui.commons.CommonAlertDialog
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
 import com.felipemz.inventaryapp.ui.product_form.CategoryUseChart
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.GoToChangeCategory
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDeleteCategory
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDeleted
-import com.felipemz.inventaryapp.ui.product_form.alert_dialog.AlertDialogProductFormType.*
+import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType.*
 
 @Composable
 fun AlertDialogProductForm(
@@ -32,11 +36,10 @@ fun AlertDialogProductForm(
                         action = { eventHandler(GoToChangeCategory(it.usedId, dialog.categoryId)) }
                     )
                     is DeleteProduct -> {
-                        Text(
-                            text = "${dialog.product.id} ${dialog.product.name}",
-                            maxLines = 1,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            overflow = TextOverflow.Ellipsis
+                        ProductItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            product = dialog.product,
+                            isSmall = true
                         )
                     }
                 }
@@ -63,10 +66,7 @@ private fun BodyDialogDeleteCategory(
         categoryUsesError.forEach {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 TextButtonUnderline(
-                    text = it.usedId.toString().padStart(
-                        length = 6,
-                        padChar = '0'
-                    ),
+                    text = it.usedId.toIdString(),
                     isEnabled = !it.isChanged
                 ) { action(it) }
 

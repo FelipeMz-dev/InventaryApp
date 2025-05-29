@@ -33,13 +33,15 @@ class CategoryRepositoryImpl(
             .launchIn(CoroutineScope(Dispatchers.IO))
     }
 
-    override suspend fun insertOrUpdate(category: CategoryModel): CategoryModel? {
-        categoryDao.getById(category.id)?.apply {
-            categoryDao.update(category.toEntity())
-            return category
-        }
-        val newCategoryId = categoryDao.insert(category.toEntity()).toInt()
-        return categoryDao.getById(newCategoryId)?.toModel()
+    override suspend fun insert(category: CategoryModel): CategoryModel? {
+        val position = categoryDao.getMaxPosition() + 1
+        val newId = categoryDao.insert(category.copy(position = position).toEntity()).toInt()
+        return categoryDao.getById(newId)?.toModel()
+    }
+
+    override suspend fun update(category: CategoryModel): CategoryModel? {
+        categoryDao.update(category.toEntity())
+        return category
     }
 
     override suspend fun getById(id: Int): CategoryModel? {
@@ -47,6 +49,14 @@ class CategoryRepositoryImpl(
     }
 
     override suspend fun delete(id: Int) {
-        categoryDao.getById(id)?.let { categoryDao.delete(it) }
+        categoryDao.getById(id)?.let {
+            moveDownGreaterCategories(it.position)
+            categoryDao.delete(it)
+        }
+    }
+
+    private suspend fun moveDownGreaterCategories(position: Int) {
+        val categoriesToMove = categoryDao.getCategoriesWithPositionGreaterThan(position)
+        categoryDao.updateAll(categoriesToMove.map { it.copy(position = it.position - 1) })
     }
 }

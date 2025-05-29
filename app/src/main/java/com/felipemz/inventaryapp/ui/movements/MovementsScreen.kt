@@ -51,7 +51,7 @@ import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnSaveMovement
 import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnSelectProduct
 import com.felipemz.inventaryapp.ui.movements.components.InvoiceList
 import com.felipemz.inventaryapp.ui.product_form.components.QuantityChangeBottomSheet
-import com.felipemz.inventaryapp.ui.product_form.components.getIdString
+import com.felipemz.inventaryapp.ui.product_form.field.getIdString
 
 @Composable
 internal fun MovementsScreen(

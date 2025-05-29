@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product_form.components
+package com.felipemz.inventaryapp.ui.product_form.field
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,19 +28,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.CategoryColor
-import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
+import com.felipemz.inventaryapp.ui.commons.SortableList
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
+import com.felipemz.inventaryapp.ui.product_form.components.CategoryEditorDialog
 
 @Composable
 internal fun CategoryField(
@@ -50,6 +53,7 @@ internal fun CategoryField(
     categoryIdToChange: Int? = null,
     onInsertOrUpdate: (CategoryModel) -> Unit,
     onDelete: (CategoryModel) -> Unit,
+    onSort: (CategoryModel, CategoryModel) -> Unit,
     onSelect: (CategoryModel) -> Unit,
 ) {
 
@@ -75,11 +79,12 @@ internal fun CategoryField(
             showDropCategory = false
             onSelect(event.category)
         }
+        is CategoryItemEvent.OnSort -> onSort(event.from, event.to)
     }
 
     CommonFormField(
         modifier = modifier,
-        title = stringResource(R.string.copy_category_dots)
+        title = stringResource(R.string.copy_category_dots),
     ) {
 
         ButtonCategories(
@@ -131,8 +136,10 @@ private fun ButtonCategories(
     ) {
 
         Text(
+            modifier = Modifier.weight(1f, false),
             text = category?.name ?: stringResource(R.string.copy_select),
-            maxLines = 1
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
 
         Icon(
@@ -148,6 +155,10 @@ sealed interface CategoryItemEvent {
     data class OnDelete(val category: CategoryModel) : CategoryItemEvent
     data class OnEdit(val category: CategoryModel) : CategoryItemEvent
     data class OnSelect(val category: CategoryModel) : CategoryItemEvent
+    data class OnSort(
+        val from: CategoryModel,
+        val to: CategoryModel
+    ) : CategoryItemEvent
 }
 
 @Composable
@@ -161,29 +172,33 @@ private fun CategoriesDropDownMenu(
         expanded = showDropCategory,
         onDismissRequest = { onEvent(CategoryItemEvent.OnDismiss) },
         shape = RoundedCornerShape(8.dp),
-        properties = PopupProperties(
-            focusable = true,
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
+        properties = PopupProperties(focusable = true)
     ) {
-        categories.forEach { category ->
+
+        SortableList(
+            modifier = Modifier.fillMaxWidth(),
+            items = categories,
+            onMove = { from, to ->
+                val fromCategory = categories[from].copy(position = categories[to].position)
+                val toCategory = categories[to].copy(position = categories[from].position)
+                onEvent(CategoryItemEvent.OnSort(fromCategory, toCategory))
+            }
+        ) { category: CategoryModel, isDragging ->
             DropdownCategoryItem(
                 category = category,
                 canEdit = canEdit,
+                isDragging = isDragging,
                 onDelete = { onEvent(CategoryItemEvent.OnDelete(category)) },
                 onEdit = { onEvent(CategoryItemEvent.OnEdit(category)) },
                 onSelect = { onEvent(CategoryItemEvent.OnSelect(category)) }
             )
         }
 
-        DropdownMenuItem(
-            text = {
-                TextButtonUnderline(
-                    text = "Crear categoría",
-                    onClick = { onEvent(CategoryItemEvent.OnCreate) }
-                )
-            },
+        TextButtonUnderline(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally),
+            text = "Crear categoría",
             onClick = { onEvent(CategoryItemEvent.OnCreate) }
         )
     }
@@ -193,6 +208,7 @@ private fun CategoriesDropDownMenu(
 private fun DropdownCategoryItem(
     category: CategoryModel,
     canEdit: Boolean,
+    isDragging: Boolean,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
     onSelect: () -> Unit
@@ -245,6 +261,7 @@ private fun DropdownCategoryItem(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .alpha(if (isDragging) 0.5f else 1f)
                         .background(
                             color = colorResource(category.color),
                             shape = CircleShape
@@ -256,6 +273,8 @@ private fun DropdownCategoryItem(
                         ),
                     text = category.name,
                     textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     color = colorResource(category.color).onColor()
                 )
             }
@@ -263,3 +282,4 @@ private fun DropdownCategoryItem(
         onClick = onSelect
     )
 }
+

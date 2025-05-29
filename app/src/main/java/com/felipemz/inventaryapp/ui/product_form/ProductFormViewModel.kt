@@ -3,7 +3,6 @@ package com.felipemz.inventaryapp.ui.product_form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
@@ -23,7 +22,6 @@ import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateCategoryUseCase
 import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateProductUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllProductsUseCase
-import com.felipemz.inventaryapp.ui.commons.fakeChips
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.Init
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
@@ -42,7 +40,7 @@ import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityType
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSubProductSelect
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetCategoryToChange
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetChangedSuccessfulCategory
-import com.felipemz.inventaryapp.ui.product_form.alert_dialog.AlertDialogProductFormType
+import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
 import kotlinx.coroutines.Dispatchers
 
 class ProductFormViewModel(
@@ -69,6 +67,7 @@ class ProductFormViewModel(
                 is ProductFormEvent.OnTryDeleteProduct -> tryToDeleteProduct()
                 is OnProductDeleted -> deleteProduct()
                 is OnInsertOrUpdateCategory -> insertOrUpdateCategory(event.category)
+                is ProductFormEvent.OnSortCategories -> sortCategories(event.from, event.to)
                 is OnDeleteCategory -> tryDeleteCategory(event.categoryId)
                 is OnProductSaved -> saveProduct()
                 is OnNameChanged -> nameChanged(event.name)
@@ -288,6 +287,11 @@ class ProductFormViewModel(
     private fun insertOrUpdateCategory(category: CategoryModel) = execute(Dispatchers.IO) {
         val newCategory = insertOrUpdateCategoryUseCase(category)
         newCategory?.let(::categoryChanged)
+    }
+
+    private fun sortCategories(from: CategoryModel, to: CategoryModel) = execute(Dispatchers.IO) {
+        insertOrUpdateCategoryUseCase(from)
+        insertOrUpdateCategoryUseCase(to)
     }
 
     private fun tryDeleteCategory(categoryId: Int) = execute(Dispatchers.IO) {

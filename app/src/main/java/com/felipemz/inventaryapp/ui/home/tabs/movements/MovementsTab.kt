@@ -73,7 +73,9 @@ internal fun MovementsTab(
                     .clickable { }
                     .padding(6.dp),
                 movement = movement,
-                movementColor = movement.type.color?.let { colorResource(id = it) } ?: MaterialTheme.colorScheme.primary
+                movementColor = movement.type.color?.let {
+                    colorResource(id = it)
+                } ?: MaterialTheme.colorScheme.primary
             )
         }
     }

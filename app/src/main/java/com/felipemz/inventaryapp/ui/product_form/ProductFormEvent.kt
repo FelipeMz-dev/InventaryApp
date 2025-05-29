@@ -46,6 +46,8 @@ sealed interface ProductFormEvent : Event {
 
     data class OnDeleteCategory(val categoryId: Int) : ProductFormEvent
 
+    data class OnSortCategories(val from: CategoryModel, val to: CategoryModel) : ProductFormEvent
+
     data class GoToChangeCategory(val productId: Int, val categoryId: Int) : ProductFormEvent
 
     data class SetCategoryToChange(val categoryId: Int) : ProductFormEvent

@@ -195,11 +195,11 @@ internal fun ImageAndCounter(
                 top = spaceCounter
             )
             .border(
-                width = 2.dp,
+                width = 2.5.dp,
                 color = colorCategory,
                 shape = CircleShape
             )
-            .padding(4.dp)
+            .padding(4.5.dp)
             .clip(CircleShape)
             .size(size),
         image = image,

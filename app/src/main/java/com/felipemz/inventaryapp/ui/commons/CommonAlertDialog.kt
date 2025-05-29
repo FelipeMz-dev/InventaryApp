@@ -1,27 +1,25 @@
 package com.felipemz.inventaryapp.ui.commons
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
@@ -35,58 +33,46 @@ internal fun CommonAlertDialog(
     onDismiss: () -> Unit,
     onAccept: () -> Unit = onDismiss
 ) {
-    BasicAlertDialog(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier.Companion
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceContainer,
-                    shape = MaterialTheme.shapes.large
-                )
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+    AlertDialog(
+        title = {
             Row(
-                modifier = Modifier.Companion.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.Companion.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Warning,
-                    contentDescription = null,
-                    tint = colorResource(R.color.yellow),
+                    modifier = Modifier.padding(4.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_warning),
+                    tint = Color.Unspecified,
+                    contentDescription = "Warning"
                 )
 
                 Text(
-                    modifier = Modifier.Companion.weight(1f),
+                    modifier = Modifier.weight(1f),
                     text = "Advertencia",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Companion.Bold,
+                    fontWeight = FontWeight.Bold
                 )
 
-                IconButton(
-                    onClick = onDismiss,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                ) {
+                IconButton(onDismiss) {
                     Icon(
-                        modifier = Modifier.Companion,
                         imageVector = Icons.Default.Close,
                         contentDescription = null
                     )
                 }
             }
-
-            Text(
-                text = message,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-
-            body()
-
+        },
+        text = {
+            Column(Modifier.fillMaxWidth()) {
+                Text(
+                    text = message,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                body()
+            }
+        },
+        onDismissRequest = onDismiss,
+        confirmButton = {
             Button(
                 modifier = Modifier.Companion.fillMaxWidth(),
                 onClick = onAccept,
@@ -95,5 +81,5 @@ internal fun CommonAlertDialog(
                 Text(text = stringResource(R.string.copy_accept))
             }
         }
-    }
+    )
 }

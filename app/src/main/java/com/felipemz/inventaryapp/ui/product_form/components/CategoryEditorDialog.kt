@@ -35,6 +35,7 @@ import com.felipemz.inventaryapp.core.enums.CategoryColor
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
+import com.felipemz.inventaryapp.ui.product_form.field.NameField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

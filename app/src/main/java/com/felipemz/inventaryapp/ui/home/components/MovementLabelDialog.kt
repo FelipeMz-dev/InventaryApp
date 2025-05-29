@@ -15,18 +15,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.ui.commons.PopupDialog
+import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
 
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
-internal fun MovementLabelPopup(
+internal fun MovementLabelDialog(
     labelList: List<String>,
+    onDismiss: () -> Unit,
     onSelect: (String) -> Unit,
-    onClose: () -> Unit,
 ) {
-    PopupDialog(
+    CommonCustomDialog(
         title = stringResource(R.string.copy_select_label),
-        onClose = { onClose() }
+        onDismiss = { onDismiss() }
     ) {
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(4.dp),

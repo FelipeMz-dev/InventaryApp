@@ -1,8 +1,5 @@
 package com.felipemz.inventaryapp.core.extensions
 
-import android.content.Context
-import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import java.time.Clock
@@ -55,18 +52,23 @@ fun <T> T?.orDefault(default: T): T {
     return this ?: default
 }
 
-fun <T> tryOrDefault(default: T, block: () -> T): T {
+fun <T> tryOrDefault(
+    default: T,
+    block: () -> T
+): T {
     return try {
         block()
     } catch (e: Exception) {
+        println("Error occurred: ${e.message}")
         default
     }
 }
 
-fun Context.showToast(@StringRes message: Int) {
-    Toast.makeText(this, getString(message), Toast.LENGTH_SHORT).show()
-}
-
-fun Context.showToast(messageRes: String) {
-    Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
+fun Int.toIdString(): String {
+    return try {
+        this.toString().padStart(6, '0')
+    } catch (e: Exception) {
+        println("Error converting Int to String: ${e.message}")
+        "000000"
+    }
 }

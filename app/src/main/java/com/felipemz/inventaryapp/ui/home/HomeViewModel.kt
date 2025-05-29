@@ -54,8 +54,6 @@ class HomeViewModel(
                 is HomeEvent.OnMovementsInverted -> movementsInverted(event.isInverted)
                 is HomeEvent.OnMovementFilterSelected -> movementFilterSelected(event.filter)
                 is HomeEvent.OnLabelSelected -> labelSelected(event.label)
-                is HomeEvent.OnHideLabelPopup -> hideLabelPopup()
-                is HomeEvent.OnCloseReportsCalendarPopup -> updateState { it.copy(isReportsCalendarPopup = false) }
                 is HomeEvent.OnProductOrderSelected -> setOrderProducts(event.orderBy, event.isInverted)
                 is HomeEvent.OnOpenProductOrderPopup -> updateState { it.copy(isProductOrderPopup = true) }
                 is HomeEvent.OpenReportsCalendarPopup -> updateState { it.copy(isReportsCalendarPopup = true) }
@@ -172,15 +170,6 @@ class HomeViewModel(
                         MovementsFilterChip.LABEL -> it.labels.isEmpty()
                     }
                 }
-            )
-        }
-    }
-
-    private fun hideLabelPopup() {
-        updateState {
-            it.copy(
-                isShowLabelPopup = false,
-                movementLabelSelected = null
             )
         }
     }

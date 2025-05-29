@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.core.enums
+package com.felipemz.inventaryapp.ui.home.tabs
 
 import com.felipemz.inventaryapp.R
 

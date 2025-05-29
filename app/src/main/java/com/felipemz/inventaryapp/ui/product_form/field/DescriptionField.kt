@@ -1,6 +1,5 @@
-package com.felipemz.inventaryapp.ui.product_form.components
+package com.felipemz.inventaryapp.ui.product_form.field
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -14,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -24,25 +22,30 @@ import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.CommonTrailingIcon
 
 @Composable
-internal fun NameField(
+internal fun DescriptionField(
     modifier: Modifier,
-    name: String,
+    description: String,
     isEnable: Boolean = true,
-    onChange: (String) -> Unit,
+    onOpen: suspend () -> Unit,
+    onChange: (String) -> Unit
 ) {
 
-    var text by remember(name) { mutableStateOf(name) }
+    var text by remember(description) { mutableStateOf(description) }
 
     CommonFormField(
         modifier = modifier,
-        title = stringResource(id = R.string.copy_name_dots)
+        title = stringResource(R.string.copy_description_dots),
+        concealable = true,
+        visible = false,
+        isMandatory = false,
+        onOpen = onOpen
     ) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier,
             shape = RoundedCornerShape(12.dp),
             value = text,
             onValueChange = {
-                val newText = it.filter { char -> char.isLetterOrDigit() || char.isWhitespace() }.trimStart()
+                val newText = it.trimStart()
                 text = newText
                 onChange(newText)
             },
@@ -61,11 +64,11 @@ internal fun NameField(
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next,
                 capitalization = KeyboardCapitalization.Sentences
             ),
             enabled = isEnable,
-            singleLine = true
+            maxLines = 6,
+            minLines = 4,
         )
     }
 }

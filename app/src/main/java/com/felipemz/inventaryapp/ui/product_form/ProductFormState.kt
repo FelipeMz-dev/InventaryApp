@@ -6,7 +6,7 @@ import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
-import com.felipemz.inventaryapp.ui.product_form.alert_dialog.AlertDialogProductFormType
+import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
 
 data class ProductFormState(
     val isLoading: Boolean = false,
