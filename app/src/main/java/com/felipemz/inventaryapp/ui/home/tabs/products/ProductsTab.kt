@@ -1,6 +1,9 @@
 package com.felipemz.inventaryapp.ui.home.tabs.products
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,11 +12,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,8 +41,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.EMPTY_STRING
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
@@ -111,6 +124,7 @@ private fun FilterChipCategories(
     onSelectChip = onSelectChip
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchTextField(
     isInventory: Boolean,
@@ -122,76 +136,82 @@ private fun SearchTextField(
     val focusManager = LocalFocusManager.current
     var text by remember { mutableStateOf(String()) }
 
-    TextField(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(8.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(
-                horizontal = 12.dp,
-                vertical = 8.dp
-            )
-            .onFocusChanged { onFocusChange(it.isFocused) },
-        value = text,
-        onValueChange = {
-            text = it
-            onTextChange(it)
-        },
-        placeholder = { Text(stringResource(R.string.copy_product_search)) },
-        shape = CircleShape,
-        leadingIcon = {
-            LeadingSearch(isFocusSearch) {
-                focusManager.clearFocus()
-                text = String()
-                onTextChange(String())
+                horizontal = 16.dp,
+                vertical = 12.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        LeadingSearch(isFocusSearch) {
+            focusManager.clearFocus()
+            text = String()
+            onTextChange(String())
+        }
+
+        BasicTextField(
+            modifier = Modifier
+                .weight(1f)
+                .padding(4.dp)
+                .onFocusChanged { onFocusChange(it.isFocused) },
+            value = text,
+            onValueChange = {
+                text = it
+                onTextChange(it)
+            },
+            singleLine = true,
+            textStyle = LocalTextStyle.current,
+            enabled = isInventory,
+            decorationBox = { innerTextField ->
+                if (text.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.copy_product_search),
+                        color = Color.Gray
+                    )
+                }
+                innerTextField()
             }
-        },
-        trailingIcon = {
-            TrailingSearch(isFocusSearch) {
-                text = String()
-                onTextChange(String())
-            }
-        },
-        singleLine = true,
-        enabled = isInventory,
-        colors = TextFieldDefaults.colors().copy(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
         )
-    )
+
+        isFocusSearch.ifTrue {
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        text = EMPTY_STRING
+                        onTextChange(EMPTY_STRING)
+                    }
+                    .padding(4.dp),
+                imageVector = Icons.Rounded.Clear,
+                contentDescription = null
+            )
+        }
+    }
 }
 
 @Composable
 private fun LeadingSearch(
     isFocusSearch: Boolean,
     onBack: () -> Unit
-) = Row(verticalAlignment = Alignment.CenterVertically) {
-
-    if (isFocusSearch) {
-        Icon(
-            modifier = Modifier
-                .padding(start = 6.dp)
-                .clip(CircleShape)
-                .clickable { onBack() }
-                .padding(4.dp),
-            imageVector = Icons.Rounded.ArrowBack,
-            contentDescription = null
-        )
-    }
-
-    Text("🔍")
-}
-
-@Composable
-private fun TrailingSearch(
-    isFocusSearch: Boolean,
-    onClean: () -> Unit,
 ) = if (isFocusSearch) {
     Icon(
         modifier = Modifier
-            .padding(end = 6.dp)
             .clip(CircleShape)
-            .clickable { onClean() }
+            .clickable { onBack() }
             .padding(4.dp),
-        imageVector = Icons.Rounded.Clear,
+        imageVector = Icons.Rounded.ArrowBack,
         contentDescription = null
     )
-} else Unit
+} else {
+    Icon(
+        modifier = Modifier.padding(4.dp),
+        imageVector = Icons.Default.Search,
+        tint = MaterialTheme.colorScheme.outline,
+        contentDescription = null,
+    )
+}

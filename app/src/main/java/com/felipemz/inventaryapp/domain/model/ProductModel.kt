@@ -9,8 +9,9 @@ data class ProductModel(
     val price: Int = 0,
     val category: CategoryModel = CategoryModel(),
     val image: ProductTypeImage = ProductTypeImage.LetterImage(EMPTY_STRING),
-    val description: String = EMPTY_STRING,
-    val cost: Int = 0,
+    val description: String? = null,
+    val cost: Int? = null,
+    val barCode: String? = null,
     val quantityModel: ProductQuantityModel? = null,
     val packageProducts: List<ProductPackageModel>? = null,
 )

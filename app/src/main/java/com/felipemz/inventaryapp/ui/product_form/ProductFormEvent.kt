@@ -30,7 +30,9 @@ sealed interface ProductFormEvent : Event {
 
     data class OnDescriptionChanged(val description: String) : ProductFormEvent
 
-    data class OnCostChanged(val cost: Int) : ProductFormEvent
+    data class OnCostChanged(val cost: Int?) : ProductFormEvent
+
+    data class OnBarcodeChanged(val barcode: String?) : ProductFormEvent
 
     data class OnQuantityTypeChanged(val quantityType: QuantityType?) : ProductFormEvent
 

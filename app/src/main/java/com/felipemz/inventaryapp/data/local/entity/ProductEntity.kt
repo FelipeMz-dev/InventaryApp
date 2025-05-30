@@ -24,11 +24,12 @@ data class ProductEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String = EMPTY_STRING,
     val price: Double = 0.0,
-    val cost: Double = 0.0,
-    val description: String = EMPTY_STRING,
     val categoryId: Int = 0,
     val imageType: String = PRODUCT_TYPE_IMAGE_LETTER,
     val imageValue: String = EMPTY_STRING,
-    val quantityType: String = QuantityType.UNIT.name,
-    val quantity: Int = 0
+    val cost: Double? = null,
+    val barCode: String? = null,
+    val description: String? = null,
+    val quantityType: String? = null,
+    val quantity: Int? = null
 )

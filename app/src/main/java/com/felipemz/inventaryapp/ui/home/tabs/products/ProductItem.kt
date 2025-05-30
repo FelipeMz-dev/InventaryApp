@@ -137,7 +137,7 @@ internal fun ProductItem(
             } ?: Row(modifier = Modifier.height(IntrinsicSize.Max)) {
                 Text(
                     text = product.description.takeUnless {
-                        it.isEmpty()
+                        it.isNullOrEmpty()
                     } ?: stringResource(R.string.copy_without_information),
                     color = Color.Gray,
                     maxLines = 1,

@@ -2,6 +2,7 @@ package com.felipemz.inventaryapp.domain.repository.mapper
 
 import com.felipemz.inventaryapp.core.EMPTY_STRING
 import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.data.local.entity.ProductEntity
 import com.felipemz.inventaryapp.data.local.entity.ProductPackageEntity
 import com.felipemz.inventaryapp.data.local.relations.ProductWithCategoryAndPackages
@@ -20,11 +21,13 @@ fun ProductEntity.toImage(): ProductTypeImage = when (imageType) {
 }
 
 fun ProductEntity.toQuantityModel(): ProductQuantityModel? {
-    if (quantityType.isEmpty()) return null
-    return ProductQuantityModel(
-        type = QuantityType.valueOf(quantityType),
-        quantity = quantity
-    )
+    if (quantityType.isNullOrEmpty()) return null
+    return quantity?.let {
+        ProductQuantityModel(
+            type = QuantityType.valueOf(quantityType),
+            quantity = it
+        )
+    }
 }
 
 fun ProductWithCategoryAndPackages.toProductModel(): ProductModel {
@@ -32,11 +35,12 @@ fun ProductWithCategoryAndPackages.toProductModel(): ProductModel {
         id = product.id,
         name = product.name,
         price = product.price.toInt(),
-        cost = product.cost.toInt(),
-        description = product.description,
-        image = product.toImage(),
-        quantityModel = product.toQuantityModel(),
         category = category.toModel(),
+        image = product.toImage(),
+        cost = product.cost?.toInt(),
+        barCode = product.barCode,
+        description = product.description,
+        quantityModel = product.toQuantityModel(),
         packageProducts = packageProducts.flatMap { packageWithQuantity ->
             packageWithQuantity.packages.map { it.toModel() }
         }.takeIf { packageProducts.isNotEmpty() }
@@ -54,22 +58,27 @@ fun ProductModel.toEntity(): ProductEntity = ProductEntity(
     id = id,
     name = name,
     price = price.toDouble(),
-    cost = cost.toDouble(),
+    categoryId = category.id,
+    imageType = toImageType(),
+    imageValue = toImageValue(),
+    cost = cost?.toDouble(),
+    barCode = barCode,
     description = description,
-    imageType = when (image) {
-        is ProductTypeImage.EmojiImage -> PRODUCT_TYPE_IMAGE_EMOJI
-        is ProductTypeImage.PhatImage -> PRODUCT_TYPE_IMAGE_PHAT
-        is ProductTypeImage.LetterImage -> PRODUCT_TYPE_IMAGE_LETTER
-    },
-    imageValue = when (image) {
-        is ProductTypeImage.EmojiImage -> image.emoji
-        is ProductTypeImage.PhatImage -> image.path
-        is ProductTypeImage.LetterImage -> image.letter
-    },
-    quantityType = quantityModel?.type?.name ?: EMPTY_STRING,
-    quantity = quantityModel?.quantity ?: 0,
-    categoryId = category.id
+    quantityType = quantityModel?.type?.name,
+    quantity = quantityModel?.quantity
 )
+
+private fun ProductModel.toImageType() = when (image) {
+    is ProductTypeImage.EmojiImage -> PRODUCT_TYPE_IMAGE_EMOJI
+    is ProductTypeImage.PhatImage -> PRODUCT_TYPE_IMAGE_PHAT
+    is ProductTypeImage.LetterImage -> PRODUCT_TYPE_IMAGE_LETTER
+}
+
+private fun ProductModel.toImageValue() = when (image) {
+    is ProductTypeImage.EmojiImage -> image.emoji
+    is ProductTypeImage.PhatImage -> image.path
+    is ProductTypeImage.LetterImage -> image.letter
+}
 
 fun ProductModel.toPackageEntities(): List<ProductPackageEntity> {
     return packageProducts?.map { it.toEntity(id) } ?: emptyList()
