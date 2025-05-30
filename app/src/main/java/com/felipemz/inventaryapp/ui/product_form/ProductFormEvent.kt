@@ -1,10 +1,10 @@
 package com.felipemz.inventaryapp.ui.product_form
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.domain.model.CategoryModel
-import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
+import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 
 sealed interface ProductFormEvent : Event {
 
@@ -12,7 +12,11 @@ sealed interface ProductFormEvent : Event {
 
     data object OnBack : ProductFormEvent
 
+    data object CloseAlertDialog : ProductFormEvent
+
     data object OnProductSaved : ProductFormEvent
+
+    data object OnTryDeleteProduct : ProductFormEvent
 
     data object OnProductDeleted : ProductFormEvent
 
@@ -32,11 +36,21 @@ sealed interface ProductFormEvent : Event {
 
     data class OnQuantityChanged(val quantity: Int) : ProductFormEvent
 
-    data class OnSubProductSelect(val product: ProductQuantityModel?) : ProductFormEvent
+    data class OnSubProductSelect(val product: ProductSelectionChart?) : ProductFormEvent
 
-    data class OnOpenProduct(val product: ProductQuantityModel) : ProductFormEvent
+    data class OnOpenProduct(val product: ProductSelectionChart) : ProductFormEvent
 
-    data class OnPackageProductSelect(val product: ProductQuantityModel?) : ProductFormEvent
+    data class OnPackageProductSelect(val product: ProductSelectionChart?) : ProductFormEvent
 
-    data class OnCompositionProductSelect(val product: ProductQuantityModel?) : ProductFormEvent
+    data class OnInsertOrUpdateCategory(val category: CategoryModel) : ProductFormEvent
+
+    data class OnDeleteCategory(val categoryId: Int) : ProductFormEvent
+
+    data class OnSortCategories(val from: CategoryModel, val to: CategoryModel) : ProductFormEvent
+
+    data class GoToChangeCategory(val productId: Int, val categoryId: Int) : ProductFormEvent
+
+    data class SetCategoryToChange(val categoryId: Int) : ProductFormEvent
+
+    data class SetChangedSuccessfulCategory(val productId: Int) : ProductFormEvent
 }

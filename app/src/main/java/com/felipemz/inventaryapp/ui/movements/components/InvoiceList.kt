@@ -17,19 +17,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
+import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
-import com.felipemz.inventaryapp.ui.product_form.components.ProductPackageItem
+import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
 
 @Composable
 internal fun InvoiceList(
     subTotal: Int,
     discount: Int,
     total: Int,
-    selectedProducts: List<ProductQuantityModel>,
-    onQuantityProduct: (ProductQuantityModel) -> Unit,
-    onSelect: (ProductQuantityModel) -> Unit,
+    selectedProducts: List<ProductSelectionChart>,
+    onQuantityProduct: (ProductSelectionChart) -> Unit,
+    onSelect: (ProductSelectionChart) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -41,7 +41,7 @@ internal fun InvoiceList(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(selectedProducts) { product ->
-            ProductPackageItem(
+            ProductSelectedItem(
                 product = product,
                 onClick = { },
                 onChangeSelection = { onSelect(product.copy(quantity = it)) },

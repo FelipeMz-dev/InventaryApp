@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product_form.components
+package com.felipemz.inventaryapp.ui.commons
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterExitState

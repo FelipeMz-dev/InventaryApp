@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product_form.components
+package com.felipemz.inventaryapp.ui.product_form.field
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +15,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.ProductTypeImage
+import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.home.tabs.products.ImageAndCounter
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
 
 @Composable
 internal fun ImageField(
@@ -25,6 +27,7 @@ internal fun ImageField(
     images: List<ProductTypeImage>,
     imageSelected: ProductTypeImage,
     category: CategoryModel?,
+    isEnable: Boolean = true,
     onOpen: suspend () -> Unit,
     onSelect: (ProductTypeImage) -> Unit,
 ) {
@@ -46,7 +49,7 @@ internal fun ImageField(
                 ImageAndCounter(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable { onSelect(image) }
+                        .clickable { isEnable.ifTrue { onSelect(image) } }
                         .alpha(if (imageSelected::class == image::class) 1f else 0.4f),
                     image = image,
                     quantity = null,

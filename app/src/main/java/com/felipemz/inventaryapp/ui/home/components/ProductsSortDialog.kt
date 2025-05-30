@@ -2,6 +2,7 @@ package com.felipemz.inventaryapp.ui.home.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
-import com.felipemz.inventaryapp.ui.commons.PopupDialog
+import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
 
 @Composable
-internal fun ProductsOrderPopup(
+internal fun ProductsSortDialog(
     productOrderSelected: ProductsOrderBy,
     isProductOrderInverted: Boolean,
     onClose: (ProductsOrderBy, Boolean) -> Unit
@@ -32,31 +33,31 @@ internal fun ProductsOrderPopup(
     var orderBy by remember { mutableStateOf(productOrderSelected) }
     var isOrderInverted by remember { mutableStateOf(isProductOrderInverted) }
 
-
-    PopupDialog(
+    CommonCustomDialog(
         title = stringResource(R.string.copy_order_by),
-        onClose = { onClose(orderBy, isOrderInverted) }
+        onDismiss = { onClose(orderBy, isOrderInverted) },
     ) {
+        Column {
+            ProductsOrderBy.entries.forEach { order ->
 
-        ProductsOrderBy.entries.forEach { order ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { orderBy = order },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { orderBy = order },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+                    Text(
+                        text = order.text,
+                        modifier = Modifier.padding(8.dp)
+                    )
 
-                Text(
-                    text = order.text,
-                    modifier = Modifier.padding(8.dp)
-                )
-
-                Checkbox(
-                    checked = orderBy == order,
-                    onCheckedChange = { orderBy = order }
-                )
+                    Checkbox(
+                        checked = orderBy == order,
+                        onCheckedChange = { orderBy = order }
+                    )
+                }
             }
         }
 

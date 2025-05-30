@@ -33,9 +33,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.ui.commons.FilterChipRow
 import com.felipemz.inventaryapp.ui.home.HomeEvent
 
@@ -74,9 +74,9 @@ internal fun InventoryTab(
             ProductItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { eventHandler(HomeEvent.OnOpenProduct(item)) }
                     .padding(horizontal = 6.dp),
-                product = item
+                product = item,
+                onClick = { eventHandler(HomeEvent.OnOpenProduct(item)) }
             )
         }
     }
@@ -99,10 +99,10 @@ private fun FilterChipCategories(
                 selectedLabelColor = colorResource(id = it.color).onColor()
             )
         } ?: FilterChipDefaults.filterChipColors().copy(
-                containerColor = Color.Gray.copy(alpha = 0.4f),
-                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = Color.Gray.copy(alpha = 0.4f),
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary
         )
     },
     text = { it?.name ?: "Todos" },

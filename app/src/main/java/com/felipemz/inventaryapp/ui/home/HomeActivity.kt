@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
-import com.felipemz.inventaryapp.core.enums.HomeTabs
+import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.ui.movements.MovementsActivity
 import com.felipemz.inventaryapp.ui.product_form.ProductFormActivity
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme

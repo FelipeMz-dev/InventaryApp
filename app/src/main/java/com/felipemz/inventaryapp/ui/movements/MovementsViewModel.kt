@@ -1,7 +1,7 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
+import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
 import com.felipemz.inventaryapp.core.utils.FormatDateUtil
 import com.felipemz.inventaryapp.ui.commons.fakeProducts
@@ -28,7 +28,7 @@ class MovementsViewModel : BaseViewModel<MovementsState, MovementsEvent>() {
         }
     }
 
-    private fun selectProduct(product: ProductQuantityModel) {
+    private fun selectProduct(product: ProductSelectionChart) {
         updateState { uiState ->
             uiState.copy(
                 selectedProducts = uiState.selectedProducts.let { products ->

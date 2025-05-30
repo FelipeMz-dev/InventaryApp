@@ -18,6 +18,9 @@ interface CategoryDao {
     @Update
     suspend fun update(category: CategoryEntity)
 
+    @Update
+    suspend fun updateAll(categories: List<CategoryEntity>)
+
     @Query("SELECT * FROM categories WHERE id = :id")
     suspend fun getById(id: Int): CategoryEntity?
 
@@ -26,4 +29,10 @@ interface CategoryDao {
 
     @Delete
     suspend fun delete(category: CategoryEntity)
+
+    @Query("SELECT MAX(position) FROM categories")
+    suspend fun getMaxPosition(): Int
+
+    @Query("SELECT * FROM categories WHERE position > :position ORDER BY position")
+    suspend fun getCategoriesWithPositionGreaterThan(position: Int): List<CategoryEntity>
 }

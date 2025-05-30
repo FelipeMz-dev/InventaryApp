@@ -1,26 +1,26 @@
 package com.felipemz.inventaryapp.ui.commons
 
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.enums.MovementItemType
+import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.CategoryRatingModel
 import com.felipemz.inventaryapp.domain.model.LabelRatingModel
 import com.felipemz.inventaryapp.domain.model.MovementItemModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 import com.felipemz.inventaryapp.domain.model.ProductRatingModel
-import com.felipemz.inventaryapp.core.enums.MovementItemType
-import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
+import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 
 val fakeChips = listOf(
-    CategoryModel(position = 1, name = "Alimentos", color = R.color.red_dark),
-    CategoryModel(position = 2, name = "Bebidas", color = R.color.blue),
-    CategoryModel(position = 3, name = "Cuidado Personal", color = R.color.pink),
-    CategoryModel(position = 4, name = "Electrónicos", color = R.color.teal),
-    CategoryModel(position = 5, name = "Hogar", color = R.color.orange),
-    CategoryModel(position = 6, name = "Limpieza", color = R.color.purple),
-    CategoryModel(position = 7, name = "Mascotas", color = R.color.green),
-    CategoryModel(position = 8, name = "Otros", color = R.color.lime)
+    CategoryModel(id = 1, position = 1, name = "Alimentos", color = R.color.red_dark),
+    CategoryModel(id = 2, position = 2, name = "Bebidas", color = R.color.blue),
+    CategoryModel(id = 3, position = 3, name = "Cuidado Personal", color = R.color.pink),
+    CategoryModel(id = 4, position = 4, name = "Electrónicos", color = R.color.teal),
+    CategoryModel(id = 5, position = 5, name = "Hogar", color = R.color.orange),
+    CategoryModel(id = 6, position = 6, name = "Limpieza", color = R.color.purple),
+    CategoryModel(id = 7, position = 7, name = "Mascotas", color = R.color.green),
+    CategoryModel(id = 8, position = 8, name = "Otros", color = R.color.lime)
 )
 
 val fakeProducts = listOf(
@@ -29,7 +29,7 @@ val fakeProducts = listOf(
         name = "Fresa delicia",
         description = "sin información",
         category = fakeChips[0],
-        quantityChart = null,
+        quantityModel = null,
         price = 11000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
     ),
@@ -38,7 +38,7 @@ val fakeProducts = listOf(
         name = "Fresa Natural",
         description = "sin información",
         category = fakeChips[0],
-        quantityChart = null,
+        quantityModel = null,
         price = 10000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
     ),
@@ -47,7 +47,7 @@ val fakeProducts = listOf(
         name = "Delicia mini",
         description = "sin información",
         category = fakeChips[0],
-        quantityChart = null,
+        quantityModel = null,
         price = 9000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF53")
     ),
@@ -56,7 +56,7 @@ val fakeProducts = listOf(
         name = "Coca Cola",
         description = "sin información",
         category = fakeChips[1],
-        quantityChart = ProductQuantityChart(QuantityType.UNIT, 5),
+        quantityModel = ProductQuantityModel(QuantityType.UNIT, 5),
         price = 5000,
         image = ProductTypeImage.EmojiImage("\uD83C\uDF7A")
     ),
@@ -65,7 +65,7 @@ val fakeProducts = listOf(
         name = "Shampoo",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[2],
-        quantityChart = ProductQuantityChart(QuantityType.UNIT, 3),
+        quantityModel = ProductQuantityModel(QuantityType.UNIT, 3),
         price = 15000,
         image = ProductTypeImage.EmojiImage("\uD83D\uDC4D")
     ),
@@ -74,7 +74,7 @@ val fakeProducts = listOf(
         name = "Audífonos",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[3],
-        quantityChart = ProductQuantityChart(QuantityType.UNIT, 1),
+        quantityModel = ProductQuantityModel(QuantityType.UNIT, 1),
         price = 50000,
         image = ProductTypeImage.PhatImage("")
     ),
@@ -83,7 +83,7 @@ val fakeProducts = listOf(
         name = "Cargador",
         description = "Aquí",
         category = fakeChips[3],
-        quantityChart = ProductQuantityChart(QuantityType.UNIT, 5),
+        quantityModel = ProductQuantityModel(QuantityType.UNIT, 5),
         price = 25000,
         image = ProductTypeImage.PhatImage("")
     ),
@@ -92,7 +92,7 @@ val fakeProducts = listOf(
         name = "Escoba",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[4],
-        quantityChart = ProductQuantityChart(QuantityType.UNIT, 20),
+        quantityModel = ProductQuantityModel(QuantityType.UNIT, 20),
         price = 20000,
         image = ProductTypeImage.LetterImage("Es")
     ),
@@ -101,7 +101,7 @@ val fakeProducts = listOf(
         name = "Detergente",
         description = "para la losa",
         category = fakeChips[5],
-        quantityChart = ProductQuantityChart(QuantityType.UNIT, 13),
+        quantityModel = ProductQuantityModel(QuantityType.UNIT, 13),
         price = 10000,
         image = ProductTypeImage.LetterImage("De")
     ),
@@ -110,7 +110,7 @@ val fakeProducts = listOf(
         name = "Comida para perro",
         description = "Aquí va toda la información del producto / sin información",
         category = fakeChips[6],
-        quantityChart = ProductQuantityChart(QuantityType.GRAM, 10),
+        quantityModel = ProductQuantityModel(QuantityType.GRAM, 10),
         price = 30000,
         image = ProductTypeImage.EmojiImage("\uD83D\uDC36")
     ),

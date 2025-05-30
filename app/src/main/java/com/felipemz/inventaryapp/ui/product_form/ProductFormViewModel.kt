@@ -3,41 +3,72 @@ package com.felipemz.inventaryapp.ui.product_form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
+import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.core.extensions.ifTrue
+import com.felipemz.inventaryapp.core.extensions.isNotNull
+import com.felipemz.inventaryapp.core.extensions.orDefault
+import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
-import com.felipemz.inventaryapp.domain.model.toProductSelectionEntity
-import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.core.extensions.isNotNull
-import com.felipemz.inventaryapp.core.extensions.tryOrDefault
-import com.felipemz.inventaryapp.ui.commons.fakeChips
-import com.felipemz.inventaryapp.ui.commons.fakeProducts
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityChart
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductTypeImage
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
+import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
+import com.felipemz.inventaryapp.domain.model.ProductTypeImage
+import com.felipemz.inventaryapp.domain.model.toProductPackageModel
+import com.felipemz.inventaryapp.domain.usecase.DeleteCategoryIfNotUseUseCase
+import com.felipemz.inventaryapp.domain.usecase.DeleteProductUseCase
+import com.felipemz.inventaryapp.domain.usecase.GetProductByIdUseCase
+import com.felipemz.inventaryapp.domain.usecase.GetProductsIdAndNameFromCategoryUseCase
+import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateCategoryUseCase
+import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateProductUseCase
+import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
+import com.felipemz.inventaryapp.domain.usecase.ObserveAllProductsUseCase
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.Init
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCostChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDeleteCategory
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnInsertOrUpdateCategory
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageProductSelect
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDeleted
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSubProductSelect
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetCategoryToChange
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetChangedSuccessfulCategory
+import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
+import kotlinx.coroutines.Dispatchers
 
-class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>() {
+class ProductFormViewModel(
+    private val observeAllProductsUseCase: ObserveAllProductsUseCase,
+    private val insertOrUpdateProductUseCase: InsertOrUpdateProductUseCase,
+    private val getProductByIdUseCase: GetProductByIdUseCase,
+    private val getProductsIdAndNameFromCategoryUseCase: GetProductsIdAndNameFromCategoryUseCase,
+    private val deleteProductUseCase: DeleteProductUseCase,
+    private val observeAllCategoriesUseCase: ObserveAllCategoriesUseCase,
+    private val insertOrUpdateCategoryUseCase: InsertOrUpdateCategoryUseCase,
+    private val deleteCategoryUseCase: DeleteCategoryIfNotUseUseCase,
+) : BaseViewModel<ProductFormState, ProductFormEvent>() {
 
-    private val messenger = MutableLiveData<String?>()
-    val messengerLiveData: LiveData<String?> = messenger
+    private val action = MutableLiveData<ProductFormAction>()
+    val actionLiveData: LiveData<ProductFormAction> = action
 
-    private val initialState = ProductFormState(
-        categories = fakeChips,
-        images = listOf(
-            ProductTypeImage.LetterImage(String()),
-            ProductTypeImage.EmojiImage(String()),
-            ProductTypeImage.PhatImage(String())
-        ),
-        productList = fakeProducts
-    )
-
-    override fun initState() = initialState
+    override fun initState() = ProductFormState()
 
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
                 is Init -> init(event.productId)
+                is CloseAlertDialog -> updateState { it.copy(alertDialog = null) }
+                is ProductFormEvent.OnTryDeleteProduct -> tryToDeleteProduct()
                 is OnProductDeleted -> deleteProduct()
+                is OnInsertOrUpdateCategory -> insertOrUpdateCategory(event.category)
+                is ProductFormEvent.OnSortCategories -> sortCategories(event.from, event.to)
+                is OnDeleteCategory -> tryDeleteCategory(event.categoryId)
                 is OnProductSaved -> saveProduct()
                 is OnNameChanged -> nameChanged(event.name)
                 is OnPriceChanged -> priceChanged(event.price)
@@ -47,47 +78,57 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
                 is OnCostChanged -> updateState { it.copy(cost = event.cost) }
                 is OnQuantityTypeChanged -> quantityTypeChanged(event.quantityType)
                 is OnQuantityChanged -> updateState { it.copy(quantity = event.quantity) }
-                is OnPackageProductSelect -> packageProductSelected(event.product)
-                is OnCompositionProductSelect -> compositionProductSelect(event.product)
-                is OnSubProductSelect -> subProductSelect(event.product)
+                is OnPackageProductSelect -> compositionProductSelect(event.product)
+                is OnSubProductSelect -> compositionProductSelect(event.product)
+                is SetCategoryToChange -> updateState { it.copy(categoryIdToChange = event.categoryId) }
+                is SetChangedSuccessfulCategory -> setChangedSuccessfulCategory(event.productId)
                 else -> Unit
             }
         }
     }
 
     private fun init(productId: Int?) {
-        val product = state.value.productList.firstOrNull { it.id == productId }
-        product?.let {
-            updateState { uiState ->
-                uiState.copy(
-                    originalProduct = product,
-                    price = product.price,
-                    category = product.category,
-                    description = product.description,
-                    cost = product.cost,
-                    quantityType = product.quantityChart?.type,
-                    quantity = product.quantityChart?.quantity ?: 0,
-                    packageProduct = getPackageProduct(product),
-                    compositionProducts = getCompositionProducts(product)
-                )
+        productId?.let { loadProduct(it) }
+        observeAllCategories()
+    }
+
+    private fun loadProduct(productId: Int) {
+        execute(Dispatchers.IO) {
+            getProductByIdUseCase(productId)?.let { product ->
+                updateState { uiState ->
+                    uiState.copy(
+                        originalProduct = product,
+                        price = product.price,
+                        category = product.category,
+                        description = product.description,
+                        cost = product.cost,
+                        quantityType = product.quantityModel?.type,
+                        quantity = product.quantityModel?.quantity ?: 0,
+                        packageProducts = getPackageProducts(product)
+                    )
+                }
+                imageChanged(product.image)
+                nameChanged(product.name)
             }
-            imageChanged(product.image)
-            nameChanged(product.name)
         }
     }
 
-    private fun getCompositionProducts(product: ProductModel): List<ProductQuantityModel>? {
-        return product.compositionProducts?.map { productSelection ->
-            ProductQuantityModel(
-                product = state.value.productList.firstOrNull { it.id == productSelection.id },
-                quantity = productSelection.quantity
-            )
+    private fun observeAllCategories() = execute(Dispatchers.IO) {
+        observeAllCategoriesUseCase().collect { categories ->
+            updateState { it.copy(categories = categories) }
         }
     }
-    private fun getPackageProduct(product: ProductModel): ProductQuantityModel? {
-        return product.packageProduct?.let { productSelection ->
-            ProductQuantityModel(
-                product = state.value.productList.firstOrNull { it.id == productSelection.id },
+
+    private fun observeAllProducts() = execute(Dispatchers.IO) {
+        observeAllProductsUseCase().collect { products ->
+            updateState { it.copy(productList = products) }
+        }
+    }
+
+    private fun getPackageProducts(product: ProductModel): List<ProductSelectionChart>? {
+        return product.packageProducts?.map { productSelection ->
+            ProductSelectionChart(
+                product = state.value.productList.firstOrNull { it.id == productSelection.productId },
                 quantity = productSelection.quantity
             )
         }
@@ -102,7 +143,14 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
                 }
             )
         }.invokeOnCompletion {
+            updateImageLetter()
             validateEnableToSave()
+        }
+    }
+
+    private fun updateImageLetter() = with(state.value) {
+        if (imageSelected is ProductTypeImage.LetterImage) updateState {
+            it.copy(imageSelected = images.first())
         }
     }
 
@@ -121,7 +169,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
     private fun imageChanged(selection: ProductTypeImage) {
         updateState {
             it.copy(
-                imageSelected = selection.ifNotEmpty(it.imageSelected.ifNotEmpty(it.images.first())),
+                imageSelected = selection.ifNotEmptyOrDefault(it.imageSelected.ifNotEmptyOrDefault(it.images.first())),
                 images = state.value.images.map { image ->
                     if (image::class == selection::class) selection
                     else image
@@ -139,40 +187,11 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         }
     }
 
-    private fun subProductSelect(product: ProductQuantityModel?) {
-        state.value.packageProduct?.product?.run {
-            packageProductSelected(product)
-        } ?: compositionProductSelect(product)
-    }
-
-    private fun packageProductSelected(product: ProductQuantityModel?) {
-        updateState { uiState ->
-            product?.let { packageProduct ->
-                uiState.copy(
-                    packageProduct = packageProduct.copy(
-                        product = packageProduct.product.takeIf { packageProduct.quantity > 0 },
-                        quantity = packageProduct.quantity
-                    ),
-                    quantityType = QuantityType.UNIT,
-                    quantity = tryOrDefault(0) {
-                        (packageProduct.product?.quantityChart?.quantity ?: 0).floorDiv(packageProduct.quantity)
-                    }
-                )
-            } ?: uiState.copy(
-                packageProduct = null,
-                quantityType = null,
-                quantity = 0
-            )
-        }.invokeOnCompletion {
-            validateEnableToSave()
-        }
-    }
-
-    private fun compositionProductSelect(product: ProductQuantityModel?) {
+    private fun compositionProductSelect(product: ProductSelectionChart?) {
         updateState { uiState ->
             product?.let { compositionProduct ->
                 uiState.copy(
-                    compositionProducts = uiState.compositionProducts?.let { products ->
+                    packageProducts = uiState.packageProducts?.let { products ->
                         if (products.any { it.product == compositionProduct.product }) {
                             products.mapNotNull {
                                 if (it.product != product.product) it
@@ -185,7 +204,7 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
                     quantityType = QuantityType.UNIT,
                 )
             } ?: uiState.copy(
-                compositionProducts = null,
+                packageProducts = null,
                 quantityType = null
             )
         }.invokeOnCompletion {
@@ -198,8 +217,8 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         updateState { uiState ->
             uiState.copy(
                 quantity = tryOrDefault(0) {
-                    uiState.compositionProducts?.minOf {
-                        (it.product?.quantityChart?.quantity ?: 0).floorDiv(it.quantity)
+                    uiState.packageProducts?.minOf {
+                        (it.product?.quantityModel?.quantity ?: 0).floorDiv(it.quantity)
                     } ?: 0
                 }
             )
@@ -210,37 +229,120 @@ class ProductFormViewModel : BaseViewModel<ProductFormState, ProductFormEvent>()
         val isEnable = name.isNotEmpty()
                 && price > 0
                 && category.isNotNull()
-                && packageProduct?.let { it.product.isNotNull() } ?: true
-                && compositionProducts?.isNotEmpty() ?: true
+                && packageProducts
+            ?.isNotEmpty()
+            .orDefault(true)
         updateState { it.copy(enableToSave = isEnable) }
     }
 
-    private fun saveProduct() {
-        val product = with(state.value) {
+    private fun saveProduct() = execute(Dispatchers.IO) {
+        val product = makeProduct()
+        product?.let { product ->
+            insertOrUpdateProductUseCase(product)
+            state.value.categoryIdToChange?.let { categoryId ->
+                if (categoryId == product.category.id) return@let
+                action.postValue(ProductFormAction.ShowMessage("Categoría actualizada"))
+                action.postValue(ProductFormAction.OnCategoryChangeDone(product.id))
+            } ?: run {
+                action.postValue(ProductFormAction.ShowMessage("Producto guardado"))
+                cleanData()
+            }
+        }
+    }
+
+    private fun makeProduct() = with(state.value) {
+        category?.let { category ->
             ProductModel(
                 id = originalProduct?.id ?: 0,
                 name = name,
                 price = price,
-                category = category ?: CategoryModel(),
+                category = category,
                 image = imageSelected,
                 description = description,
                 cost = cost,
-                quantityChart = quantityType?.let {
-                    ProductQuantityChart(
-                        type = it,
-                        quantity = quantity
-                    )
-                },
-                packageProduct = packageProduct?.toProductSelectionEntity(),
-                compositionProducts = compositionProducts?.map { it.toProductSelectionEntity() }
+                quantityModel = quantityType?.let { ProductQuantityModel(it, quantity) },
+                packageProducts = packageProducts?.map { it.toProductPackageModel() }
             )
         }
-        messenger.postValue("Producto guardado")
-        updateState { initialState }
     }
 
-    private fun deleteProduct() {
-        messenger.postValue("Producto eliminado")
-        updateState { initialState }
+    private fun tryToDeleteProduct() {
+        state.value.originalProduct?.let { product ->
+            updateState {
+                it.copy(
+                    alertDialog = AlertDialogProductFormType.DeleteProduct(product)
+                )
+            }
+        }
+    }
+
+    private fun deleteProduct() = execute(Dispatchers.IO) {
+        state.value.originalProduct?.id?.let {
+            deleteProductUseCase(it)
+            action.postValue(ProductFormAction.ShowMessage("Producto eliminado"))
+            cleanData()
+        }
+    }
+
+    private fun insertOrUpdateCategory(category: CategoryModel) = execute(Dispatchers.IO) {
+        val newCategory = insertOrUpdateCategoryUseCase(category)
+        newCategory?.let(::categoryChanged)
+    }
+
+    private fun sortCategories(from: CategoryModel, to: CategoryModel) = execute(Dispatchers.IO) {
+        insertOrUpdateCategoryUseCase(from)
+        insertOrUpdateCategoryUseCase(to)
+    }
+
+    private fun tryDeleteCategory(categoryId: Int) = execute(Dispatchers.IO) {
+        deleteCategoryUseCase(categoryId).let { isDeleted ->
+            isDeleted.ifTrue {
+                action.postValue(ProductFormAction.ShowMessage("Categoría eliminada"))
+                if (categoryId == state.value.category?.id) {
+                    updateState { it.copy(category = null) }
+                }
+                return@execute
+            }
+            validateCategoryUses(categoryId)
+        }
+    }
+
+    private fun validateCategoryUses(categoryId: Int) = execute(Dispatchers.IO) {
+        getProductsIdAndNameFromCategoryUseCase(categoryId).let { productIds ->
+            updateState {
+                it.copy(
+                    alertDialog = AlertDialogProductFormType.DeleteCategory(
+                        categoryId = categoryId,
+                        categoryUsesError = productIds.map { idAndName ->
+                            CategoryUseChart(
+                                usedId = idAndName.first,
+                                usesName = idAndName.second,
+                                isChanged = false
+                            )
+                        }
+                    )
+                )
+            }
+        }
+    }
+
+    private fun setChangedSuccessfulCategory(productId: Int) {
+        updateState { uiState ->
+            if (uiState.alertDialog is AlertDialogProductFormType.DeleteCategory) {
+                uiState.copy(
+                    alertDialog = AlertDialogProductFormType.DeleteCategory(
+                        categoryId = uiState.alertDialog.categoryId,
+                        categoryUsesError = uiState.alertDialog.categoryUsesError.map {
+                            if (it.usedId == productId) it.copy(isChanged = true) else it
+                        }
+                    ),
+                )
+            } else uiState
+        }
+    }
+
+    private fun cleanData() {
+        updateState { ProductFormState() }
+        observeAllCategories()
     }
 }

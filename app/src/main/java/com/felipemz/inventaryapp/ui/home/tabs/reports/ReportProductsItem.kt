@@ -128,7 +128,7 @@ internal fun ReportRatingItem(
     TextButtonUnderline(
         modifier = Modifier.fillMaxWidth(),
         text = "Ver más",
-        enabled = true
+        isEnabled = true
     ) { onSeeMore() }
 
     HorizontalDotDivider(

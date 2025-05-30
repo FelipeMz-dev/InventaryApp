@@ -1,14 +1,16 @@
-package com.felipemz.inventaryapp.ui.product_form.components
+package com.felipemz.inventaryapp.ui.product_form.field
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.OutlinedPriceField
 
 @Composable
 internal fun CostField(
     modifier: Modifier,
     value: Int,
+    isEnable: Boolean = true,
     onChange: (Int) -> Unit,
     onOpen: suspend () -> Unit
 ) {
@@ -20,10 +22,11 @@ internal fun CostField(
         concealable = true,
         onOpen = onOpen
     ) {
-       OutlinedPriceField(
-           modifier = Modifier.fillMaxWidth(),
-           value = value,
-           onChange = onChange
-       )
+        OutlinedPriceField(
+            modifier = Modifier.fillMaxWidth(),
+            value = value,
+            isEnable = isEnable,
+            onChange = onChange
+        )
     }
 }

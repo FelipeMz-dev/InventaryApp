@@ -7,7 +7,9 @@ interface CategoryRepository {
 
     fun observeAllCategories(): Flow<List<CategoryModel>>
 
-    suspend fun insertOrUpdate(category: CategoryModel) : CategoryModel?
+    suspend fun insert(category: CategoryModel) : CategoryModel?
+
+    suspend fun update(category: CategoryModel) : CategoryModel?
 
     suspend fun getById(id: Int): CategoryModel?
 

@@ -1,10 +1,10 @@
 package com.felipemz.inventaryapp.data.repository
 
+import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.data.cache.ProductsCache
 import com.felipemz.inventaryapp.data.local.dao.ProductDao
 import com.felipemz.inventaryapp.data.local.dao.ProductPackageDao
 import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.domain.repository.CategoryRepository
 import com.felipemz.inventaryapp.domain.repository.ProductRepository
 import com.felipemz.inventaryapp.domain.repository.mapper.toEntity
 import com.felipemz.inventaryapp.domain.repository.mapper.toPackageEntities
@@ -29,6 +29,11 @@ class ProductRepositoryImpl(
         if (canObserveProducts) initProductObservation()
         return productCache.products
     }
+
+    override suspend fun sortProductsFromObserver(
+        orderBy: ProductsOrderBy,
+        isInverted: Boolean
+    ) { productCache.sortBy(orderBy, isInverted) }
 
     private fun initProductObservation() {
         canObserveProducts = false

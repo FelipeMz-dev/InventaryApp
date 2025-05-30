@@ -51,10 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.extensions.createImageUri
-import com.felipemz.inventaryapp.core.extensions.getBitmapFromUri
 import com.felipemz.inventaryapp.core.extensions.hasCameraPermission
-import com.felipemz.inventaryapp.core.extensions.saveBitmapToUri
+import com.felipemz.inventaryapp.core.utils.BitmapContentManager
 import com.felipemz.inventaryapp.core.utils.BitmapUtil.dragBitmap
 import com.felipemz.inventaryapp.core.utils.BitmapUtil.rotateBitmap
 import com.felipemz.inventaryapp.core.utils.BitmapUtil.scaleBitmapFromOffset
@@ -76,16 +74,18 @@ internal fun ImageSelectorBottomSheet(
     var position by remember { mutableStateOf(Offset.Zero) }
     val sheetState = rememberModalBottomSheetState()
 
+    val bitmapManager = BitmapContentManager(context)
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { image = context.getBitmapFromUri(it) }
+        uri?.let { image = bitmapManager.getBitmapFromUri(it) }
     }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success: Boolean ->
         if (success) {
-            imageUri?.let { image = context.getBitmapFromUri(it) }
+            imageUri?.let { image = bitmapManager.getBitmapFromUri(it) }
             imageUri = null
         }
     }
@@ -93,7 +93,7 @@ internal fun ImageSelectorBottomSheet(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            imageUri = context.createImageUri()
+            imageUri = bitmapManager.createImageUri()
             imageUri?.let { cameraLauncher.launch(it) }
         }
     }
@@ -153,14 +153,14 @@ internal fun ImageSelectorBottomSheet(
                 BottomActions(
                     modifier = Modifier.fillMaxWidth(),
                     onRetry = { image = null },
-                    onAccept = { onSelect(context.saveBitmapToUri(selected).path.orEmpty()) }
+                    onAccept = { onSelect(bitmapManager.saveBitmapToUri(selected).path.orEmpty()) }
                 )
             } ?: ActionsImageObtain(
                 modifier = Modifier.fillMaxWidth(),
                 onGallery = { galleryLauncher.launch("image/*") },
                 onCamera = {
                     if (context.hasCameraPermission()) {
-                        imageUri = context.createImageUri()
+                        imageUri = bitmapManager.createImageUri()
                         imageUri?.let { cameraLauncher.launch(it) }
                     } else {
                         requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)

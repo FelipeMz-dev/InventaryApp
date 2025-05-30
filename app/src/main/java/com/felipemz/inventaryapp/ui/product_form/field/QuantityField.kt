@@ -1,4 +1,4 @@
-package com.felipemz.inventaryapp.ui.product_form.components
+package com.felipemz.inventaryapp.ui.product_form.field
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -24,13 +24,14 @@ import androidx.compose.ui.window.PopupProperties
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNull
+import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 
 @Composable
 internal fun QuantityField(
     modifier: Modifier,
     quantityType: QuantityType?,
-    enabled: Boolean,
+    isEnabled: Boolean,
     quantity: Int = 0,
     onAdd: () -> Unit,
     onOpen: suspend () -> Unit,
@@ -38,8 +39,8 @@ internal fun QuantityField(
 ) {
 
     var showListPopup by remember { mutableStateOf(false) }
-    val toggle by remember(quantityType, enabled) {
-        derivedStateOf { quantityType.isNull().not() || !enabled }
+    val toggle by remember(quantityType, isEnabled) {
+        derivedStateOf { quantityType.isNull().not() || !isEnabled }
     }
 
     CommonFormField(
@@ -51,7 +52,7 @@ internal fun QuantityField(
         onOpen = onOpen,
         thumbContent = {
             Switch(
-                enabled = enabled,
+                enabled = isEnabled,
                 checked = toggle,
                 onCheckedChange = {
                     if (it) onSelect(QuantityType.UNIT) else onSelect(null)
@@ -62,13 +63,13 @@ internal fun QuantityField(
 
         QuantityTypeField(
             quantityType = quantityType,
-            enabled = enabled
+            enabled = isEnabled
         ) { showListPopup = true }
 
         QuantityValueField(
             quantity = quantity,
             quantityType = quantityType,
-            enabled = enabled
+            enabled = isEnabled
         ) { onAdd() }
 
         DropDownQuantityType(
@@ -137,7 +138,7 @@ private fun QuantityValueField(
 
         TextButtonUnderline(
             text = "$quantity/${quantityType?.initial.orEmpty()}",
-            enabled = enabled,
+            isEnabled = enabled,
             onClick = action
         )
     }
@@ -158,7 +159,7 @@ private fun QuantityTypeField(
 
         TextButtonUnderline(
             text = quantityType?.text.orEmpty(),
-            enabled = enabled,
+            isEnabled = enabled,
             onClick = action
         )
     }

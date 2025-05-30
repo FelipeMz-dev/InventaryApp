@@ -14,14 +14,15 @@ import androidx.compose.ui.text.coerceIn
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.core.utils.PriceUtil
-import com.felipemz.inventaryapp.ui.product_form.components.CommonTrailingIcon
 
 @Composable
 fun OutlinedPriceField(
     modifier: Modifier,
     value: Int,
+    isEnable: Boolean = true,
     onChange: (Int) -> Unit
 ){
 
@@ -58,11 +59,14 @@ fun OutlinedPriceField(
             }
         },
         trailingIcon = {
-            CommonTrailingIcon(value == 0) {
-                val newValue = PriceUtil.getValue(it)
-                onChange(newValue)
+            isEnable.ifTrue {
+                CommonTrailingIcon(value == 0) {
+                    val newValue = PriceUtil.getValue(it)
+                    onChange(newValue)
+                }
             }
         },
+        enabled = isEnable,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )

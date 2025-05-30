@@ -32,58 +32,59 @@ import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.CustomFilterDate
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
-import com.felipemz.inventaryapp.ui.commons.PopupDialog
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.commons.datepicker.DatePickerDialogPopup
 
 @Composable
-fun ReportsCalendarPopup(
-    onAccept: (RangeDateModel) -> Unit,
-    onClose: () -> Unit
+fun ReportsCalendarDialog(
+    onDismiss: () -> Unit,
+    onAccept: (RangeDateModel) -> Unit
 ) {
 
     var filterTypeSelected by remember { mutableStateOf(CustomFilterDate.DAY) }
     var dateSelected by remember { mutableStateOf<RangeDateModel?>(null) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-    PopupDialog(
+    CommonCustomDialog(
         title = stringResource(R.string.copy_search_date),
-        onClose = { onClose() }
+        onDismiss = onDismiss
     ) {
+        Column {
+            TopFilterTypeSelector(
+                modifier = Modifier.fillMaxWidth(),
+                filterTypeSelected = filterTypeSelected,
+            ) {
+                filterTypeSelected = it
+                dateSelected = null
+            }
 
-        TopFilterTypeSelector(
-            modifier = Modifier.fillMaxWidth(),
-            filterTypeSelected = filterTypeSelected,
-        ) {
-            filterTypeSelected = it
-            dateSelected = null
-        }
+            HorizontalDotDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
 
-        HorizontalDotDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
+            BodySearchDate(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                dateSelected = dateSelected,
+                filterTypeSelected = filterTypeSelected
+            ) { showDatePicker = true }
 
-        BodySearchDate(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            dateSelected = dateSelected,
-            filterTypeSelected = filterTypeSelected
-        ) { showDatePicker = true }
+            HorizontalDotDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
 
-        HorizontalDotDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
-
-        TextButtonUnderline(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.copy_accept),
-            enabled = !dateSelected.isNull()
-        ) {
-            dateSelected?.let { onAccept(it) }
+            TextButtonUnderline(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.copy_accept),
+                isEnabled = !dateSelected.isNull()
+            ) {
+                dateSelected?.let { onAccept(it) }
+            }
         }
     }
 
