@@ -22,7 +22,7 @@ import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
 @Composable
 fun PackageField(
     modifier: Modifier,
-    compositionProducts: List<ProductSelectionChart>?,
+    selectedProducts: List<ProductSelectionChart>?,
     isEnabled: Boolean,
     onAdd: () -> Unit,
     onOpen: suspend () -> Unit,
@@ -31,15 +31,15 @@ fun PackageField(
 ) {
     CommonFormField(
         modifier = modifier,
-        title = "Conjunto:",
+        title = "Paquete:",
         isMandatory = false,
-        visible = compositionProducts.isNotNull(),
+        visible = selectedProducts.isNotNull(),
         concealable = true,
         onOpen = onOpen,
         thumbContent = {
             Switch(
-                enabled = isEnabled || compositionProducts.isNotNull(),
-                checked = compositionProducts.isNotNull(),
+                enabled = isEnabled || selectedProducts.isNotNull(),
+                checked = selectedProducts.isNotNull(),
                 onCheckedChange = { state ->
                     onSelect(ProductSelectionChart().takeIf { state })
                 }
@@ -59,7 +59,7 @@ fun PackageField(
             )
 
             ProductSelectionField(
-                compositionProducts = compositionProducts,
+                compositionProducts = selectedProducts,
                 onClick = onClick,
                 onSelect = onSelect
             )

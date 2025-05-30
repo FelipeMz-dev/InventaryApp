@@ -76,6 +76,7 @@ class ProductFormViewModel(
                 is OnImageChanged -> imageChanged(event.image)
                 is OnDescriptionChanged -> updateState { it.copy(description = event.description) }
                 is OnCostChanged -> updateState { it.copy(cost = event.cost) }
+                is ProductFormEvent.OnBarcodeChanged -> updateState { it.copy(barcode = event.barcode) }
                 is OnQuantityTypeChanged -> quantityTypeChanged(event.quantityType)
                 is OnQuantityChanged -> updateState { it.copy(quantity = event.quantity) }
                 is OnPackageProductSelect -> compositionProductSelect(event.product)
@@ -102,6 +103,7 @@ class ProductFormViewModel(
                         category = product.category,
                         description = product.description,
                         cost = product.cost,
+                        barcode = product.barCode,
                         quantityType = product.quantityModel?.type,
                         quantity = product.quantityModel?.quantity ?: 0,
                         packageProducts = getPackageProducts(product)
@@ -258,8 +260,9 @@ class ProductFormViewModel(
                 price = price,
                 category = category,
                 image = imageSelected,
-                description = description,
-                cost = cost,
+                description = description?.trim()?.takeIf{ it.isNotEmpty() },
+                barCode = barcode?.trim()?.takeIf { it.isNotEmpty() },
+                cost = cost.takeIf { it != 0 },
                 quantityModel = quantityType?.let { ProductQuantityModel(it, quantity) },
                 packageProducts = packageProducts?.map { it.toProductPackageModel() }
             )

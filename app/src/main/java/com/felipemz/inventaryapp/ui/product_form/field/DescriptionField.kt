@@ -18,13 +18,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.extensions.ifTrue
+import com.felipemz.inventaryapp.core.extensions.orEmpty
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.CommonTrailingIcon
 
 @Composable
 internal fun DescriptionField(
     modifier: Modifier,
-    description: String,
+    description: String?,
     isEnable: Boolean = true,
     onOpen: suspend () -> Unit,
     onChange: (String) -> Unit
@@ -43,7 +44,7 @@ internal fun DescriptionField(
         OutlinedTextField(
             modifier = modifier,
             shape = RoundedCornerShape(12.dp),
-            value = text,
+            value = text.orEmpty(),
             onValueChange = {
                 val newText = it.trimStart()
                 text = newText
@@ -53,7 +54,7 @@ internal fun DescriptionField(
             trailingIcon = {
                 isEnable.ifTrue {
                     CommonTrailingIcon(
-                        isTextEmpty = text.isEmpty(),
+                        isTextEmpty = text.isNullOrEmpty(),
                         onEdit = onChange
                     )
                 }

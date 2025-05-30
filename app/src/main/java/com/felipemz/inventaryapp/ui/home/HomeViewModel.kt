@@ -103,7 +103,7 @@ class HomeViewModel(
         }
     }
 
-    private fun changeSearchText(text: String) = execute(Dispatchers.IO) {
+    private fun changeSearchText(text: String) = execute(Dispatchers.IO) { //TODO: Move logic to use case
         val filteredProducts = _products.value.filter { product ->
             val matchesCategory = state.value.categorySelected.isNull()
                     || product.category.color == state.value.categorySelected?.color

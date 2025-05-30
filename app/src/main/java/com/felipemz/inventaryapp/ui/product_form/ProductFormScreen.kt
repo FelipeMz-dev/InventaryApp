@@ -176,16 +176,6 @@ internal fun ProductFormScreen(
 
             HorizontalDotDivider(modifier = Modifier.fillMaxWidth())
 
-            CostField(
-                modifier = Modifier.fillMaxWidth(),
-                value = state.cost,
-                isEnable = state.categoryIdToChange.isNull(),
-                onChange = { eventHandler(OnCostChanged(it)) },
-                onOpen = { moveToFinal() }
-            )
-
-            HorizontalDotDivider(modifier = Modifier.fillMaxWidth())
-
             AdvancedField(
                 state = state,
                 onAddSubProduct = { showProductsPopup = true },
@@ -213,6 +203,13 @@ private fun AdvancedField(
         concealable = true,
         onOpen = { onOpen() }
     ) {
+        BarcodeField(
+            modifier = Modifier.fillMaxWidth(),
+            barcode = state.barcode,
+            isEnable = state.categoryIdToChange.isNull(),
+            onChange = { eventHandler(OnBarcodeChanged(it)) },
+            onOpen = { onOpen() }
+        )
 
         QuantityField(
             modifier = Modifier.fillMaxWidth(),
@@ -225,12 +222,20 @@ private fun AdvancedField(
 
         PackageField(
             modifier = Modifier.fillMaxWidth(),
-            compositionProducts = state.packageProducts,
+            selectedProducts = state.packageProducts,
             isEnabled = state.quantityType.isNull() || state.categoryIdToChange.isNull(),
             onAdd = onAddSubProduct,
             onOpen = onOpen,
             onClick = { eventHandler(OnOpenProduct(it)) },
             onSelect = { eventHandler(OnPackageProductSelect(it)) }
+        )
+
+        CostField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.cost,
+            isEnable = state.categoryIdToChange.isNull(),
+            onChange = { eventHandler(OnCostChanged(it)) },
+            onOpen = { onOpen() }
         )
     }
 }

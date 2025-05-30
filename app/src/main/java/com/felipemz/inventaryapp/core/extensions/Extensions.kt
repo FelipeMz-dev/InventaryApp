@@ -2,6 +2,7 @@ package com.felipemz.inventaryapp.core.extensions
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import com.felipemz.inventaryapp.core.EMPTY_STRING
 import java.time.Clock
 import java.time.LocalDate
 import java.util.Date
@@ -71,4 +72,12 @@ fun Int.toIdString(): String {
         println("Error converting Int to String: ${e.message}")
         "000000"
     }
+}
+
+fun String?.orEmpty(): String {
+    return this ?: EMPTY_STRING
+}
+
+fun List<Any>?.orEmpty(): List<Any> {
+    return this ?: emptyList()
 }
