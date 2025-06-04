@@ -17,14 +17,8 @@ data class ProductWithCategoryAndPackages(
     val category: CategoryEntity,
 
     @Relation(
-        entity = ProductEntity::class,
         parentColumn = "id",
-        entityColumn = "id",
-        associateBy = Junction(
-            value = ProductPackageEntity::class,
-            parentColumn = "packageId",
-            entityColumn = "productId"
-        )
+        entityColumn = "packageId"
     )
-    val packageProducts: List<ProductPackageWithQuantity>
+    val packageProducts: List<ProductPackageEntity>
 )

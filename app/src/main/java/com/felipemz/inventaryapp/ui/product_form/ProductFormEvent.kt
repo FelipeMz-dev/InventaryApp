@@ -38,8 +38,6 @@ sealed interface ProductFormEvent : Event {
 
     data class OnQuantityChanged(val quantity: Int) : ProductFormEvent
 
-    data class OnSubProductSelect(val product: ProductSelectionChart?) : ProductFormEvent
-
     data class OnOpenProduct(val product: ProductSelectionChart) : ProductFormEvent
 
     data class OnPackageProductSelect(val product: ProductSelectionChart?) : ProductFormEvent
