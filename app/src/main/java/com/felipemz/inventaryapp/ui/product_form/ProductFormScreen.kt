@@ -85,11 +85,11 @@ internal fun ProductFormScreen(
             }
         )
         showProductsPopup -> ProductsAddBottomSheet(
-            productList = state.productList,
+            productList = state.productList.filterNot { it.id == state.editProduct?.id },
             selected = state.packageProducts ?: emptyList(),
             onQuantity = { },
             onDismiss = { showProductsPopup = false },
-            onSelect = { eventHandler(OnSubProductSelect(it)) }
+            onSelect = { eventHandler(OnPackageProductSelect(it)) }
         )
     }
 
@@ -103,7 +103,7 @@ internal fun ProductFormScreen(
         topBar = {
             TopBarProduct(
                 onBack = { eventHandler(OnBack) },
-                isNewProduct = state.originalProduct.isNull()
+                isNewProduct = state.editProduct.isNull()
             )
         },
         bottomBar = {
@@ -123,8 +123,8 @@ internal fun ProductFormScreen(
 
             IdProductField(
                 modifier = Modifier.fillMaxWidth(),
-                idProduct = state.originalProduct?.id,
-                canDelete = state.originalProduct.isNotNull()
+                idProduct = state.editProduct?.id,
+                canDelete = state.editProduct.isNotNull()
                         && state.categoryIdToChange.isNull(),
             ) { eventHandler(OnTryDeleteProduct) }
 
@@ -211,31 +211,31 @@ private fun AdvancedField(
             onOpen = { onOpen() }
         )
 
-        QuantityField(
-            modifier = Modifier.fillMaxWidth(),
-            quantityType = state.quantityType,
-            isEnabled = state.packageProducts.isNull() || state.categoryIdToChange.isNull(),
-            quantity = state.quantity,
-            onAdd = onQuantity,
-            onOpen = { onOpen() }
-        ) { eventHandler(OnQuantityTypeChanged(it)) }
-
-        PackageField(
-            modifier = Modifier.fillMaxWidth(),
-            selectedProducts = state.packageProducts,
-            isEnabled = state.quantityType.isNull() || state.categoryIdToChange.isNull(),
-            onAdd = onAddSubProduct,
-            onOpen = onOpen,
-            onClick = { eventHandler(OnOpenProduct(it)) },
-            onSelect = { eventHandler(OnPackageProductSelect(it)) }
-        )
-
         CostField(
             modifier = Modifier.fillMaxWidth(),
             value = state.cost,
             isEnable = state.categoryIdToChange.isNull(),
             onChange = { eventHandler(OnCostChanged(it)) },
             onOpen = { onOpen() }
+        )
+
+        QuantityField(
+            modifier = Modifier.fillMaxWidth(),
+            quantityType = state.quantityType,
+            isEnabled = state.packageProducts.isNull() && state.categoryIdToChange.isNull(),
+            quantity = state.quantity,
+            onOpen = { onOpen() },
+            onChange = { eventHandler(OnQuantityChanged(it)) }
+        ) { eventHandler(OnQuantityTypeChanged(it)) }
+
+        PackageField(
+            modifier = Modifier.fillMaxWidth(),
+            selectedProducts = state.packageProducts,
+            isEnabled = state.categoryIdToChange.isNull() && state.quantityType.isNull(),
+            onAdd = onAddSubProduct,
+            onOpen = onOpen,
+            onClick = { eventHandler(OnOpenProduct(it)) },
+            onSelect = { eventHandler(OnPackageProductSelect(it)) }
         )
     }
 }

@@ -11,7 +11,7 @@ import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDi
 data class ProductFormState(
     val isLoading: Boolean = false,
     val alertDialog: AlertDialogProductFormType? = null,
-    val originalProduct: ProductModel? = null,
+    val editProduct: ProductModel? = null,
     val productList: List<ProductModel> = emptyList(),
     val categories: List<CategoryModel> = emptyList(),
     val name: String = String(),

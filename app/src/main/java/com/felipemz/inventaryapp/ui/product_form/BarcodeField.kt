@@ -16,6 +16,7 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -87,11 +88,11 @@ internal fun BarcodeField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
-                .clip(MaterialTheme.shapes.small)
+                .clip(OutlinedTextFieldDefaults.shape)
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline,
-                    shape = MaterialTheme.shapes.small
+                    shape = OutlinedTextFieldDefaults.shape
                 )
                 .padding(
                     vertical = 4.dp,
