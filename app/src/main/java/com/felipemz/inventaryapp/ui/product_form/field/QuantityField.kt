@@ -37,12 +37,11 @@ import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
-import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
-import com.felipemz.inventaryapp.ui.commons.CalculatorBottomSheet
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
-import com.felipemz.inventaryapp.ui.commons.CommonTrailingIcon
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
 
 @Composable
 internal fun QuantityField(
@@ -63,7 +62,7 @@ internal fun QuantityField(
 
     showCalculator.ifTrue {
         CalculatorBottomSheet(
-            currentQuantity = quantity,
+            controller = CalculatorController(quantity),
             onDismiss = { showCalculator = false },
             onSelect = { onChange(it) }
         )
