@@ -35,7 +35,6 @@ internal fun ImageField(
         modifier = modifier,
         title = stringResource(R.string.copy_image_dots),
         concealable = true,
-        isMandatory = false,
         visible = false,
         onOpen = onOpen
     ) {

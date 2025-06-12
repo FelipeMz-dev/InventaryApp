@@ -1,5 +1,6 @@
 package com.felipemz.inventaryapp.core.extensions
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import com.felipemz.inventaryapp.core.EMPTY_STRING
@@ -80,4 +81,13 @@ fun String?.orEmpty(): String {
 
 fun List<Any>?.orEmpty(): List<Any> {
     return this ?: emptyList()
+}
+
+inline fun String.ifNotEmpty(block: (String) -> Unit): Unit? {
+    if (this.isNotEmpty()) block(this) else return null
+    return Unit
+}
+
+fun Modifier.thenIf(condition: Boolean, modifier: Modifier): Modifier {
+    return if (condition) this.then(modifier) else this
 }
