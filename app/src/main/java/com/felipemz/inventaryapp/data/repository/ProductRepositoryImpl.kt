@@ -76,4 +76,8 @@ class ProductRepositoryImpl(
     override suspend fun getNameById(id: Int): String? {
         return productDao.getById(id)?.name
     }
+
+    override suspend fun verifyBarcode(barcode: String): Boolean {
+        return productDao.verifyBarcode(barcode)
+    }
 }

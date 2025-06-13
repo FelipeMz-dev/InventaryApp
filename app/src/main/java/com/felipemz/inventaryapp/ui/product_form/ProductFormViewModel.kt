@@ -4,9 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.core.extensions.ifNotEmpty
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.orDefault
+import com.felipemz.inventaryapp.core.extensions.orFalse
+import com.felipemz.inventaryapp.core.extensions.orTrue
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
@@ -22,23 +25,8 @@ import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateCategoryUseCase
 import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateProductUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveProductsNotPackaged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.Init
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCostChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDeleteCategory
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnInsertOrUpdateCategory
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageProductSelect
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDeleted
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetCategoryToChange
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetChangedSuccessfulCategory
+import com.felipemz.inventaryapp.domain.usecase.VerifyBarcodeUseCase
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
 import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
 import kotlinx.coroutines.Dispatchers
 
@@ -51,6 +39,7 @@ class ProductFormViewModel(
     private val observeAllCategoriesUseCase: ObserveAllCategoriesUseCase,
     private val insertOrUpdateCategoryUseCase: InsertOrUpdateCategoryUseCase,
     private val deleteCategoryUseCase: DeleteCategoryIfNotUseUseCase,
+    private val verifyBarcodeUseCase: VerifyBarcodeUseCase,
 ) : BaseViewModel<ProductFormState, ProductFormEvent>() {
 
     private val action = MutableLiveData<ProductFormAction>()
@@ -63,10 +52,10 @@ class ProductFormViewModel(
             when (event) {
                 is Init -> init(event.productId)
                 is CloseAlertDialog -> updateState { it.copy(alertDialog = null) }
-                is ProductFormEvent.OnTryDeleteProduct -> tryToDeleteProduct()
+                is OnTryDeleteProduct -> tryToDeleteProduct()
                 is OnProductDeleted -> deleteProduct()
                 is OnInsertOrUpdateCategory -> insertOrUpdateCategory(event.category)
-                is ProductFormEvent.OnSortCategories -> sortCategories(event.from, event.to)
+                is OnSortCategories -> sortCategories(event.from, event.to)
                 is OnDeleteCategory -> tryDeleteCategory(event.categoryId)
                 is OnProductSaved -> saveProduct()
                 is OnNameChanged -> nameChanged(event.name)
@@ -75,7 +64,7 @@ class ProductFormViewModel(
                 is OnImageChanged -> imageChanged(event.image)
                 is OnDescriptionChanged -> updateState { it.copy(description = event.description) }
                 is OnCostChanged -> updateState { it.copy(cost = event.cost) }
-                is ProductFormEvent.OnBarcodeChanged -> updateState { it.copy(barcode = event.barcode) }
+                is OnBarcodeChanged -> barcodeChanged(event.barcode)
                 is OnQuantityTypeChanged -> quantityTypeChanged(event.quantityType)
                 is OnQuantityChanged -> updateState { it.copy(quantity = event.quantity) }
                 is OnPackageProductSelect -> packageProductSelect(event.product)
@@ -86,31 +75,41 @@ class ProductFormViewModel(
         }
     }
 
+    private fun barcodeChanged(barcode: String?) = execute(Dispatchers.IO) {
+        val showAlertBarcode = barcode?.let { verifyBarcodeUseCase(it) }.orFalse()
+        updateState {
+            it.copy(
+                barcode = barcode,
+                alertBarcode = showAlertBarcode,
+            )
+        }.invokeOnCompletion {
+            validateEnableToSave()
+        }
+    }
+
     private fun init(productId: Int?) {
         productId?.let { loadProduct(it) }
         observeAllCategories()
         observeAllProductsNotPackaged()
     }
 
-    private fun loadProduct(productId: Int) {
-        execute(Dispatchers.IO) {
-            getProductByIdUseCase(productId)?.let { product ->
-                updateState { uiState ->
-                    uiState.copy(
-                        editProduct = product,
-                        price = product.price,
-                        category = product.category,
-                        description = product.description,
-                        cost = product.cost,
-                        barcode = product.barCode,
-                        quantityType = product.quantityModel?.type,
-                        quantity = product.quantityModel?.quantity ?: 0,
-                        packageProducts = getPackageProducts(product)
-                    )
-                }
-                imageChanged(product.image)
-                nameChanged(product.name)
+    private fun loadProduct(productId: Int) = execute(Dispatchers.IO) {
+        getProductByIdUseCase(productId)?.let { product ->
+            updateState { uiState ->
+                uiState.copy(
+                    editProduct = product,
+                    price = product.price,
+                    category = product.category,
+                    description = product.description,
+                    cost = product.cost,
+                    barcode = product.barCode,
+                    quantityType = product.quantityModel?.type,
+                    quantity = product.quantityModel?.quantity ?: 0,
+                    packageProducts = getPackageProducts(product)
+                )
             }
+            imageChanged(product.image)
+            nameChanged(product.name)
         }
     }
 
@@ -230,9 +229,10 @@ class ProductFormViewModel(
         val isEnable = name.isNotEmpty()
                 && price > 0
                 && category.isNotNull()
+                && !alertBarcode
                 && packageProducts
-                    ?.isNotEmpty()
-                    .orDefault(true)
+            ?.isNotEmpty()
+            .orDefault(true)
         updateState { it.copy(enableToSave = isEnable) }
     }
 
@@ -259,7 +259,7 @@ class ProductFormViewModel(
                 price = price,
                 category = category,
                 image = imageSelected,
-                description = description?.trim()?.takeIf{ it.isNotEmpty() },
+                description = description?.trim()?.takeIf { it.isNotEmpty() },
                 barCode = barcode?.trim()?.takeIf { it.isNotEmpty() },
                 cost = cost.takeIf { it != 0 },
                 quantityModel = quantityType?.let { ProductQuantityModel(it, quantity) },
@@ -291,7 +291,10 @@ class ProductFormViewModel(
         newCategory?.let(::categoryChanged)
     }
 
-    private fun sortCategories(from: CategoryModel, to: CategoryModel) = execute(Dispatchers.IO) {
+    private fun sortCategories(
+        from: CategoryModel,
+        to: CategoryModel
+    ) = execute(Dispatchers.IO) {
         insertOrUpdateCategoryUseCase(from)
         insertOrUpdateCategoryUseCase(to)
     }

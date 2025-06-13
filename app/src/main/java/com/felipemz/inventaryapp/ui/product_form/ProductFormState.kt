@@ -20,6 +20,7 @@ data class ProductFormState(
     val imageSelected: ProductTypeImage = ProductTypeImage.LetterImage(String()),
     val description: String? = null,
     val barcode: String? = null,
+    val alertBarcode: Boolean = false,
     val cost: Int? = null,
     val quantityType: QuantityType? = null,
     val quantity: Int = 0,

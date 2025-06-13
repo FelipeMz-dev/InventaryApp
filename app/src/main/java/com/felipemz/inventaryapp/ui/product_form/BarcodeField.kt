@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
@@ -44,6 +45,7 @@ import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
 internal fun BarcodeField(
     modifier: Modifier,
     barcode: String?,
+    showAlertBarcode: Boolean,
     isEnable: Boolean = true,
     onChange: (String?) -> Unit,
     onOpen: suspend () -> Unit
@@ -114,6 +116,14 @@ internal fun BarcodeField(
                 color = if (barcode.isNullOrEmpty()) MaterialTheme.colorScheme.outline
                 else MaterialTheme.colorScheme.onSurface,
             )
+
+            showAlertBarcode.ifTrue {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_warning),
+                    contentDescription = "Alerta de codigo de barras",
+                    tint = Color.Unspecified
+                )
+            }
 
             FilledIconButton(
                 shape = RoundedCornerShape(12.dp),

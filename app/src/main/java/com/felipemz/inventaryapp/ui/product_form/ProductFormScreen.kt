@@ -206,6 +206,7 @@ private fun AdvancedField(
         BarcodeField(
             modifier = Modifier.fillMaxWidth(),
             barcode = state.barcode,
+            showAlertBarcode = state.alertBarcode,
             isEnable = state.categoryIdToChange.isNull(),
             onChange = { eventHandler(OnBarcodeChanged(it)) },
             onOpen = { onOpen() }
