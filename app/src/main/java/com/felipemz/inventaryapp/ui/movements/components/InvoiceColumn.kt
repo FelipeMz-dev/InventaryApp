@@ -23,7 +23,7 @@ import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
 
 @Composable
-internal fun InvoiceList(
+internal fun InvoiceColumn(
     subTotal: Int,
     discount: Int,
     total: Int,
