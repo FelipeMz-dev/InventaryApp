@@ -30,7 +30,7 @@ internal fun CommonFormField(
     modifier: Modifier,
     title: String,
     concealable: Boolean = false,
-    isMandatory: Boolean? = true,
+    isMandatory: Boolean? = null,
     visible: Boolean = true,
     thumbContent: (@Composable () -> Unit)? = null,
     onOpen: (suspend () -> Unit)? = null,

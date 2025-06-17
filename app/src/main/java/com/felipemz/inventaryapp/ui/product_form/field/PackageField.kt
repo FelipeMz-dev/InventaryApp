@@ -59,22 +59,19 @@ fun PackageField(
             )
 
             ProductSelectionField(
-                compositionProducts = selectedProducts,
+                packageProducts = selectedProducts,
+                onAdd = onAdd,
                 onClick = onClick,
                 onSelect = onSelect
             )
-
-            TextButtonUnderline(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Agregar productos"
-            ) { onAdd() }
         }
     }
 }
 
 @Composable
 private fun ProductSelectionField(
-    compositionProducts: List<ProductSelectionChart>?,
+    packageProducts: List<ProductSelectionChart>?,
+    onAdd: () -> Unit,
     onClick: (ProductSelectionChart) -> Unit,
     onSelect: (ProductSelectionChart?) -> Unit
 ) {
@@ -85,8 +82,8 @@ private fun ProductSelectionField(
             .background(color = MaterialTheme.colorScheme.surfaceContainerHigh),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        compositionProducts?.let { composition ->
-            if (composition.isNotEmpty()) composition.forEach { product ->
+        packageProducts?.let { pack ->
+            if (pack.isNotEmpty()) pack.forEach { product ->
                 ProductSelectedItem(
                     product = product,
                     onClick = { onClick(product) },
@@ -103,5 +100,12 @@ private fun ProductSelectionField(
                 text = "No hay productos relacionados"
             )
         }
+
+        TextButtonUnderline(
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .align(Alignment.CenterHorizontally),
+            text = "Agregar productos"
+        ) { onAdd() }
     }
 }

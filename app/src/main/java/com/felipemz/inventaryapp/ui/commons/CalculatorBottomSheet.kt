@@ -81,7 +81,10 @@ internal fun CalculatorBottomSheet(
         CustomTextFieldWithoutKeyboard(
             value = quantity.toString(),
             cursorPosition = cursorPosition,
-            onDone = {}
+            onDone = {
+                onSelect(sum ?: 0)
+                onDismiss()
+            }
         )
 
         Column {
@@ -129,10 +132,6 @@ private fun CustomTextFieldWithoutKeyboard(
     cursorPosition: MutableState<Int>,
     onDone: () -> Unit,
 ) {
-
-
-    val context = LocalContext.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     val widthLetter = with(LocalDensity.current) { textStyle.fontSize.toPx() / 1.65f }
 
@@ -182,7 +181,7 @@ private fun CustomTextFieldWithoutKeyboard(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ),
-            onClick = { keyboardController?.hide() }
+            onClick = { onDone() }
         ) {
             Icon(
                 modifier = Modifier,

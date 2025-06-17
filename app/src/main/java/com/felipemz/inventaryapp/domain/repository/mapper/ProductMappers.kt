@@ -41,9 +41,9 @@ fun ProductWithCategoryAndPackages.toProductModel(): ProductModel {
         barCode = product.barCode,
         description = product.description,
         quantityModel = product.toQuantityModel(),
-        packageProducts = packageProducts.flatMap { packageWithQuantity ->
-            packageWithQuantity.packages.map { it.toModel() }
-        }.takeIf { packageProducts.isNotEmpty() }
+        packageProducts = packageProducts
+            .map { it.toModel() }
+            .takeIf { it.isNotEmpty() }
     )
 }
 

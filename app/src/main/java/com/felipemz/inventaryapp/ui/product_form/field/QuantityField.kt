@@ -2,10 +2,19 @@ package com.felipemz.inventaryapp.ui.product_form.field
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -17,14 +26,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.core.extensions.ifTrue
+import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
+import com.felipemz.inventaryapp.core.extensions.tryOrDefault
+import com.felipemz.inventaryapp.ui.commons.CalculatorBottomSheet
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
+import com.felipemz.inventaryapp.ui.commons.CommonTrailingIcon
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 
 @Composable
@@ -33,14 +50,23 @@ internal fun QuantityField(
     quantityType: QuantityType?,
     isEnabled: Boolean,
     quantity: Int = 0,
-    onAdd: () -> Unit,
     onOpen: suspend () -> Unit,
+    onChange: (Int) -> Unit,
     onSelect: (QuantityType?) -> Unit = {},
 ) {
 
+    var showCalculator by remember { mutableStateOf(false) }
     var showListPopup by remember { mutableStateOf(false) }
     val toggle by remember(quantityType, isEnabled) {
-        derivedStateOf { quantityType.isNull().not() || !isEnabled }
+        derivedStateOf { quantityType.isNotNull() || !isEnabled }
+    }
+
+    showCalculator.ifTrue {
+        CalculatorBottomSheet(
+            currentQuantity = quantity,
+            onDismiss = { showCalculator = false },
+            onSelect = { onChange(it) }
+        )
     }
 
     CommonFormField(
@@ -61,16 +87,49 @@ internal fun QuantityField(
         }
     ) {
 
-        QuantityTypeField(
-            quantityType = quantityType,
-            enabled = isEnabled
-        ) { showListPopup = true }
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 8.dp),
+            enabled = isEnabled,
+            shape = RoundedCornerShape(12.dp),
+            value = quantity.toString(),
+            onValueChange = {
+                onChange(tryOrDefault(quantity) { it.toInt() })
+            },
+            leadingIcon = {
+                Button(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    enabled = isEnabled,
+                    shape = OutlinedTextFieldDefaults.shape,
+                    onClick = {showListPopup = true}
+                ) {
+                    Text(
+                        text = quantityType?.text.orEmpty(),
+                        fontWeight = FontWeight.Bold,
+                    )
 
-        QuantityValueField(
-            quantity = quantity,
-            quantityType = quantityType,
-            enabled = isEnabled
-        ) { onAdd() }
+                    Icon(
+                        modifier = Modifier.padding(start = 4.dp),
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null
+                    )
+                }
+            },
+            trailingIcon = {
+                IconButton(
+                    enabled = isEnabled,
+                    onClick = { showCalculator = true }
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_calculator),
+                        contentDescription = null
+                    )
+                }
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
 
         DropDownQuantityType(
             showListPopup = showListPopup,
