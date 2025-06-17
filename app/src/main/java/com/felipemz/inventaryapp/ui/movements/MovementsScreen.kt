@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 import com.felipemz.inventaryapp.core.enums.QuantityType
+import com.felipemz.inventaryapp.core.extensions.tryOrDefault
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
 import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
@@ -44,12 +47,13 @@ internal fun MovementsScreen(
     var showProductsPopup by remember { mutableStateOf(false) }
     var showCalculatorPopup by remember { mutableStateOf(false) }
     var showDiscountPopup by remember { mutableStateOf(false) }
+    var showScannerDialog by remember { mutableStateOf(false) }
     var showProductQuantityPopup by remember { mutableStateOf<ProductSelectionChart?>(null) }
 
     val fabActions: (MovementsActions) -> Unit = { action ->
         when (action) {
             MovementsActions.CALCULATOR -> showCalculatorPopup = true
-            MovementsActions.SCANNER -> showDiscountPopup = true
+            MovementsActions.SCANNER -> showScannerDialog = true
             MovementsActions.DETAILS -> {}
             MovementsActions.NAVIGATE -> {}
         }
@@ -87,6 +91,15 @@ internal fun MovementsScreen(
                 )
             }
         )
+        showScannerDialog -> {
+            BarcodeScannerDialog(
+                onBarcodeScanned = {
+                    eventHandler(OnSelectProduct(ProductSelectionChart(
+                        product = ProductModel(barCode = it)
+                    )))
+                }
+            ) { showScannerDialog = false }
+        }
     }
 
     showProductQuantityPopup?.let { product ->

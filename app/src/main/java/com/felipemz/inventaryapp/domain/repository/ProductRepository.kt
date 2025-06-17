@@ -26,4 +26,6 @@ interface ProductRepository {
     suspend fun getProductsIdFromCategoryId(categoryId: Int): List<Int>
 
     suspend fun getNameById(id: Int): String?
+
+    suspend fun verifyBarcode(barcode: String): Boolean
 }

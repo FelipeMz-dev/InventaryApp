@@ -76,7 +76,8 @@ fun CategoryEditorDialog(
             NameField(
                 modifier = Modifier.fillMaxWidth(),
                 name = newCategory.name,
-            ) { newCategory = newCategory.copy(name = it) }
+                onChange = { newCategory = newCategory.copy(name = it) }
+            ){}
 
             HorizontalUncontainedCarousel(
                 modifier = Modifier.fillMaxWidth(),

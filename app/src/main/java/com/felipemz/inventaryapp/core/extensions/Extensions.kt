@@ -54,6 +54,14 @@ fun <T> T?.orDefault(default: T): T {
     return this ?: default
 }
 
+fun Any?.orTrue(default: Boolean = true): Boolean {
+    return this as? Boolean ?: default
+}
+
+fun Any?.orFalse(default: Boolean = false): Boolean {
+    return this as? Boolean ?: default
+}
+
 fun <T> tryOrDefault(
     default: T,
     block: () -> T

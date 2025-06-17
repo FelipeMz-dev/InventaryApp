@@ -11,6 +11,7 @@ import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllProductsUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveProductsNotPackaged
 import com.felipemz.inventaryapp.domain.usecase.SortProductsFromObserver
+import com.felipemz.inventaryapp.domain.usecase.VerifyBarcodeUseCase
 import org.koin.dsl.module
 
 val useCaseModule = module {
@@ -25,4 +26,5 @@ val useCaseModule = module {
     factory { DeleteCategoryIfNotUseUseCase(get(), get()) }
     factory { DeleteProductUseCase(get()) }
     factory { GetProductByIdUseCase(get()) }
+    factory { VerifyBarcodeUseCase(get()) }
 }
