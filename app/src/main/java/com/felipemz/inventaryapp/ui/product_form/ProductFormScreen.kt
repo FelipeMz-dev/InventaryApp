@@ -51,6 +51,7 @@ internal fun ProductFormScreen(
 ) {
 
     val scrollState = rememberScrollState()
+    var showImageField = remember { mutableStateOf(false) }
     var showEmojiPopup by remember { mutableStateOf(false) }
     var showImagePopup by remember { mutableStateOf(false) }
     var showQuantityPopup by remember { mutableStateOf(false) }
@@ -132,7 +133,11 @@ internal fun ProductFormScreen(
                 modifier = Modifier.fillMaxWidth(),
                 name = state.name,
                 isEnable = state.categoryIdToChange.isNull(),
-            ) { eventHandler(OnNameChanged(it)) }
+                onChange = { eventHandler(OnNameChanged(it)) },
+            ) {
+                showImageField.value = true
+                eventHandler(OnImageChanged(ProductTypeImage.EmojiImage(it)))
+            }
 
             PriceField(
                 modifier = Modifier.fillMaxWidth(),
@@ -158,6 +163,7 @@ internal fun ProductFormScreen(
                 imageSelected = state.imageSelected,
                 category = state.category,
                 isEnable = state.categoryIdToChange.isNull(),
+                isVisible = showImageField,
                 onOpen = { moveToFinal() }
             ) {
                 eventHandler(OnImageChanged(it))

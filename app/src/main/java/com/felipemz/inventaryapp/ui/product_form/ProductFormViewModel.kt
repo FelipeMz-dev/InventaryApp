@@ -2,6 +2,7 @@ package com.felipemz.inventaryapp.ui.product_form
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.felipemz.inventaryapp.core.EMPTY_STRING
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifNotEmpty
@@ -29,6 +30,7 @@ import com.felipemz.inventaryapp.domain.usecase.VerifyBarcodeUseCase
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
 import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
 import kotlinx.coroutines.Dispatchers
+import kotlin.text.any
 
 class ProductFormViewModel(
     private val observeProductsNotPackaged: ObserveProductsNotPackaged,

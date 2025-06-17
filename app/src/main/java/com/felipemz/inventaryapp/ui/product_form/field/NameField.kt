@@ -19,7 +19,9 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.ifFalse
 import com.felipemz.inventaryapp.core.extensions.ifTrue
+import com.felipemz.inventaryapp.core.extensions.orFalse
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.CommonTrailingIcon
 
@@ -29,9 +31,23 @@ internal fun NameField(
     name: String,
     isEnable: Boolean = true,
     onChange: (String) -> Unit,
+    onSetEmoji: (String) -> Unit,
 ) {
 
     var text by remember(name) { mutableStateOf(name) }
+
+    fun onWriteText(newText: String) {
+        val emojis = extractEmojis(newText)
+        if (emojis.isNotEmpty()) {
+            onSetEmoji(emojis.joinToString(""))
+        } else {
+            val cleanText = newText.filter {
+                it.isLetterOrDigit() || it.isWhitespace()
+            }.trimStart()
+            text = cleanText
+            onChange(cleanText)
+        }
+    }
 
     CommonFormField(
         modifier = modifier,
@@ -41,11 +57,7 @@ internal fun NameField(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             value = text,
-            onValueChange = {
-                val newText = it.filter { char -> char.isLetterOrDigit() || char.isWhitespace() }.trimStart()
-                text = newText
-                onChange(newText)
-            },
+            onValueChange = ::onWriteText,
             placeholder = { Text(text = stringResource(R.string.copy_write_here)) },
             trailingIcon = {
                 isEnable.ifTrue {
@@ -60,7 +72,6 @@ internal fun NameField(
                 focusedPlaceholderColor = MaterialTheme.colorScheme.outline
             ),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next,
                 capitalization = KeyboardCapitalization.Sentences
             ),
@@ -68,4 +79,13 @@ internal fun NameField(
             singleLine = true
         )
     }
+}
+
+fun extractEmojis(text: String): List<String> {
+    val emojiRegex = Regex(
+        "(?:[\uD83C-\uDBFF\uDC00-\uDFFF]+|[\u2600-\u27BF])"
+    )
+    return emojiRegex.findAll(text)
+        .map { it.value }
+        .toList()
 }

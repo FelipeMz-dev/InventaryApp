@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,6 +30,7 @@ internal fun ImageField(
     imageSelected: ProductTypeImage,
     category: CategoryModel?,
     isEnable: Boolean = true,
+    isVisible: MutableState<Boolean>,
     onOpen: suspend () -> Unit,
     onSelect: (ProductTypeImage) -> Unit,
 ) {
@@ -35,7 +38,7 @@ internal fun ImageField(
         modifier = modifier,
         title = stringResource(R.string.copy_image_dots),
         concealable = true,
-        visible = false,
+        visible = isVisible.value,
         onOpen = onOpen
     ) {
         Row(
@@ -58,6 +61,12 @@ internal fun ImageField(
                         colorResource(id = it.color)
                     } ?: MaterialTheme.colorScheme.secondaryContainer
                 )
+            }
+        }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                isVisible.value = false
             }
         }
     }
