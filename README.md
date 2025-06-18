@@ -34,7 +34,7 @@
 
 ## 🏗 Arquitectura
 
-La app sigue una arquitectura limpia basada en **Clean Architecture** y **MVVM**:
+La app sigue una arquitectura limpia basada en **Clean Architecture** y **MVI**:
 
 ```
 |-- core/
@@ -79,7 +79,7 @@ La app sigue una arquitectura limpia basada en **Clean Architecture** y **MVVM**
 
 2. Ábrelo en Android Studio `Giraffe+`
 
-3. Ejecuta en un emulador o dispositivo Android (API 26+)
+3. Ejecuta en un emulador o dispositivo Android (API 27+)
 
 ---
 
@@ -87,7 +87,7 @@ La app sigue una arquitectura limpia basada en **Clean Architecture** y **MVVM**
 
 - [x] CRUD de productos
 - [x] CRUD de categorías
-- [ ] Registro de movimientos con productos o montos libres
+- [x] Registro de movimientos con productos o montos libres
 - [x] Soporte para productos tipo paquete
 - [ ] Estadísticas por producto y categoría
 - [ ] Soporte multiusuario / sincronización
