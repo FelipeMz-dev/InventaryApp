@@ -1,6 +1,6 @@
 # 📦 InventaryApp
 
-**InventaryApp** es una aplicación Android desarrollada con **Jetpack Compose**, diseñada para llevar el control de productos, movimientos (ventas y gastos), y generar reportes visuales. Está pensada para negocios pequeños que manejan inventario con productos simples o paquetes de productos compuestos.
+**InventaryApp** es una aplicación Android desarrollada con **Jetpack Compose**, diseñada para llevar el control de productos, movimientos (ventas y gastos), y generar reportes visuales. Está pensada para negocios pequeños que manejan inventario con productos simples o paquetes.
 
 ---
 
@@ -87,7 +87,7 @@ La app sigue una arquitectura limpia basada en **Clean Architecture** y **MVVM**
 
 - [x] CRUD de productos
 - [x] CRUD de categorías
-- [-] Registro de movimientos con productos o montos libres
+- [ ] Registro de movimientos con productos o montos libres
 - [x] Soporte para productos tipo paquete
 - [ ] Estadísticas por producto y categoría
 - [ ] Soporte multiusuario / sincronización
