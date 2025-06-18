@@ -2,7 +2,6 @@ package com.felipemz.inventaryapp.core.customs
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
-import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.toLocalDate
 import com.felipemz.inventaryapp.core.extensions.toLong
 import java.time.LocalDate

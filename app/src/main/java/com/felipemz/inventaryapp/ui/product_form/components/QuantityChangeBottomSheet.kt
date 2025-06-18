@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifNotNull
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
+import com.felipemz.inventaryapp.ui.commons.CommonTrailingIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

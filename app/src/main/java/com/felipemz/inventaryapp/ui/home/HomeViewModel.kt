@@ -2,34 +2,37 @@ package com.felipemz.inventaryapp.ui.home
 
 import androidx.compose.runtime.mutableStateOf
 import com.felipemz.inventaryapp.core.base.BaseViewModel
-import com.felipemz.inventaryapp.model.CategoryEntity
-import com.felipemz.inventaryapp.model.MovementItemEntity
-import com.felipemz.inventaryapp.model.ProductEntity
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.MovementItemModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
-import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.ui.commons.fakeChips
+import com.felipemz.inventaryapp.data.cache.ProductsCache
+import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
+import com.felipemz.inventaryapp.domain.usecase.ObserveAllProductsUseCase
+import com.felipemz.inventaryapp.domain.usecase.SortProductsFromObserver
 import com.felipemz.inventaryapp.ui.commons.fakeLabelList
 import com.felipemz.inventaryapp.ui.commons.fakeMovements
-import com.felipemz.inventaryapp.ui.commons.fakeProducts
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 
-class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
+class HomeViewModel(
+    private val observeAllProductsUseCase: ObserveAllProductsUseCase,
+    private val sortProductsFromObserver: SortProductsFromObserver,
+    private val observeAllCategoriesUseCase: ObserveAllCategoriesUseCase,
+) : BaseViewModel<HomeState, HomeEvent>() {
 
-    private val _movements = mutableStateOf<List<MovementItemEntity>>(emptyList())
-    private val _products = mutableStateOf<List<ProductEntity>>(emptyList())
+    private val _movements = mutableStateOf<List<MovementItemModel>>(emptyList())
+    private val _products = MutableStateFlow<List<ProductModel>>(emptyList())
 
     init {
         _movements.value = fakeMovements
-        _products.value = fakeProducts
-        orderProducts(ProductsOrderBy.CATEGORY, false)
+        setOrderProducts(ProductsOrderBy.CATEGORY, false)
     }
 
     override fun initState() = HomeState(
-        categories = fakeChips,
-        products = _products.value,
         movements = _movements.value,
         movementLabelList = fakeLabelList,
         totalAmount = fakeMovements.sumBy {
@@ -44,29 +47,48 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
+                is HomeEvent.Init -> onInit()
                 is HomeEvent.OnFocusSearch -> updateState { it.copy(isSearchFocused = event.isFocus) }
                 is HomeEvent.OnChangeSearchText -> changeSearchText(event.text)
                 is HomeEvent.OnCategorySelected -> categorySelected(event.category)
                 is HomeEvent.OnMovementsInverted -> movementsInverted(event.isInverted)
                 is HomeEvent.OnMovementFilterSelected -> movementFilterSelected(event.filter)
                 is HomeEvent.OnLabelSelected -> labelSelected(event.label)
-                is HomeEvent.OnHideLabelPopup -> hideLabelPopup()
-                is HomeEvent.OnCloseReportsCalendarPopup -> updateState { it.copy(isReportsCalendarPopup = false) }
-                is HomeEvent.OnProductOrderSelected -> orderProducts(event.orderBy, event.isInverted)
+                is HomeEvent.OnProductOrderSelected -> setOrderProducts(event.orderBy, event.isInverted)
                 is HomeEvent.OnOpenProductOrderPopup -> updateState { it.copy(isProductOrderPopup = true) }
                 is HomeEvent.OpenReportsCalendarPopup -> updateState { it.copy(isReportsCalendarPopup = true) }
                 is HomeEvent.OnReportsCustomFilterSelected -> updateState {
-                    it.copy(reportsCustomFilterSelected = event.filter, reportsFilterChipSelected = null, isReportsCalendarPopup = false)
+                    it.copy(
+                        reportsCustomFilterSelected = event.filter, reportsFilterChipSelected = null, isReportsCalendarPopup = false
+                    ) //TODO: refactor
                 }
                 is HomeEvent.OnReportsFilterSelected -> updateState {
-                    it.copy(reportsFilterChipSelected = event.filter, reportsCustomFilterSelected = null)
+                    it.copy(reportsFilterChipSelected = event.filter, reportsCustomFilterSelected = null)  //TODO: refactor
                 }
                 else -> Unit
             }
         }
     }
 
-    private fun orderProducts(
+    private fun onInit() {
+        observeAllCategories()
+        observeAllProducts()
+    }
+
+    private fun observeAllCategories() = execute(Dispatchers.IO) {
+        observeAllCategoriesUseCase().collect { categories ->
+            updateState { it.copy(categories = categories) }
+        }
+    }
+
+    private fun observeAllProducts() = execute(Dispatchers.IO) {
+        observeAllProductsUseCase().collect { products ->
+            _products.value = products
+            updateState { it.copy(products = products) }
+        }
+    }
+
+    private fun setOrderProducts(
         orderBy: ProductsOrderBy,
         isInverted: Boolean
     ) {
@@ -75,27 +97,13 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
                 productOrderSelected = orderBy,
                 isProductOrderInverted = isInverted,
                 isProductOrderPopup = false,
-            )
-        }
-        val sortedProducts = when (orderBy) {
-            ProductsOrderBy.CATEGORY -> _products.value.sortedBy {
-                fakeChips.findLast { chip -> chip.color == it.category.color }?.position ?: 0
+            ).also {
+                sortProductsFromObserver(orderBy, isInverted)
             }
-            ProductsOrderBy.NAME -> _products.value.sortedBy { it.name }
-            ProductsOrderBy.PRICE -> _products.value.sortedBy { it.price }
-            ProductsOrderBy.STOCK -> _products.value.sortedBy { it.quantityChart?.quantity ?: 0 }
-            else -> _products.value.sortedBy { it.id }
-        }
-        val orderedProducts = if (isInverted) sortedProducts.reversed() else sortedProducts
-        _products.value = orderedProducts
-        when {
-            state.value.searchText.isNotEmpty() -> changeSearchText(state.value.searchText)
-            state.value.categorySelected.isNotNull() -> categorySelected(state.value.categorySelected)
-            else -> updateState { it.copy(products = orderedProducts) }
         }
     }
 
-    private fun changeSearchText(text: String) = execute(Dispatchers.IO) {
+    private fun changeSearchText(text: String) = execute(Dispatchers.IO) { //TODO: Move logic to use case
         val filteredProducts = _products.value.filter { product ->
             val matchesCategory = state.value.categorySelected.isNull()
                     || product.category.color == state.value.categorySelected?.color
@@ -110,7 +118,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         }
     }
 
-    private fun categorySelected(category: CategoryEntity?) = execute(Dispatchers.IO) {
+    private fun categorySelected(category: CategoryModel?) = execute(Dispatchers.IO) {
         val filteredProducts = _products.value.filter { product ->
             val matchesSearchText = state.value.searchText.isEmpty()
                     || product.name.contains(state.value.searchText, ignoreCase = true)
@@ -125,7 +133,7 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
         }
     }
 
-    private fun movementsInverted(isInverted: Boolean) {
+    private fun movementsInverted(isInverted: Boolean) {   //TODO: Move logic to use case
         if (state.value.isMovementsInverted != isInverted) {
             updateState {
                 it.copy(
@@ -141,12 +149,12 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
             state.copy(
                 movementLabelSelected = label,
                 isShowLabelPopup = false,
-                movements = _movements.value.filter { it.labels.contains(label) }
+                movements = _movements.value.filter { it.labels.contains(label) } //TODO: Move logic to use case
             )
         }
     }
 
-    private fun movementFilterSelected(filter: MovementsFilterChip) {
+    private fun movementFilterSelected(filter: MovementsFilterChip) {  //TODO: Move logic to use case
         if (filter == MovementsFilterChip.LABEL) {
             updateState { it.copy(isShowLabelPopup = true) }
         } else updateState { it.copy(movementLabelSelected = null) }
@@ -162,15 +170,6 @@ class HomeViewModel : BaseViewModel<HomeState, HomeEvent>() {
                         MovementsFilterChip.LABEL -> it.labels.isEmpty()
                     }
                 }
-            )
-        }
-    }
-
-    private fun hideLabelPopup() {
-        updateState {
-            it.copy(
-                isShowLabelPopup = false,
-                movementLabelSelected = null
             )
         }
     }

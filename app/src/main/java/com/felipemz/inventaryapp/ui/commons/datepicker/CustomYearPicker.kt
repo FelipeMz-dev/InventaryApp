@@ -80,7 +80,7 @@ private fun HeadLineYearPicker(
 
         TextButtonUnderline(
             text = dateSelected?.title ?: "No se ha seleccionado un año",
-            enabled = !dateSelected.isNull()
+            isEnabled = !dateSelected.isNull()
         ) { onClear() }
     }
 }

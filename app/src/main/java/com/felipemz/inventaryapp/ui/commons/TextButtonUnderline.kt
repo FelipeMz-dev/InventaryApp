@@ -17,16 +17,16 @@ import androidx.compose.ui.unit.dp
 fun TextButtonUnderline(
     modifier: Modifier = Modifier,
     text: String,
-    enabled: Boolean = true,
+    isEnabled: Boolean = true,
     onClick: () -> Unit
 ) = Text(
     modifier = modifier
         .clip(CircleShape)
-        .clickable(enabled = enabled) { onClick() }
+        .clickable(enabled = isEnabled) { onClick() }
         .padding(8.dp),
     text = text,
     color = MaterialTheme.colorScheme.primary.let { color ->
-        color.takeIf { enabled } ?: color.copy(alpha = 0.4f)
+        color.takeIf { isEnabled } ?: color.copy(alpha = 0.4f)
     },
     style = MaterialTheme.typography.bodyMedium,
     textDecoration = TextDecoration.Underline,

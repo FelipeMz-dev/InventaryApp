@@ -115,7 +115,7 @@ private fun DateSelection(
             text = selectedDateMillis?.let {
                 FormatDateUtil.getOfCustomDate(it.toLocalDate())
             } ?: placeHolder,
-            enabled = !selectedDateMillis.isNull()
+            isEnabled = !selectedDateMillis.isNull()
         ) { onAction() }
     }
 }

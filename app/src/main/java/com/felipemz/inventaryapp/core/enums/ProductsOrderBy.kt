@@ -1,9 +1,9 @@
 package com.felipemz.inventaryapp.core.enums
 
 enum class ProductsOrderBy(val text: String) {
-    CATEGORY("Categoría"),
+    ID("id"),
     NAME("Nombre"),
-    DATE("Fecha"),
+    CATEGORY("Categoría"),
     PRICE("Precio"),
     STOCK("Stock")
 }

@@ -1,15 +1,17 @@
 package com.felipemz.inventaryapp.ui.home
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.model.CategoryEntity
-import com.felipemz.inventaryapp.model.ProductEntity
-import com.felipemz.inventaryapp.core.enums.HomeTabs
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
 import com.felipemz.inventaryapp.core.models.RangeDateModel
 
 sealed interface HomeEvent : Event {
+
+    object Init : HomeEvent
 
     object OnHideLabelPopup : HomeEvent
 
@@ -27,7 +29,7 @@ sealed interface HomeEvent : Event {
 
     data class OnChangeSearchText(val text: String) : HomeEvent
 
-    data class OnCategorySelected(val category: CategoryEntity?) : HomeEvent
+    data class OnCategorySelected(val category: CategoryModel?) : HomeEvent
 
     data class OnMovementFilterSelected(val filter: MovementsFilterChip) : HomeEvent
 
@@ -44,5 +46,5 @@ sealed interface HomeEvent : Event {
 
     data class OnReportsFilterSelected(val filter: ReportsFilterDate) : HomeEvent
 
-    data class OnOpenProduct(val product: ProductEntity) : HomeEvent
+    data class OnOpenProduct(val product: ProductModel) : HomeEvent
 }

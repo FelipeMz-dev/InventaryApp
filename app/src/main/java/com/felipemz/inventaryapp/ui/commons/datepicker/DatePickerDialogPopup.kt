@@ -44,13 +44,13 @@ fun DatePickerDialogPopup(
         dismissButton = {
             TextButtonUnderline(
                 text = "Salir",
-                enabled = true
+                isEnabled = true
             ) { onDismiss() }
         },
         confirmButton = {
             TextButtonUnderline(
                 text = "Confirmar",
-                enabled = !selectedDate.value.isNull()
+                isEnabled = !selectedDate.value.isNull()
             ) { selectedDate.value?.let { onConfirm(it) } }
         }
     ) {
