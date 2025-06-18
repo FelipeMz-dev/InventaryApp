@@ -37,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -134,17 +133,36 @@ internal fun ProductItem(
                         contentDescription = null
                     )
                 }
-            } ?: Row(modifier = Modifier.height(IntrinsicSize.Max)) {
-                Text(
-                    text = product.description.takeUnless {
-                        it.isNullOrEmpty()
-                    } ?: stringResource(R.string.copy_without_information),
-                    color = Color.Gray,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            } ?: InformationField(
+                modifier = Modifier.height(IntrinsicSize.Max),
+                product = product
+            )
         }
+    }
+}
+
+@Composable
+private fun InformationField(
+    modifier: Modifier,
+    product: ProductModel
+) {
+    Row(modifier) {
+
+        val textType = product.packageProducts?.let {
+            stringResource(R.string.copy_package)
+        } ?: product.quantityModel?.type?.text
+
+        Text(
+            modifier = Modifier.weight(1f),
+            text = product.description.takeUnless {
+                it.isNullOrEmpty()
+            } ?: stringResource(R.string.copy_without_information),
+            color = Color.Gray,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        textType?.let { Text(text = "($it)") }
     }
 }
 

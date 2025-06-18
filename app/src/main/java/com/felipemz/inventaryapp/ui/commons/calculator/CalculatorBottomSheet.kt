@@ -57,7 +57,7 @@ fun CalculatorBottomSheet(
             onMoveCursor = { controller.cursorPosition = it },
             onDone = {
                 controller.onKeyPress(CalculatorKey.EQUAL)
-                onSelect(controller.listOperation.lastOrNull()?.result ?: controller.value)
+                onSelect(controller.result.first)
                 onDismiss()
             }
         )

@@ -2,15 +2,12 @@ package com.felipemz.inventaryapp.ui.product_form
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.felipemz.inventaryapp.core.EMPTY_STRING
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.core.extensions.ifNotEmpty
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.orDefault
 import com.felipemz.inventaryapp.core.extensions.orFalse
-import com.felipemz.inventaryapp.core.extensions.orTrue
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
@@ -30,7 +27,6 @@ import com.felipemz.inventaryapp.domain.usecase.VerifyBarcodeUseCase
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
 import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
 import kotlinx.coroutines.Dispatchers
-import kotlin.text.any
 
 class ProductFormViewModel(
     private val observeProductsNotPackaged: ObserveProductsNotPackaged,
@@ -52,7 +48,7 @@ class ProductFormViewModel(
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
-                is Init -> init(event.productId)
+                is Init -> init(event.productId, event.barcode)
                 is CloseAlertDialog -> updateState { it.copy(alertDialog = null) }
                 is OnTryDeleteProduct -> tryToDeleteProduct()
                 is OnProductDeleted -> deleteProduct()
@@ -77,22 +73,24 @@ class ProductFormViewModel(
         }
     }
 
-    private fun barcodeChanged(barcode: String?) = execute(Dispatchers.IO) {
-        val showAlertBarcode = barcode?.let { verifyBarcodeUseCase(it) }.orFalse()
+
+    private fun init(
+        productId: Int?,
+        barcode: String?
+    ) {
+        productId?.let { loadProduct(it) }
+        barcode?.let { createFromBarcode(it) }
+        observeAllCategories()
+        observeAllProductsNotPackaged()
+    }
+
+    private fun createFromBarcode(barcode: String) {
         updateState {
             it.copy(
                 barcode = barcode,
-                alertBarcode = showAlertBarcode,
+                barcodeCreation = true
             )
-        }.invokeOnCompletion {
-            validateEnableToSave()
         }
-    }
-
-    private fun init(productId: Int?) {
-        productId?.let { loadProduct(it) }
-        observeAllCategories()
-        observeAllProductsNotPackaged()
     }
 
     private fun loadProduct(productId: Int) = execute(Dispatchers.IO) {
@@ -104,7 +102,7 @@ class ProductFormViewModel(
                     category = product.category,
                     description = product.description,
                     cost = product.cost,
-                    barcode = product.barCode,
+                    barcode = product.barcode,
                     quantityType = product.quantityModel?.type,
                     quantity = product.quantityModel?.quantity ?: 0,
                     packageProducts = getPackageProducts(product)
@@ -180,6 +178,18 @@ class ProductFormViewModel(
         }
     }
 
+    private fun barcodeChanged(barcode: String?) = execute(Dispatchers.IO) {
+        val showAlertBarcode = barcode?.let { verifyBarcodeUseCase(it) }.orFalse()
+        updateState {
+            it.copy(
+                barcode = barcode,
+                alertBarcode = showAlertBarcode,
+            )
+        }.invokeOnCompletion {
+            validateEnableToSave()
+        }
+    }
+
     private fun quantityTypeChanged(quantityType: QuantityType?) {
         updateState {
             it.copy(
@@ -247,8 +257,12 @@ class ProductFormViewModel(
                 action.postValue(ProductFormAction.ShowMessage("Categoría actualizada"))
                 action.postValue(ProductFormAction.OnCategoryChangeDone(product.id))
             } ?: run {
-                action.postValue(ProductFormAction.ShowMessage("Producto guardado"))
-                cleanData()
+                if (state.value.barcodeCreation){
+                    action.postValue(ProductFormAction.OnCreateFromBarcode(product.barcode.orEmpty()))
+                } else {
+                    action.postValue(ProductFormAction.ShowMessage("Producto guardado"))
+                    cleanData()
+                }
             }
         }
     }
@@ -262,7 +276,7 @@ class ProductFormViewModel(
                 category = category,
                 image = imageSelected,
                 description = description?.trim()?.takeIf { it.isNotEmpty() },
-                barCode = barcode?.trim()?.takeIf { it.isNotEmpty() },
+                barcode = barcode?.trim()?.takeIf { it.isNotEmpty() },
                 cost = cost.takeIf { it != 0 },
                 quantityModel = quantityType?.let { ProductQuantityModel(it, quantity) },
                 packageProducts = packageProducts?.map { it.toProductPackageModel() }

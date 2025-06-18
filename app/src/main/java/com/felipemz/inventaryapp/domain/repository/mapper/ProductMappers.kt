@@ -1,8 +1,6 @@
 package com.felipemz.inventaryapp.domain.repository.mapper
 
-import com.felipemz.inventaryapp.core.EMPTY_STRING
 import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.data.local.entity.ProductEntity
 import com.felipemz.inventaryapp.data.local.entity.ProductPackageEntity
 import com.felipemz.inventaryapp.data.local.relations.ProductWithCategoryAndPackages
@@ -38,7 +36,7 @@ fun ProductWithCategoryAndPackages.toProductModel(): ProductModel {
         category = category.toModel(),
         image = product.toImage(),
         cost = product.cost?.toInt(),
-        barCode = product.barCode,
+        barcode = product.barCode,
         description = product.description,
         quantityModel = product.toQuantityModel(),
         packageProducts = packageProducts
@@ -62,7 +60,7 @@ fun ProductModel.toEntity(): ProductEntity = ProductEntity(
     imageType = toImageType(),
     imageValue = toImageValue(),
     cost = cost?.toDouble(),
-    barCode = barCode,
+    barCode = barcode,
     description = description,
     quantityType = quantityModel?.type?.name,
     quantity = quantityModel?.quantity

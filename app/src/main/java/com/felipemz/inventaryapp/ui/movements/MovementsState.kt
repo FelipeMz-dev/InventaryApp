@@ -16,4 +16,5 @@ data class MovementsState(
     val subTotal: Int = 0,
     val discount: Int = 0,
     val calculatorId: Int = 0,
+    val errorBarcode: String? = null,
 ): State

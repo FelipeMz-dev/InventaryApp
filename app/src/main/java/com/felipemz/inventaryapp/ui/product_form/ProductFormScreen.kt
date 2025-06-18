@@ -205,7 +205,7 @@ private fun AdvancedField(
         modifier = Modifier.fillMaxWidth(),
         title = stringResource(R.string.copy_advanced),
         isMandatory = null,
-        visible = false,
+        visible = state.barcodeCreation,
         concealable = true,
         onOpen = { onOpen() }
     ) {
@@ -213,7 +213,7 @@ private fun AdvancedField(
             modifier = Modifier.fillMaxWidth(),
             barcode = state.barcode,
             showAlertBarcode = state.alertBarcode,
-            isEnable = state.categoryIdToChange.isNull(),
+            isEnable = state.categoryIdToChange.isNull() && !state.barcodeCreation,
             onChange = { eventHandler(OnBarcodeChanged(it)) },
             onOpen = { onOpen() }
         )

@@ -11,7 +11,7 @@ data class ProductModel(
     val image: ProductTypeImage = ProductTypeImage.LetterImage(EMPTY_STRING),
     val description: String? = null,
     val cost: Int? = null,
-    val barCode: String? = null,
+    val barcode: String? = null,
     val quantityModel: ProductQuantityModel? = null,
     val packageProducts: List<ProductPackageModel>? = null,
 )

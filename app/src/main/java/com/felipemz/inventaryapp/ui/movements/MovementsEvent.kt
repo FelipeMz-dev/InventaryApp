@@ -5,6 +5,8 @@ import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 
 sealed interface MovementsEvent : Event {
 
+    data object Init : MovementsEvent
+
     data object OnBack : MovementsEvent
 
     data object OnSaveMovement : MovementsEvent
@@ -13,7 +15,13 @@ sealed interface MovementsEvent : Event {
 
     data object IncrementCalculatorId : MovementsEvent
 
+    data object OnClearBarcodeError : MovementsEvent
+
     data class OnSelectProduct(val product: ProductSelectionChart) : MovementsEvent
 
+    data class OnSelectProductFromBarcode(val barcode: String) : MovementsEvent
+
     data class OnChangeDiscount(val discount: Int) : MovementsEvent
+
+    data class OnExecuteAction(val action: MovementsAction) : MovementsEvent
 }

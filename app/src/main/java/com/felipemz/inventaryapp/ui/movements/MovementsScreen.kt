@@ -2,9 +2,11 @@ package com.felipemz.inventaryapp.ui.movements
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,18 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.core.extensions.tryOrDefault
+import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
+import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
 import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.IncrementCalculatorId
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnBack
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnChangeDiscount
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnDeleteMovement
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnSaveMovement
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnSelectProduct
+import com.felipemz.inventaryapp.ui.movements.MovementsEvent.*
 import com.felipemz.inventaryapp.ui.movements.components.BottomBarMovements
 import com.felipemz.inventaryapp.ui.movements.components.IdMovementField
 import com.felipemz.inventaryapp.ui.movements.components.actions.FABMovements
@@ -79,26 +77,64 @@ internal fun MovementsScreen(
         showCalculatorPopup -> CalculatorBottomSheet(
             controller = CalculatorController(0),
             onDismiss = { showCalculatorPopup = false },
-            onSelect = {
+            onSelect = { value ->
                 eventHandler(IncrementCalculatorId)
-                eventHandler(
-                    OnSelectProduct(
-                        ProductSelectionChart(
-                            price = it,
-                            quantity = 1
+                state.selectedProducts.filter { it.product.isNull() }.findLast { it.price == value }?.let {
+                    eventHandler(OnSelectProduct(it.copy(quantity = it.quantity + 1)))
+                } ?: run {
+                    eventHandler(
+                        OnSelectProduct(
+                            ProductSelectionChart(
+                                price = value,
+                                quantity = 1
+                            )
                         )
                     )
-                )
+                }
             }
         )
         showScannerDialog -> {
             BarcodeScannerDialog(
                 onBarcodeScanned = {
-                    eventHandler(OnSelectProduct(ProductSelectionChart(
-                        product = ProductModel(barCode = it)
-                    )))
+                    eventHandler(OnSelectProductFromBarcode(it))
                 }
             ) { showScannerDialog = false }
+        }
+    }
+
+    state.errorBarcode?.let {
+        CommonCustomDialog(
+            title = "Barcode not found",
+            onDismiss = { eventHandler(OnClearBarcodeError) }
+        ) {
+            Text(
+                text = "The barcode '$it' does not match any product in the inventory.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventHandler(OnExecuteAction(MovementsAction.CreateProductFromBarcode(it)))
+                    }
+                ) {
+                    Text(text = "Create new")
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventHandler(OnClearBarcodeError)
+                        showScannerDialog = true
+                    }
+                ) {
+                    Text(text = "Scan Again")
+                }
+            }
         }
     }
 

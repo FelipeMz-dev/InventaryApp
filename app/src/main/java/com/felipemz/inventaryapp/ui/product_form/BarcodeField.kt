@@ -79,6 +79,7 @@ internal fun BarcodeField(
         onOpen = onOpen,
         thumbContent = {
             Switch(
+                enabled = isEnable,
                 checked = barcode.isNotNull(),
                 onCheckedChange = { state ->
                     onChange(if (barcode.isNull()) EMPTY_STRING else null)
