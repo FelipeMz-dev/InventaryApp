@@ -9,29 +9,53 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
+import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
+import com.felipemz.inventaryapp.core.extensions.isNull
+import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
+import com.felipemz.inventaryapp.ui.commons.InvoiceActions
+import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
+import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
 
 @Composable
 fun PackageField(
     modifier: Modifier,
-    selectedProducts: List<ProductSelectionChart>?,
+    productList: List<ProductModel>,
+    selectedProducts: List<ProductInvoiceItem>?,
     isEnabled: Boolean,
-    onAdd: () -> Unit,
     onOpen: suspend () -> Unit,
-    onClick: (ProductSelectionChart) -> Unit,
-    onSelect: (ProductSelectionChart?) -> Unit
+    onClick: (ProductInvoiceItem) -> Unit,
+    onSelect: (InvoiceActions) -> Unit,
+    toggle: (Boolean) -> Unit,
 ) {
+
+    var showProductsListBottomSheet by remember { mutableStateOf(false) }
+
+    showProductsListBottomSheet.ifTrue {
+        ProductsListBottomSheet(
+            productList = productList,
+            selected = selectedProducts ?: emptyList(),
+            onDismiss = { showProductsListBottomSheet = false },
+            onAction = onSelect
+        )
+    }
+
     CommonFormField(
         modifier = modifier,
-        title = "Paquete:",
+        title = stringResource(R.string.copy_package_dots),
         isMandatory = false,
         visible = selectedProducts.isNotNull(),
         concealable = true,
@@ -41,7 +65,7 @@ fun PackageField(
                 enabled = isEnabled || selectedProducts.isNotNull(),
                 checked = selectedProducts.isNotNull(),
                 onCheckedChange = { state ->
-                    onSelect(ProductSelectionChart().takeIf { state })
+                    toggle(selectedProducts.isNull())
                 }
             )
         }
@@ -54,15 +78,15 @@ fun PackageField(
         ) {
 
             Text(
-                text = "Sub productos:",
+                text = stringResource(R.string.copy_content),
                 color = MaterialTheme.colorScheme.outline
             )
 
             ProductSelectionField(
                 packageProducts = selectedProducts,
-                onAdd = onAdd,
+                onAdd = { showProductsListBottomSheet = true },
                 onClick = onClick,
-                onSelect = onSelect
+                onAction = onSelect
             )
         }
     }
@@ -70,10 +94,10 @@ fun PackageField(
 
 @Composable
 private fun ProductSelectionField(
-    packageProducts: List<ProductSelectionChart>?,
+    packageProducts: List<ProductInvoiceItem>?,
     onAdd: () -> Unit,
-    onClick: (ProductSelectionChart) -> Unit,
-    onSelect: (ProductSelectionChart?) -> Unit
+    onClick: (ProductInvoiceItem) -> Unit,
+    onAction: (InvoiceActions) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -87,17 +111,11 @@ private fun ProductSelectionField(
                 ProductSelectedItem(
                     product = product,
                     onClick = { onClick(product) },
-                    onChangeSelection = { value ->
-                        onSelect(product.copy(quantity = value))
-                    },
-                    onQuantity = {},
-                    onDelete = {
-                        onSelect(product.copy(quantity = 0))
-                    }
+                    onAction = { onAction(it) },
                 )
             } else Text(
                 modifier = Modifier.padding(8.dp),
-                text = "No hay productos relacionados"
+                text = stringResource(R.string.copy_not_products_related)
             )
         }
 
@@ -105,7 +123,7 @@ private fun ProductSelectionField(
             modifier = Modifier
                 .padding(top = 8.dp)
                 .align(Alignment.CenterHorizontally),
-            text = "Agregar productos"
+            text = stringResource(R.string.copy_add_products)
         ) { onAdd() }
     }
 }

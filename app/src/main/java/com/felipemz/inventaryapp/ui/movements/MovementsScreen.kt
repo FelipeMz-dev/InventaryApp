@@ -1,5 +1,9 @@
 package com.felipemz.inventaryapp.ui.movements
 
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,15 +22,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
-import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.core.extensions.tryOrDefault
+import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.ui.commons.AmountInvoiceItem
 import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
 import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
+import com.felipemz.inventaryapp.ui.commons.InvoiceActions
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
-import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
+import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
+import com.felipemz.inventaryapp.ui.commons.getProducts
 import com.felipemz.inventaryapp.ui.movements.MovementsEvent.*
 import com.felipemz.inventaryapp.ui.movements.components.BottomBarMovements
 import com.felipemz.inventaryapp.ui.movements.components.IdMovementField
@@ -34,7 +39,7 @@ import com.felipemz.inventaryapp.ui.movements.components.actions.FABMovements
 import com.felipemz.inventaryapp.ui.movements.components.InvoiceColumn
 import com.felipemz.inventaryapp.ui.movements.components.TopBarMovements
 import com.felipemz.inventaryapp.ui.movements.components.actions.MovementsActions
-import com.felipemz.inventaryapp.ui.product_form.components.QuantityChangeBottomSheet
+import java.util.Locale
 
 @Composable
 internal fun MovementsScreen(
@@ -44,62 +49,56 @@ internal fun MovementsScreen(
 
     var showProductsPopup by remember { mutableStateOf(false) }
     var showCalculatorPopup by remember { mutableStateOf(false) }
-    var showDiscountPopup by remember { mutableStateOf(false) }
     var showScannerDialog by remember { mutableStateOf(false) }
-    var showProductQuantityPopup by remember { mutableStateOf<ProductSelectionChart?>(null) }
+
+    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+    }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data
+        val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+        matches?.firstOrNull()?.let {
+            val value = PriceUtil.getValue(it)
+            if (value > 0) eventHandler(
+                OnInvoiceAction(
+                    InvoiceActions.OnInsertItem(AmountInvoiceItem(value))
+                )
+            )
+        }
+    }
 
     val fabActions: (MovementsActions) -> Unit = { action ->
         when (action) {
             MovementsActions.CALCULATOR -> showCalculatorPopup = true
             MovementsActions.SCANNER -> showScannerDialog = true
-            MovementsActions.DETAILS -> {}
+            MovementsActions.MICROPHONE -> launcher.launch(intent)
             MovementsActions.NAVIGATE -> {}
         }
     }
 
     when {
-        showProductsPopup -> ProductsAddBottomSheet(
+        showProductsPopup -> ProductsListBottomSheet(
             productList = state.productList,
-            selected = state.selectedProducts,
-            onQuantity = { showProductQuantityPopup = it },
+            selected = state.selectedProducts.getProducts(),
             onDismiss = { showProductsPopup = false },
-            onSelect = { eventHandler(OnSelectProduct(it)) }
-        )
-        showDiscountPopup -> QuantityChangeBottomSheet(
-            currentQuantity = state.discount,
-            quantityType = QuantityType.UNIT,
-            onDismiss = { showDiscountPopup = false },
-            onSelect = {
-                eventHandler(OnChangeDiscount(it))
-                showDiscountPopup = false
-            }
+            onAction = { eventHandler(OnInvoiceAction(it)) }
         )
         showCalculatorPopup -> CalculatorBottomSheet(
             controller = CalculatorController(0),
             onDismiss = { showCalculatorPopup = false },
             onSelect = { value ->
-                eventHandler(IncrementCalculatorId)
-                state.selectedProducts.filter { it.product.isNull() }.findLast { it.price == value }?.let {
-                    eventHandler(OnSelectProduct(it.copy(quantity = it.quantity + 1)))
-                } ?: run {
-                    eventHandler(
-                        OnSelectProduct(
-                            ProductSelectionChart(
-                                price = value,
-                                quantity = 1
-                            )
-                        )
+                eventHandler(
+                    OnInvoiceAction(
+                        InvoiceActions.OnInsertItem(AmountInvoiceItem(value))
                     )
-                }
+                )
             }
         )
-        showScannerDialog -> {
-            BarcodeScannerDialog(
-                onBarcodeScanned = {
-                    eventHandler(OnSelectProductFromBarcode(it))
-                }
-            ) { showScannerDialog = false }
-        }
+        showScannerDialog -> BarcodeScannerDialog(
+            onDismiss = { showScannerDialog = false },
+        ) { eventHandler(OnSelectProductFromBarcode(it)) }
     }
 
     state.errorBarcode?.let {
@@ -138,18 +137,6 @@ internal fun MovementsScreen(
         }
     }
 
-    showProductQuantityPopup?.let { product ->
-        QuantityChangeBottomSheet(
-            currentQuantity = product.quantity,
-            quantityType = product.product?.quantityModel?.type ?: QuantityType.UNIT,
-            onDismiss = { showProductQuantityPopup = null },
-            onSelect = {
-                eventHandler(OnSelectProduct(product.copy(quantity = it)))
-                showProductQuantityPopup = null
-            }
-        )
-    }
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButtonPosition = FabPosition.Center,
@@ -183,7 +170,11 @@ internal fun MovementsScreen(
         ) {
 
             Text(
-                text = "${state.movementState.typeName} #${state.movementNumber} - ${state.movementDate}",
+                text = formattedMovementTitle(
+                    typeName = state.movementState.typeName,
+                    movementNumber = state.movementNumber,
+                    movementDate = state.movementDate
+                ),
                 color = MaterialTheme.colorScheme.outline,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -199,9 +190,15 @@ internal fun MovementsScreen(
                 discount = state.discount,
                 total = state.total,
                 selectedProducts = state.selectedProducts,
-                onQuantityProduct = { showProductQuantityPopup = it },
-                onSelect = { eventHandler(OnSelectProduct(it)) }
+                onAction = { eventHandler(OnInvoiceAction(it)) },
             )
         }
     }
 }
+
+@Composable
+private fun formattedMovementTitle(
+    typeName: String,
+    movementNumber: Int,
+    movementDate: String,
+): String = "$typeName #$movementNumber - $movementDate"

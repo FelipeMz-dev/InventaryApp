@@ -36,6 +36,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -55,13 +56,17 @@ internal fun ProductItem(
     isSmall: Boolean = false,
     product: ProductModel,
     selection: Int? = null,
-    onQuantity: (() -> Unit)? = null,
-    onSelectionChange: ((Int) -> Unit)? = null,
-    onClick: (() -> Unit)? = null
+    onQuantity: (ProductQuantityActionType) -> Unit = {},
+    onClick: (() -> Unit) = {},
 ) {
+
+    val name = remember {
+        product.name.takeIf { it.isNotEmpty() }
+    } ?: stringResource(R.string.copy_without_concept)
+
     Row(
         modifier = modifier
-            .clickable { onClick?.invoke() }
+            .clickable { onClick() }
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -81,9 +86,11 @@ internal fun ProductItem(
         ) {
 
             NameAndPrice(
-                name = product.name,
+                modifier = Modifier.fillMaxWidth(),
+                name = name,
                 price = product.price,
-                isSmall = isSmall
+                isSmall = isSmall,
+                hasName = product.name.isNotEmpty(),
             )
 
             selection?.let {
@@ -105,9 +112,7 @@ internal fun ProductItem(
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
-                            .clickable {
-                                onSelectionChange?.invoke(it - 1)
-                            }
+                            .clickable { onQuantity(ProductQuantityActionType.SUBTRACT) }
                             .padding(4.dp)
                             .size(16.dp),
                         imageVector = Icons.Default.KeyboardArrowLeft,
@@ -117,15 +122,13 @@ internal fun ProductItem(
 
                     TextButtonUnderline(
                         text = "$it${product.quantityModel?.type?.initial?.let { "/$it" }.orEmpty()}"
-                    ) { onQuantity?.invoke() }
+                    ) { onQuantity(ProductQuantityActionType.UPDATE) }
 
                     Icon(
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
-                            .clickable {
-                                onSelectionChange?.invoke(it + 1)
-                            }
+                            .clickable { onQuantity(ProductQuantityActionType.ADD) }
                             .padding(4.dp)
                             .size(16.dp),
                         imageVector = Icons.Default.KeyboardArrowRight,
@@ -139,6 +142,10 @@ internal fun ProductItem(
             )
         }
     }
+}
+
+enum class ProductQuantityActionType {
+    ADD, SUBTRACT, UPDATE
 }
 
 @Composable
@@ -168,31 +175,38 @@ private fun InformationField(
 
 @Composable
 private fun NameAndPrice(
+    modifier: Modifier,
     name: String,
     price: Int,
     isSmall: Boolean,
-) = Row {
+    hasName: Boolean,
+) {
+    Row(modifier) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = name,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = if (isSmall) 16.sp else 18.sp,
+            textDecoration = if (hasName) TextDecoration.None else TextDecoration.LineThrough,
+            color = MaterialTheme.colorScheme.let {
+                if (hasName) it.onSurface else it.outline
+            }
+        )
 
-    Text(
-        modifier = Modifier.weight(1f),
-        text = name,
-        fontWeight = FontWeight.Bold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        fontSize = if (isSmall) 16.sp else 18.sp
-    )
-
-    Text(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = CircleShape
-            )
-            .padding(horizontal = 6.dp),
-        text = PriceUtil.formatPrice(price),
-        fontWeight = FontWeight.Bold,
-        fontSize = if (isSmall) 14.sp else 16.sp
-    )
+        Text(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = CircleShape
+                )
+                .padding(horizontal = 6.dp),
+            text = PriceUtil.formatPrice(price),
+            fontWeight = FontWeight.Bold,
+            fontSize = if (isSmall) 14.sp else 16.sp
+        )
+    }
 }
 
 @Composable

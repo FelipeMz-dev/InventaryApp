@@ -3,8 +3,9 @@ package com.felipemz.inventaryapp.ui.product_form
 import com.felipemz.inventaryapp.core.base.Event
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.domain.model.CategoryModel
-import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
+import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
+import com.felipemz.inventaryapp.ui.commons.InvoiceActions
 
 sealed interface ProductFormEvent : Event {
 
@@ -41,9 +42,11 @@ sealed interface ProductFormEvent : Event {
 
     data class OnQuantityChanged(val quantity: Int) : ProductFormEvent
 
-    data class OnOpenProduct(val product: ProductSelectionChart) : ProductFormEvent
+    data class OnOpenProduct(val product: ProductInvoiceItem) : ProductFormEvent
 
-    data class OnPackageProductSelect(val product: ProductSelectionChart?) : ProductFormEvent
+    data class OnPackageProductSelect(val product: ProductInvoiceItem) : ProductFormEvent
+
+    data class OnTogglePackage(val value: Boolean) : ProductFormEvent
 
     data class OnInsertOrUpdateCategory(val category: CategoryModel) : ProductFormEvent
 
@@ -56,4 +59,6 @@ sealed interface ProductFormEvent : Event {
     data class SetCategoryToChange(val categoryId: Int) : ProductFormEvent
 
     data class SetChangedSuccessfulCategory(val productId: Int) : ProductFormEvent
+
+    data class OnPackageAction(val action: InvoiceActions) : ProductFormEvent
 }
