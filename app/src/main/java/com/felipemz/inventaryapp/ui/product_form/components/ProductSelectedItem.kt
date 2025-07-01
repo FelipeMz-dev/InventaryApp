@@ -13,27 +13,27 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
-import com.felipemz.inventaryapp.domain.model.ProductTypeImage
+import com.felipemz.inventaryapp.ui.commons.InvoiceActions
+import com.felipemz.inventaryapp.ui.commons.InvoiceActions.*
+import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityActionType
 
 @Composable
 fun ProductSelectedItem(
-    product: ProductSelectionChart,
+    product: ProductInvoiceItem,
     onClick: () -> Unit,
-    onDelete: () -> Unit,
-    onQuantity: (ProductSelectionChart) -> Unit,
-    onChangeSelection: (Int) -> Unit
+    onAction: (InvoiceActions) -> Unit
 ) {
 
     val state = rememberSwipeToDismissBoxState()
 
     LaunchedEffect(state.currentValue) {
         if (state.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onDelete()
+            onAction(OnRemoveItem(product))
             state.snapTo(SwipeToDismissBoxValue.Settled)
         }
     }
@@ -62,14 +62,15 @@ fun ProductSelectedItem(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceContainer),
             isSmall = true,
-            product = product.product ?: ProductModel(
-                name = "Valor sin concepto",
-                price = product.price,
-                image = ProductTypeImage.EmojiImage("\uD83D\uDCB0")
-            ),
+            product = product.product,
             selection = product.quantity,
-            onQuantity = { onQuantity(product) },
-            onSelectionChange = { onChangeSelection(it) }
+            onQuantity = {
+                when (it) {
+                    ProductQuantityActionType.ADD -> onAction(OnAddItem(product))
+                    ProductQuantityActionType.SUBTRACT -> onAction(OnSubtractItem(product))
+                    ProductQuantityActionType.UPDATE -> {}
+                }
+            },
         )
     }
 }

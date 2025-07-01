@@ -27,7 +27,6 @@ import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
-import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
 import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductForm
 import com.felipemz.inventaryapp.ui.product_form.field.CategoryField
@@ -54,8 +53,6 @@ internal fun ProductFormScreen(
     var showImageField = remember { mutableStateOf(false) }
     var showEmojiPopup by remember { mutableStateOf(false) }
     var showImagePopup by remember { mutableStateOf(false) }
-    var showQuantityPopup by remember { mutableStateOf(false) }
-    var showProductsPopup by remember { mutableStateOf(false) }
 
     val moveToFinal = remember {
         suspend { scrollState.animateScrollTo(scrollState.maxValue) }
@@ -75,22 +72,6 @@ internal fun ProductFormScreen(
                 eventHandler(OnImageChanged(ProductTypeImage.EmojiImage(it)))
                 showEmojiPopup = false
             }
-        )
-        showQuantityPopup -> QuantityChangeBottomSheet(
-            currentQuantity = state.quantity,
-            quantityType = state.quantityType ?: QuantityType.UNIT,
-            onDismiss = { showQuantityPopup = false },
-            onSelect = {
-                eventHandler(OnQuantityChanged(it))
-                showQuantityPopup = false
-            }
-        )
-        showProductsPopup -> ProductsAddBottomSheet(
-            productList = state.productList.filterNot { it.id == state.editProduct?.id },
-            selected = state.packageProducts ?: emptyList(),
-            onQuantity = { },
-            onDismiss = { showProductsPopup = false },
-            onSelect = { eventHandler(OnPackageProductSelect(it)) }
         )
     }
 
@@ -184,8 +165,6 @@ internal fun ProductFormScreen(
 
             AdvancedField(
                 state = state,
-                onAddSubProduct = { showProductsPopup = true },
-                onQuantity = { showQuantityPopup = true },
                 onOpen = { moveToFinal() },
                 eventHandler = eventHandler
             )
@@ -196,8 +175,6 @@ internal fun ProductFormScreen(
 @Composable
 private fun AdvancedField(
     state: ProductFormState,
-    onQuantity: () -> Unit,
-    onAddSubProduct: () -> Unit,
     onOpen: suspend () -> Unit,
     eventHandler: (ProductFormEvent) -> Unit
 ) {
@@ -205,7 +182,7 @@ private fun AdvancedField(
         modifier = Modifier.fillMaxWidth(),
         title = stringResource(R.string.copy_advanced),
         isMandatory = null,
-        visible = false,
+        visible = state.barcodeCreation,
         concealable = true,
         onOpen = { onOpen() }
     ) {
@@ -213,7 +190,7 @@ private fun AdvancedField(
             modifier = Modifier.fillMaxWidth(),
             barcode = state.barcode,
             showAlertBarcode = state.alertBarcode,
-            isEnable = state.categoryIdToChange.isNull(),
+            isEnable = state.categoryIdToChange.isNull() && !state.barcodeCreation,
             onChange = { eventHandler(OnBarcodeChanged(it)) },
             onOpen = { onOpen() }
         )
@@ -237,12 +214,13 @@ private fun AdvancedField(
 
         PackageField(
             modifier = Modifier.fillMaxWidth(),
+            productList = state.productList.filterNot { it.id == state.editProduct?.id },
             selectedProducts = state.packageProducts,
             isEnabled = state.categoryIdToChange.isNull() && state.quantityType.isNull(),
-            onAdd = onAddSubProduct,
             onOpen = onOpen,
             onClick = { eventHandler(OnOpenProduct(it)) },
-            onSelect = { eventHandler(OnPackageProductSelect(it)) }
+            onSelect = { eventHandler(OnPackageAction(it)) },
+            toggle = { eventHandler(OnTogglePackage(it)) }
         )
     }
 }

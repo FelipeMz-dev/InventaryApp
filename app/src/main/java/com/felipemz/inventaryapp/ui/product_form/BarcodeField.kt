@@ -1,20 +1,13 @@
 package com.felipemz.inventaryapp.ui.product_form
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
@@ -29,17 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.EMPTY_STRING
-import com.felipemz.inventaryapp.core.extensions.hasCameraPermission
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
+import com.felipemz.inventaryapp.ui.commons.CommonFormField
 
 @Composable
 internal fun BarcodeField(
@@ -51,22 +42,15 @@ internal fun BarcodeField(
     onOpen: suspend () -> Unit
 ) {
 
-    val context = LocalContext.current
     var showScanner by remember { mutableStateOf(false) }
-
-    val requestCameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        isGranted.ifTrue { showScanner = true }
-    }
 
     if (showScanner) {
         BarcodeScannerDialog(
+            onDismiss = { showScanner = false },
             onBarcodeScanned = { code ->
                 onChange(code)
                 showScanner = false
-            },
-            onDismiss = { showScanner = false }
+            }
         )
     }
 
@@ -79,6 +63,7 @@ internal fun BarcodeField(
         onOpen = onOpen,
         thumbContent = {
             Switch(
+                enabled = isEnable,
                 checked = barcode.isNotNull(),
                 onCheckedChange = { state ->
                     onChange(if (barcode.isNull()) EMPTY_STRING else null)
@@ -128,10 +113,7 @@ internal fun BarcodeField(
             FilledIconButton(
                 shape = RoundedCornerShape(12.dp),
                 enabled = isEnable,
-                onClick = {
-                    if (context.hasCameraPermission()) showScanner = true
-                    else requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-                }
+                onClick = { showScanner = true }
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_scanner),

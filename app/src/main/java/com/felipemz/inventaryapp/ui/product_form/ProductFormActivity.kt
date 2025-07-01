@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.felipemz.inventaryapp.core.KEY_BARCODE_CREATE
 import com.felipemz.inventaryapp.core.KEY_CATEGORY_CHANGED
 import com.felipemz.inventaryapp.core.KEY_CATEGORY_TO_CHANGE
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
@@ -43,8 +44,14 @@ class ProductFormActivity : AppCompatActivity() {
         val bundle = intent.extras
         val productId = bundle?.getInt(KEY_PRODUCT_ID)
         val categoryId = bundle?.getInt(KEY_CATEGORY_TO_CHANGE)
+        val barcode = bundle?.getString(KEY_BARCODE_CREATE)
         categoryId?.let { if (it != 0) eventHandler(ProductFormEvent.SetCategoryToChange(it)) }
-        eventHandler(ProductFormEvent.Init(productId))
+        eventHandler(
+            ProductFormEvent.Init(
+                productId = productId,
+                barcode = barcode
+            )
+        )
         viewModel.actionLiveData.observe(this) { action ->
             action?.also { actionHandler(it) }
         }
@@ -67,23 +74,24 @@ class ProductFormActivity : AppCompatActivity() {
         when (action) {
             is ProductFormAction.ShowMessage -> showToast(action.message)
             is ProductFormAction.OnCategoryChangeDone -> onCategoryChangeDone(action.productId)
+            is ProductFormAction.OnCreateFromBarcode -> onCreateFromBarcode(action.barcode)
             else -> Unit
         }
-    }
-
-    private fun setShowWhenLocked() {
-        window.addFlags(
-            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-        )
     }
 
     private fun onCategoryChangeDone(productId: Int) {
         setResult(
             RESULT_OK, Intent().apply {
                 putExtra(KEY_CATEGORY_CHANGED, productId)
+            }
+        )
+        finish()
+    }
+
+    private fun onCreateFromBarcode(barcode: String) {
+        setResult(
+            RESULT_OK, Intent().apply {
+                putExtra(KEY_BARCODE_CREATE, barcode)
             }
         )
         finish()

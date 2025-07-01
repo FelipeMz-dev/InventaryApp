@@ -11,7 +11,7 @@ data class ProductModel(
     val image: ProductTypeImage = ProductTypeImage.LetterImage(EMPTY_STRING),
     val description: String? = null,
     val cost: Int? = null,
-    val barCode: String? = null,
+    val barcode: String? = null,
     val quantityModel: ProductQuantityModel? = null,
     val packageProducts: List<ProductPackageModel>? = null,
 )
@@ -19,17 +19,6 @@ data class ProductModel(
 data class ProductPackageModel(
     val productId: Int = 0,
     val quantity: Int = 0,
-)
-
-data class ProductSelectionChart(
-    val product: ProductModel? = null,
-    val quantity: Int = 0,
-    val price: Int = 0
-)
-
-fun ProductSelectionChart.toProductPackageModel() = ProductPackageModel(
-    productId = product?.id ?: 0,
-    quantity = quantity,
 )
 
 data class ProductQuantityModel(

@@ -2,22 +2,18 @@ package com.felipemz.inventaryapp.ui.product_form
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.felipemz.inventaryapp.core.EMPTY_STRING
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.core.extensions.ifNotEmpty
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.orDefault
 import com.felipemz.inventaryapp.core.extensions.orFalse
-import com.felipemz.inventaryapp.core.extensions.orTrue
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.ProductPackageModel
 import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
-import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
-import com.felipemz.inventaryapp.domain.model.toProductPackageModel
 import com.felipemz.inventaryapp.domain.usecase.DeleteCategoryIfNotUseUseCase
 import com.felipemz.inventaryapp.domain.usecase.DeleteProductUseCase
 import com.felipemz.inventaryapp.domain.usecase.GetProductByIdUseCase
@@ -27,10 +23,31 @@ import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateProductUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveProductsNotPackaged
 import com.felipemz.inventaryapp.domain.usecase.VerifyBarcodeUseCase
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
+import com.felipemz.inventaryapp.ui.commons.InvoiceActions
+import com.felipemz.inventaryapp.ui.commons.InvoiceItem
+import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.Init
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBarcodeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCostChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDeleteCategory
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnInsertOrUpdateCategory
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageProductSelect
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDeleted
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSortCategories
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTryDeleteProduct
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetCategoryToChange
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.SetChangedSuccessfulCategory
 import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
 import kotlinx.coroutines.Dispatchers
-import kotlin.text.any
 
 class ProductFormViewModel(
     private val observeProductsNotPackaged: ObserveProductsNotPackaged,
@@ -52,7 +69,7 @@ class ProductFormViewModel(
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
-                is Init -> init(event.productId)
+                is Init -> init(event.productId, event.barcode)
                 is CloseAlertDialog -> updateState { it.copy(alertDialog = null) }
                 is OnTryDeleteProduct -> tryToDeleteProduct()
                 is OnProductDeleted -> deleteProduct()
@@ -70,29 +87,86 @@ class ProductFormViewModel(
                 is OnQuantityTypeChanged -> quantityTypeChanged(event.quantityType)
                 is OnQuantityChanged -> updateState { it.copy(quantity = event.quantity) }
                 is OnPackageProductSelect -> packageProductSelect(event.product)
+                is ProductFormEvent.OnTogglePackage -> togglePackage(event.value)
                 is SetCategoryToChange -> updateState { it.copy(categoryIdToChange = event.categoryId) }
                 is SetChangedSuccessfulCategory -> setChangedSuccessfulCategory(event.productId)
+                is ProductFormEvent.OnPackageAction -> handlePackageAction(event.action)
                 else -> Unit
             }
         }
     }
 
-    private fun barcodeChanged(barcode: String?) = execute(Dispatchers.IO) {
-        val showAlertBarcode = barcode?.let { verifyBarcodeUseCase(it) }.orFalse()
-        updateState {
-            it.copy(
-                barcode = barcode,
-                alertBarcode = showAlertBarcode,
-            )
-        }.invokeOnCompletion {
-            validateEnableToSave()
+    private fun handlePackageAction(action: InvoiceActions) = with(state.value) {
+
+        fun add(item: InvoiceItem) {
+            updateState { state ->
+                state.copy(
+                    packageProducts = state.packageProducts?.map {
+                        if (item.isEqualTo(it)) it.copy(quantity = it.quantity + 1) else it
+                    }
+                )
+            }
+        }
+
+        fun subtract(item: ProductInvoiceItem) {
+            updateState { state ->
+                state.copy(
+                    packageProducts = state.packageProducts?.mapNotNull {
+                        if (item.isEqualTo(it)) {
+                            val newValue = it.quantity - 1
+                            it.copy(quantity = newValue).takeIf { newValue > 0 }
+                        } else it
+                    }
+                )
+            }
+        }
+
+        fun itemAdd(item: ProductInvoiceItem) {
+            packageProducts?.any { it.isEqualTo(item) }?.ifTrue { add(item) }
+        }
+
+        fun itemSubtract(item: ProductInvoiceItem) {
+            packageProducts?.any { it.isEqualTo(item) }?.ifTrue { subtract(item) }
+        }
+
+        fun itemInsert(item: ProductInvoiceItem) {
+            if (packageProducts?.any { it.isEqualTo(item) } == true) itemAdd(item)
+            else updateState { it.copy(packageProducts = it.packageProducts?.plus(item)) }
+        }
+
+        fun itemRemove(item: ProductInvoiceItem) {
+            packageProducts?.any { it.isEqualTo(item) }?.ifTrue {
+                updateState { it.copy(packageProducts = it.packageProducts?.filterNot { it.isEqualTo(item) }) }
+            }
+        }
+
+
+        when (action) {
+            is InvoiceActions.OnInsertItem -> (action.item as? ProductInvoiceItem)?.let { itemInsert(it) }
+            is InvoiceActions.OnRemoveItem -> (action.item as? ProductInvoiceItem)?.let { itemRemove(it) }
+            is InvoiceActions.OnAddItem -> (action.item as? ProductInvoiceItem)?.let { itemAdd(it) }
+            is InvoiceActions.OnSubtractItem -> (action.item as? ProductInvoiceItem)?.let { itemSubtract(it) }
+            else -> Unit
         }
     }
 
-    private fun init(productId: Int?) {
+    private fun init(
+        productId: Int?,
+        barcode: String?
+    ) {
         productId?.let { loadProduct(it) }
+        barcode?.let { createFromBarcode(it) }
         observeAllCategories()
         observeAllProductsNotPackaged()
+    }
+
+    private fun createFromBarcode(barcode: String) {
+        updateState {
+            it.copy(
+                barcode = barcode,
+                barcodeCreation = true
+            )
+        }
     }
 
     private fun loadProduct(productId: Int) = execute(Dispatchers.IO) {
@@ -104,7 +178,7 @@ class ProductFormViewModel(
                     category = product.category,
                     description = product.description,
                     cost = product.cost,
-                    barcode = product.barCode,
+                    barcode = product.barcode,
                     quantityType = product.quantityModel?.type,
                     quantity = product.quantityModel?.quantity ?: 0,
                     packageProducts = getPackageProducts(product)
@@ -127,14 +201,21 @@ class ProductFormViewModel(
         }
     }
 
-    private fun getPackageProducts(product: ProductModel): List<ProductSelectionChart>? {
-        return product.packageProducts?.map { productSelection ->
-            ProductSelectionChart(
-                product = state.value.productList.firstOrNull { it.id == productSelection.productId },
-                quantity = productSelection.quantity
-            )
-        }
+    private fun getPackageProducts(product: ProductModel): List<ProductInvoiceItem>? {
+        return product.packageProducts?.mapNotNull { productSelection ->
+            state.value.productList.firstOrNull { it.id == productSelection.productId }?.let {
+                ProductInvoiceItem(
+                    product = it,
+                    quantity = productSelection.quantity
+                )
+            }
+        }?.takeIf { it.isEmpty() }
     }
+
+    private fun ProductInvoiceItem.toProductPackageModel() = ProductPackageModel(
+        productId = product.id,
+        quantity = quantity,
+    )
 
     private fun nameChanged(name: String) {
         updateState { uiState ->
@@ -180,6 +261,18 @@ class ProductFormViewModel(
         }
     }
 
+    private fun barcodeChanged(barcode: String?) = execute(Dispatchers.IO) {
+        val showAlertBarcode = barcode?.let { verifyBarcodeUseCase(it) }.orFalse()
+        updateState {
+            it.copy(
+                barcode = barcode,
+                alertBarcode = showAlertBarcode,
+            )
+        }.invokeOnCompletion {
+            validateEnableToSave()
+        }
+    }
+
     private fun quantityTypeChanged(quantityType: QuantityType?) {
         updateState {
             it.copy(
@@ -189,25 +282,18 @@ class ProductFormViewModel(
         }
     }
 
-    private fun packageProductSelect(product: ProductSelectionChart?) {
+    private fun packageProductSelect(product: ProductInvoiceItem) {
         updateState { uiState ->
-            product?.let { compositionProduct ->
-                uiState.copy(
-                    packageProducts = uiState.packageProducts?.let { products ->
-                        if (products.any { it.product == compositionProduct.product }) {
-                            products.mapNotNull {
-                                if (it.product != product.product) it
-                                else it.copy(quantity = compositionProduct.quantity).takeIf {
-                                    compositionProduct.quantity > 0
-                                }
-                            }
-                        } else products + compositionProduct
-                    } ?: emptyList(),
-                    quantityType = QuantityType.UNIT,
-                )
-            } ?: uiState.copy(
-                packageProducts = null,
-                quantityType = null
+            uiState.copy(
+                packageProducts = uiState.packageProducts?.let { products ->
+                    if (products.any { it.product == product.product }) {
+                        products.mapNotNull {
+                            if (it.product != product.product) it
+                            else product.takeIf { it.quantity > 0 }
+                        }
+                    } else products + product
+                },
+                quantityType = QuantityType.UNIT,
             )
         }.invokeOnCompletion {
             updateQuantityComposition()
@@ -215,12 +301,32 @@ class ProductFormViewModel(
         }
     }
 
+    private fun togglePackage(value: Boolean) {
+        updateState { uiState ->
+            if (value) {
+                uiState.copy(
+                    packageProducts = emptyList(),
+                    quantityType = QuantityType.UNIT,
+                )
+            } else {
+                uiState.copy(
+                    packageProducts = null,
+                    quantityType = null,
+                )
+            }
+        }.invokeOnCompletion {
+            updateQuantityComposition()
+            validateEnableToSave()
+        }
+
+    }
+
     private fun updateQuantityComposition() {
         updateState { uiState ->
             uiState.copy(
                 quantity = tryOrDefault(0) {
                     uiState.packageProducts?.minOf {
-                        (it.product?.quantityModel?.quantity ?: 0).floorDiv(it.quantity)
+                        (it.product.quantityModel?.quantity ?: 0).floorDiv(it.quantity)
                     } ?: 0
                 }
             )
@@ -247,8 +353,12 @@ class ProductFormViewModel(
                 action.postValue(ProductFormAction.ShowMessage("Categoría actualizada"))
                 action.postValue(ProductFormAction.OnCategoryChangeDone(product.id))
             } ?: run {
-                action.postValue(ProductFormAction.ShowMessage("Producto guardado"))
-                cleanData()
+                if (state.value.barcodeCreation) {
+                    action.postValue(ProductFormAction.OnCreateFromBarcode(product.barcode.orEmpty()))
+                } else {
+                    action.postValue(ProductFormAction.ShowMessage("Producto guardado"))
+                    cleanData()
+                }
             }
         }
     }
@@ -262,7 +372,7 @@ class ProductFormViewModel(
                 category = category,
                 image = imageSelected,
                 description = description?.trim()?.takeIf { it.isNotEmpty() },
-                barCode = barcode?.trim()?.takeIf { it.isNotEmpty() },
+                barcode = barcode?.trim()?.takeIf { it.isNotEmpty() },
                 cost = cost.takeIf { it != 0 },
                 quantityModel = quantityType?.let { ProductQuantityModel(it, quantity) },
                 packageProducts = packageProducts?.map { it.toProductPackageModel() }

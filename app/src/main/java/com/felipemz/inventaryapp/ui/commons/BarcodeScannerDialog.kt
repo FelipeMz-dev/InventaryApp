@@ -1,5 +1,7 @@
 package com.felipemz.inventaryapp.ui.commons
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
@@ -19,8 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,18 +37,22 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.hasCameraPermission
+import com.felipemz.inventaryapp.core.extensions.ifFalse
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.utils.BarcodeCameraHandler
 import com.felipemz.inventaryapp.ui.animation.scanAnimation
-import com.google.common.util.concurrent.ListenableFuture
 
 @Composable
 fun BarcodeScannerDialog(
-    onBarcodeScanned: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onBarcodeScanned: (String) -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val requestCameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { it.ifFalse { onDismiss } }
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val handler = remember {
         BarcodeCameraHandler(
@@ -62,6 +67,13 @@ fun BarcodeScannerDialog(
     val close = {
         handler.terminate()
         onDismiss()
+    }
+
+
+    LaunchedEffect(Unit) {
+        if (!context.hasCameraPermission()) {
+            requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
     }
 
     Dialog(close) {

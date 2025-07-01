@@ -4,7 +4,7 @@ import com.felipemz.inventaryapp.core.base.State
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.domain.model.ProductSelectionChart
+import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductFormType
 
@@ -20,12 +20,13 @@ data class ProductFormState(
     val imageSelected: ProductTypeImage = ProductTypeImage.LetterImage(String()),
     val description: String? = null,
     val barcode: String? = null,
+    val barcodeCreation: Boolean = false,
     val alertBarcode: Boolean = false,
     val cost: Int? = null,
     val quantityType: QuantityType? = null,
     val quantity: Int = 0,
     val images: List<ProductTypeImage> = ProductTypeImage.emptyTypes,
-    val packageProducts: List<ProductSelectionChart>? = null,
+    val packageProducts: List<ProductInvoiceItem>? = null,
     val enableToSave: Boolean = false,
     val categoryIdToChange: Int? = null,
 ) : State
