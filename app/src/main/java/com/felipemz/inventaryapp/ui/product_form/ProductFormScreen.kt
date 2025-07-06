@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
@@ -39,7 +38,6 @@ import com.felipemz.inventaryapp.ui.product_form.components.ImageSelectorBottomS
 import com.felipemz.inventaryapp.ui.product_form.field.NameField
 import com.felipemz.inventaryapp.ui.product_form.field.PackageField
 import com.felipemz.inventaryapp.ui.product_form.field.PriceField
-import com.felipemz.inventaryapp.ui.product_form.components.QuantityChangeBottomSheet
 import com.felipemz.inventaryapp.ui.product_form.field.QuantityField
 import com.felipemz.inventaryapp.ui.product_form.components.TopBarProduct
 
@@ -206,7 +204,7 @@ private fun AdvancedField(
         QuantityField(
             modifier = Modifier.fillMaxWidth(),
             quantityType = state.quantityType,
-            isEnabled = state.packageProducts.isNull() && state.categoryIdToChange.isNull(),
+            isEnabled = state.packageList.isNull() && state.categoryIdToChange.isNull(),
             quantity = state.quantity,
             onOpen = { onOpen() },
             onChange = { eventHandler(OnQuantityChanged(it)) }
@@ -215,7 +213,7 @@ private fun AdvancedField(
         PackageField(
             modifier = Modifier.fillMaxWidth(),
             productList = state.productList.filterNot { it.id == state.editProduct?.id },
-            selectedProducts = state.packageProducts,
+            selectedProducts = state.packageList,
             isEnabled = state.categoryIdToChange.isNull() && state.quantityType.isNull(),
             onOpen = onOpen,
             onClick = { eventHandler(OnOpenProduct(it)) },

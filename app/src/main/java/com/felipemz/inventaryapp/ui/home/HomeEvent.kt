@@ -7,7 +7,7 @@ import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 
 sealed interface HomeEvent : Event {
 
@@ -42,7 +42,7 @@ sealed interface HomeEvent : Event {
         val isInverted: Boolean
     ) : HomeEvent
 
-    data class OnReportsCustomFilterSelected(val filter: RangeDateModel) : HomeEvent
+    data class OnReportsCustomFilterSelected(val filter: RangeDateChart) : HomeEvent
 
     data class OnReportsFilterSelected(val filter: ReportsFilterDate) : HomeEvent
 

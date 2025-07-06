@@ -17,29 +17,48 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions.*
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions.*
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityActionType
+import com.felipemz.inventaryapp.core.charts.BillItemChart
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProductsListBottomSheet(
     productList: List<ProductModel>,
-    selected: List<ProductInvoiceItem>,
+    selected: List<BillItemChart>,
     onDismiss: () -> Unit,
-    onAction: (InvoiceActions) -> Unit,
+    onAction: (BillActions) -> Unit,
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         LazyColumn {
             items(productList) { product ->
 
                 val selection = remember(selected) {
-                    selected.find { it.product.id == product.id }
+                    selected.find { it.product?.id == product.id }
+                }
+
+                var showCalculator by remember { mutableStateOf(false) }
+
+                showCalculator.ifTrue {
+                    selection?.let { amount ->
+                        CalculatorBottomSheet(
+                            controller = CalculatorController(amount.quantity),
+                            onDismiss = { showCalculator = false }
+                        ) { onAction(OnUpdateItem(amount.copy(quantity = it))) }
+                    }
                 }
 
                 val item = @Composable {
@@ -52,11 +71,11 @@ internal fun ProductsListBottomSheet(
                                 when (action) {
                                     ProductQuantityActionType.ADD -> onAction(OnAddItem(it))
                                     ProductQuantityActionType.SUBTRACT -> onAction(OnSubtractItem(it))
-                                    ProductQuantityActionType.UPDATE -> {}
+                                    ProductQuantityActionType.UPDATE -> showCalculator = true
                                 }
                             }
                         }
-                    ) { onAction(OnInsertItem(ProductInvoiceItem(product))) }
+                    ) { onAction(OnInsertItem(BillItemChart(product = product))) }
                 }
 
                 selection?.let {

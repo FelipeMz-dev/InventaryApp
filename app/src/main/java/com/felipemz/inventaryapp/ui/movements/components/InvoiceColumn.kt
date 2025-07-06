@@ -19,8 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions
-import com.felipemz.inventaryapp.ui.commons.InvoiceItem
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
+import com.felipemz.inventaryapp.core.charts.BillItemChart
 import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
 
 @Composable
@@ -28,8 +28,8 @@ internal fun InvoiceColumn(
     subTotal: Int,
     discount: Int,
     total: Int,
-    selectedProducts: List<InvoiceItem>,
-    onAction: (InvoiceActions) -> Unit,
+    invoiceList: List<BillItemChart>,
+    onAction: (BillActions) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -40,14 +40,12 @@ internal fun InvoiceColumn(
         contentPadding = PaddingValues(bottom = 68.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(selectedProducts) { item ->
-            item.toProductInvoice()?.let { product ->
-                ProductSelectedItem(
-                    product = product,
-                    onClick = { },
-                    onAction = { onAction(it.setItem(item)) }
-                )
-            }
+        items(invoiceList) { item ->
+            ProductSelectedItem(
+                amount = item,
+                onClick = { },
+                onAction = onAction
+            )
         }
 
         item {

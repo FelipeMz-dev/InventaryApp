@@ -3,9 +3,13 @@ package com.felipemz.inventaryapp.ui.product_form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
+import com.felipemz.inventaryapp.core.charts.BillItemChart
+import com.felipemz.inventaryapp.core.charts.CategoryUseChart
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
+import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.core.extensions.orDefault
 import com.felipemz.inventaryapp.core.extensions.orFalse
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
@@ -23,9 +27,8 @@ import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateProductUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveProductsNotPackaged
 import com.felipemz.inventaryapp.domain.usecase.VerifyBarcodeUseCase
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions
-import com.felipemz.inventaryapp.ui.commons.InvoiceItem
-import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
+import com.felipemz.inventaryapp.ui.commons.delegate.InvoiceItemsDelegate
+import com.felipemz.inventaryapp.ui.commons.delegate.InvoiceItemsDelegateImpl
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.Init
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBarcodeChanged
@@ -64,6 +67,11 @@ class ProductFormViewModel(
     private val action = MutableLiveData<ProductFormAction>()
     val actionLiveData: LiveData<ProductFormAction> = action
 
+    private val invoiceDelegate: InvoiceItemsDelegate = InvoiceItemsDelegateImpl(
+        getBillList = { state.value.packageList.orEmpty() },
+        updateBillList = { newList -> updateState { it.copy(packageList = newList) } }
+    )
+
     override fun initState() = ProductFormState()
 
     override fun intentHandler() {
@@ -96,57 +104,13 @@ class ProductFormViewModel(
         }
     }
 
-    private fun handlePackageAction(action: InvoiceActions) = with(state.value) {
-
-        fun add(item: InvoiceItem) {
-            updateState { state ->
-                state.copy(
-                    packageProducts = state.packageProducts?.map {
-                        if (item.isEqualTo(it)) it.copy(quantity = it.quantity + 1) else it
-                    }
-                )
-            }
-        }
-
-        fun subtract(item: ProductInvoiceItem) {
-            updateState { state ->
-                state.copy(
-                    packageProducts = state.packageProducts?.mapNotNull {
-                        if (item.isEqualTo(it)) {
-                            val newValue = it.quantity - 1
-                            it.copy(quantity = newValue).takeIf { newValue > 0 }
-                        } else it
-                    }
-                )
-            }
-        }
-
-        fun itemAdd(item: ProductInvoiceItem) {
-            packageProducts?.any { it.isEqualTo(item) }?.ifTrue { add(item) }
-        }
-
-        fun itemSubtract(item: ProductInvoiceItem) {
-            packageProducts?.any { it.isEqualTo(item) }?.ifTrue { subtract(item) }
-        }
-
-        fun itemInsert(item: ProductInvoiceItem) {
-            if (packageProducts?.any { it.isEqualTo(item) } == true) itemAdd(item)
-            else updateState { it.copy(packageProducts = it.packageProducts?.plus(item)) }
-        }
-
-        fun itemRemove(item: ProductInvoiceItem) {
-            packageProducts?.any { it.isEqualTo(item) }?.ifTrue {
-                updateState { it.copy(packageProducts = it.packageProducts?.filterNot { it.isEqualTo(item) }) }
-            }
-        }
-
-
+    private fun handlePackageAction(action: BillActions) {
         when (action) {
-            is InvoiceActions.OnInsertItem -> (action.item as? ProductInvoiceItem)?.let { itemInsert(it) }
-            is InvoiceActions.OnRemoveItem -> (action.item as? ProductInvoiceItem)?.let { itemRemove(it) }
-            is InvoiceActions.OnAddItem -> (action.item as? ProductInvoiceItem)?.let { itemAdd(it) }
-            is InvoiceActions.OnSubtractItem -> (action.item as? ProductInvoiceItem)?.let { itemSubtract(it) }
-            else -> Unit
+            is BillActions.OnInsertItem -> invoiceDelegate.insertInvoiceItem(action.item)
+            is BillActions.OnRemoveItem -> invoiceDelegate.removeInvoiceItem(action.item)
+            is BillActions.OnAddItem -> invoiceDelegate.addInvoiceItem(action.item)
+            is BillActions.OnSubtractItem -> invoiceDelegate.subtractInvoiceItem(action.item)
+            is BillActions.OnUpdateItem -> invoiceDelegate.updateInvoiceItem(action.item)
         }
     }
 
@@ -181,7 +145,7 @@ class ProductFormViewModel(
                     barcode = product.barcode,
                     quantityType = product.quantityModel?.type,
                     quantity = product.quantityModel?.quantity ?: 0,
-                    packageProducts = getPackageProducts(product)
+                    packageList = getPackageProducts(product)
                 )
             }
             imageChanged(product.image)
@@ -200,22 +164,6 @@ class ProductFormViewModel(
             updateState { it.copy(productList = products) }
         }
     }
-
-    private fun getPackageProducts(product: ProductModel): List<ProductInvoiceItem>? {
-        return product.packageProducts?.mapNotNull { productSelection ->
-            state.value.productList.firstOrNull { it.id == productSelection.productId }?.let {
-                ProductInvoiceItem(
-                    product = it,
-                    quantity = productSelection.quantity
-                )
-            }
-        }?.takeIf { it.isEmpty() }
-    }
-
-    private fun ProductInvoiceItem.toProductPackageModel() = ProductPackageModel(
-        productId = product.id,
-        quantity = quantity,
-    )
 
     private fun nameChanged(name: String) {
         updateState { uiState ->
@@ -282,10 +230,10 @@ class ProductFormViewModel(
         }
     }
 
-    private fun packageProductSelect(product: ProductInvoiceItem) {
+    private fun packageProductSelect(product: BillItemChart) {
         updateState { uiState ->
             uiState.copy(
-                packageProducts = uiState.packageProducts?.let { products ->
+                packageList = uiState.packageList?.let { products ->
                     if (products.any { it.product == product.product }) {
                         products.mapNotNull {
                             if (it.product != product.product) it
@@ -305,12 +253,12 @@ class ProductFormViewModel(
         updateState { uiState ->
             if (value) {
                 uiState.copy(
-                    packageProducts = emptyList(),
+                    packageList = emptyList(),
                     quantityType = QuantityType.UNIT,
                 )
             } else {
                 uiState.copy(
-                    packageProducts = null,
+                    packageList = null,
                     quantityType = null,
                 )
             }
@@ -325,8 +273,8 @@ class ProductFormViewModel(
         updateState { uiState ->
             uiState.copy(
                 quantity = tryOrDefault(0) {
-                    uiState.packageProducts?.minOf {
-                        (it.product.quantityModel?.quantity ?: 0).floorDiv(it.quantity)
+                    uiState.packageList?.minOf {
+                        (it.product?.quantityModel?.quantity ?: 0).floorDiv(it.quantity)
                     } ?: 0
                 }
             )
@@ -338,7 +286,7 @@ class ProductFormViewModel(
                 && price > 0
                 && category.isNotNull()
                 && !alertBarcode
-                && packageProducts
+                && packageList
             ?.isNotEmpty()
             .orDefault(true)
         updateState { it.copy(enableToSave = isEnable) }
@@ -375,7 +323,7 @@ class ProductFormViewModel(
                 barcode = barcode?.trim()?.takeIf { it.isNotEmpty() },
                 cost = cost.takeIf { it != 0 },
                 quantityModel = quantityType?.let { ProductQuantityModel(it, quantity) },
-                packageProducts = packageProducts?.map { it.toProductPackageModel() }
+                packageProducts = packageList?.map { it.toProductPackageModel() }
             )
         }
     }
@@ -383,9 +331,7 @@ class ProductFormViewModel(
     private fun tryToDeleteProduct() {
         state.value.editProduct?.let { product ->
             updateState {
-                it.copy(
-                    alertDialog = AlertDialogProductFormType.DeleteProduct(product)
-                )
+                it.copy(alertDialog = AlertDialogProductFormType.DeleteProduct(product))
             }
         }
     }
@@ -457,6 +403,23 @@ class ProductFormViewModel(
             } else uiState
         }
     }
+
+    private fun getPackageProducts(product: ProductModel): List<BillItemChart>? {
+        if (product.packageProducts.isNullOrEmpty()) return null
+        return product.packageProducts.mapNotNull { item ->
+            state.value.productList.firstOrNull { it.id == item.productId }?.let {
+                BillItemChart(
+                    product = it,
+                    quantity = item.quantity
+                )
+            }
+        }
+    }
+
+    private fun BillItemChart.toProductPackageModel() = ProductPackageModel(
+        productId = product?.id ?: 0,
+        quantity = quantity,
+    )
 
     private fun cleanData() {
         updateState { ProductFormState() }

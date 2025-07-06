@@ -1,7 +1,6 @@
 package com.felipemz.inventaryapp.domain.model
 
 import com.felipemz.inventaryapp.core.EMPTY_STRING
-import com.felipemz.inventaryapp.core.enums.QuantityType
 
 data class ProductModel(
     val id: Int = 0,
@@ -14,14 +13,4 @@ data class ProductModel(
     val barcode: String? = null,
     val quantityModel: ProductQuantityModel? = null,
     val packageProducts: List<ProductPackageModel>? = null,
-)
-
-data class ProductPackageModel(
-    val productId: Int = 0,
-    val quantity: Int = 0,
-)
-
-data class ProductQuantityModel(
-    val type: QuantityType = QuantityType.UNIT,
-    val quantity: Int = 0,
 )
