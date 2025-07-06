@@ -3,13 +3,12 @@ package com.felipemz.inventaryapp.ui.home
 import androidx.compose.runtime.mutableStateOf
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.domain.model.CategoryModel
-import com.felipemz.inventaryapp.domain.model.MovementItemModel
+import com.felipemz.inventaryapp.domain.model.MovementModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.data.cache.ProductsCache
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllProductsUseCase
 import com.felipemz.inventaryapp.domain.usecase.SortProductsFromObserver
@@ -24,7 +23,7 @@ class HomeViewModel(
     private val observeAllCategoriesUseCase: ObserveAllCategoriesUseCase,
 ) : BaseViewModel<HomeState, HomeEvent>() {
 
-    private val _movements = mutableStateOf<List<MovementItemModel>>(emptyList())
+    private val _movements = mutableStateOf<List<MovementModel>>(emptyList())
     private val _products = MutableStateFlow<List<ProductModel>>(emptyList())
 
     init {
@@ -37,8 +36,8 @@ class HomeViewModel(
         movementLabelList = fakeLabelList,
         totalAmount = fakeMovements.sumBy {
             when (it.type) {
-                MovementItemType.MOVEMENT_SALE -> it.amount
-                MovementItemType.MOVEMENT_EXPENSE -> -it.amount
+                MovementItemType.MOVEMENT_SALE -> it.total
+                MovementItemType.MOVEMENT_EXPENSE -> -it.total
                 else -> 0
             }
         }

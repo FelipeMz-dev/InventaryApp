@@ -22,16 +22,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.core.extensions.tryOrDefault
+import com.felipemz.inventaryapp.core.extensions.isNotNull
+import com.felipemz.inventaryapp.core.charts.BillItemChart
 import com.felipemz.inventaryapp.core.utils.PriceUtil
-import com.felipemz.inventaryapp.ui.commons.AmountInvoiceItem
 import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
 import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
 import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
 import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
-import com.felipemz.inventaryapp.ui.commons.getProducts
 import com.felipemz.inventaryapp.ui.movements.MovementsEvent.*
 import com.felipemz.inventaryapp.ui.movements.components.BottomBarMovements
 import com.felipemz.inventaryapp.ui.movements.components.IdMovementField
@@ -63,7 +62,7 @@ internal fun MovementsScreen(
             val value = PriceUtil.getValue(it)
             if (value > 0) eventHandler(
                 OnInvoiceAction(
-                    InvoiceActions.OnInsertItem(AmountInvoiceItem(value))
+                    BillActions.OnInsertItem(BillItemChart(value = value))
                 )
             )
         }
@@ -81,7 +80,7 @@ internal fun MovementsScreen(
     when {
         showProductsPopup -> ProductsListBottomSheet(
             productList = state.productList,
-            selected = state.selectedProducts.getProducts(),
+            selected = state.billList.filter { it.product.isNotNull() },
             onDismiss = { showProductsPopup = false },
             onAction = { eventHandler(OnInvoiceAction(it)) }
         )
@@ -91,7 +90,7 @@ internal fun MovementsScreen(
             onSelect = { value ->
                 eventHandler(
                     OnInvoiceAction(
-                        InvoiceActions.OnInsertItem(AmountInvoiceItem(value))
+                        BillActions.OnInsertItem(BillItemChart(value = value))
                     )
                 )
             }
@@ -189,7 +188,7 @@ internal fun MovementsScreen(
                 subTotal = state.subTotal,
                 discount = state.discount,
                 total = state.total,
-                selectedProducts = state.selectedProducts,
+                invoiceList = state.billList,
                 onAction = { eventHandler(OnInvoiceAction(it)) },
             )
         }

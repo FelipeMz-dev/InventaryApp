@@ -1,7 +1,7 @@
 package com.felipemz.inventaryapp.ui.product_form.components.alert_dialog
 
 import com.felipemz.inventaryapp.domain.model.ProductModel
-import com.felipemz.inventaryapp.ui.product_form.CategoryUseChart
+import com.felipemz.inventaryapp.core.charts.CategoryUseChart
 
 interface AlertDialogProductFormType {
     val message: String

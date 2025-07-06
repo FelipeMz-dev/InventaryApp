@@ -1,8 +1,7 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions
-import com.felipemz.inventaryapp.ui.commons.InvoiceItem
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 
 sealed interface MovementsEvent : Event {
 
@@ -16,13 +15,11 @@ sealed interface MovementsEvent : Event {
 
     data object OnClearBarcodeError : MovementsEvent
 
-    data class OnSelectProduct(val item: InvoiceItem) : MovementsEvent
-
     data class OnSelectProductFromBarcode(val barcode: String) : MovementsEvent
 
     data class OnChangeDiscount(val discount: Int) : MovementsEvent
 
     data class OnExecuteAction(val action: MovementsAction) : MovementsEvent
 
-    data class OnInvoiceAction(val action: InvoiceActions) : MovementsEvent
+    data class OnInvoiceAction(val action: BillActions) : MovementsEvent
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.customs.CustomSelectableDates
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.core.utils.FormatDateUtil
 import java.time.LocalDate
 import java.time.Month
@@ -33,7 +33,7 @@ import java.util.Locale
 @OptIn(ExperimentalLayoutApi::class)
 internal fun MonthsSelector(
     modifier: Modifier,
-    dateSelected: MutableState<RangeDateModel?>,
+    dateSelected: MutableState<RangeDateChart?>,
     currentYear: MutableIntState,
     selectableDates: CustomSelectableDates,
     currentDate: LocalDate
@@ -82,7 +82,7 @@ private fun MonthItem(
     currentYear: MutableIntState,
     currentDate: LocalDate,
     isEnable: Boolean,
-    dateSelected: MutableState<RangeDateModel?>
+    dateSelected: MutableState<RangeDateChart?>
 ) = Box(
     modifier = modifier,
     contentAlignment = Alignment.Center
@@ -103,7 +103,7 @@ private fun MonthItem(
             .clip(CircleShape)
             .clickable(enabled = isEnable) {
                 val dateMonthOfYear = LocalDate.of(currentYear.intValue, month, 1)
-                dateSelected.value = RangeDateModel(
+                dateSelected.value = RangeDateChart(
                     title = FormatDateUtil.getOfCustomMonth(dateMonthOfYear),
                     startDate = dateMonthOfYear
                 )

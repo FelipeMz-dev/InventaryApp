@@ -24,21 +24,21 @@ import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions
-import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
+import com.felipemz.inventaryapp.core.charts.BillItemChart
 import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
 
 @Composable
 fun PackageField(
     modifier: Modifier,
     productList: List<ProductModel>,
-    selectedProducts: List<ProductInvoiceItem>?,
+    selectedProducts: List<BillItemChart>?,
     isEnabled: Boolean,
     onOpen: suspend () -> Unit,
-    onClick: (ProductInvoiceItem) -> Unit,
-    onSelect: (InvoiceActions) -> Unit,
+    onClick: (BillItemChart) -> Unit,
+    onSelect: (BillActions) -> Unit,
     toggle: (Boolean) -> Unit,
 ) {
 
@@ -94,10 +94,10 @@ fun PackageField(
 
 @Composable
 private fun ProductSelectionField(
-    packageProducts: List<ProductInvoiceItem>?,
+    packageProducts: List<BillItemChart>?,
     onAdd: () -> Unit,
-    onClick: (ProductInvoiceItem) -> Unit,
-    onAction: (InvoiceActions) -> Unit
+    onClick: (BillItemChart) -> Unit,
+    onAction: (BillActions) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -109,7 +109,7 @@ private fun ProductSelectionField(
         packageProducts?.let { pack ->
             if (pack.isNotEmpty()) pack.forEach { product ->
                 ProductSelectedItem(
-                    product = product,
+                    amount = product,
                     onClick = { onClick(product) },
                     onAction = { onAction(it) },
                 )

@@ -13,29 +13,44 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions
-import com.felipemz.inventaryapp.ui.commons.InvoiceActions.*
-import com.felipemz.inventaryapp.ui.commons.ProductInvoiceItem
+import com.felipemz.inventaryapp.core.extensions.ifTrue
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions.*
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityActionType
+import com.felipemz.inventaryapp.core.charts.BillItemChart
 
 @Composable
 fun ProductSelectedItem(
-    product: ProductInvoiceItem,
+    amount: BillItemChart,
     onClick: () -> Unit,
-    onAction: (InvoiceActions) -> Unit
+    onAction: (BillActions) -> Unit
 ) {
 
     val state = rememberSwipeToDismissBoxState()
+    var showCalculator by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.currentValue) {
         if (state.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onAction(OnRemoveItem(product))
+            onAction(OnRemoveItem(amount))
             state.snapTo(SwipeToDismissBoxValue.Settled)
         }
+    }
+
+    showCalculator.ifTrue {
+        CalculatorBottomSheet(
+            controller = CalculatorController(amount.quantity),
+            onDismiss = { showCalculator = false }
+        ) { onAction(OnUpdateItem(amount.copy(quantity = it))) }
     }
 
     SwipeToDismissBox(
@@ -62,13 +77,13 @@ fun ProductSelectedItem(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceContainer),
             isSmall = true,
-            product = product.product,
-            selection = product.quantity,
+            product = amount.product ?: ProductModel(price = amount.value),
+            selection = amount.quantity,
             onQuantity = {
                 when (it) {
-                    ProductQuantityActionType.ADD -> onAction(OnAddItem(product))
-                    ProductQuantityActionType.SUBTRACT -> onAction(OnSubtractItem(product))
-                    ProductQuantityActionType.UPDATE -> {}
+                    ProductQuantityActionType.ADD -> onAction(OnAddItem(amount))
+                    ProductQuantityActionType.SUBTRACT -> onAction(OnSubtractItem(amount))
+                    ProductQuantityActionType.UPDATE -> showCalculator = true
                 }
             },
         )

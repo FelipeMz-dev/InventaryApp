@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.CustomFilterDate
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
@@ -40,11 +40,11 @@ import com.felipemz.inventaryapp.ui.commons.datepicker.DatePickerDialogPopup
 @Composable
 fun ReportsCalendarDialog(
     onDismiss: () -> Unit,
-    onAccept: (RangeDateModel) -> Unit
+    onAccept: (RangeDateChart) -> Unit
 ) {
 
     var filterTypeSelected by remember { mutableStateOf(CustomFilterDate.DAY) }
-    var dateSelected by remember { mutableStateOf<RangeDateModel?>(null) }
+    var dateSelected by remember { mutableStateOf<RangeDateChart?>(null) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     CommonCustomDialog(
@@ -152,7 +152,7 @@ private fun TopFilterTypeSelector(
 @Composable
 private fun BodySearchDate(
     modifier: Modifier,
-    dateSelected: RangeDateModel?,
+    dateSelected: RangeDateChart?,
     filterTypeSelected: CustomFilterDate,
     onClick: () -> Unit,
 ) = Column(

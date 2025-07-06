@@ -6,7 +6,7 @@ import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.CategoryRatingModel
 import com.felipemz.inventaryapp.domain.model.LabelRatingModel
-import com.felipemz.inventaryapp.domain.model.MovementItemModel
+import com.felipemz.inventaryapp.domain.model.MovementModel
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.domain.model.ProductQuantityModel
 import com.felipemz.inventaryapp.domain.model.ProductRatingModel
@@ -128,65 +128,65 @@ val fakeLabelList = listOf(
 )
 
 val fakeMovements = listOf(
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_SALE,
         number = 1,
         date = "12/12/2021",
         time = "12:00 pm",
-        amount = 10000,
+        total = 10000,
     ),
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_SALE,
         number = 2,
         date = "12/12/2021",
         time = "1:40 pm",
-        amount = 10500,
+        total = 10500,
         labels = listOf("rappy", "domicilios", "mesa 1", "mesa 2", "caja 1", "caja 2")
     ),
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_SALE,
         number = 3,
         date = "12/12/2021",
         time = "2:00 pm",
-        amount = 11000,
+        total = 11000,
         labels = listOf("fiado"),
     ),
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_PENDING,
         date = "12/12/2021",
         time = "4:00 pm",
-        amount = 8000,
+        total = 8000,
         labels = listOf("fiado", "caja 1", "caja 2")
     ),
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_EXPENSE,
         number = 1,
         date = "12/12/2021",
         time = "4:20 pm",
-        amount = 2050,
+        total = 2050,
         labels = listOf("caja 1"),
     ),
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_SALE,
         number = 4,
         date = "12/12/2021",
         time = "5:30 pm",
-        amount = 2000,
+        total = 2000,
     ),
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_EXPENSE,
         number = 2,
         date = "12/12/2021",
         time = "6:00 pm",
         labels = listOf("rappy", "caja 1"),
-        amount = 500,
+        total = 500,
     ),
-    MovementItemModel(
+    MovementModel(
         type = MovementItemType.MOVEMENT_SALE,
         number = 3,
         date = "12/12/2021",
         time = "6:40 pm",
-        amount = 1500,
+        total = 1500,
         labels = listOf("rappy", "domicilios", "caja 1", "caja 2", "perdida")
     )
 )

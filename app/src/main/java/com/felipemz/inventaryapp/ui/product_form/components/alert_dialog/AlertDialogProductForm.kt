@@ -13,7 +13,7 @@ import com.felipemz.inventaryapp.core.extensions.toIdString
 import com.felipemz.inventaryapp.ui.commons.CommonAlertDialog
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
-import com.felipemz.inventaryapp.ui.product_form.CategoryUseChart
+import com.felipemz.inventaryapp.core.charts.CategoryUseChart
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.GoToChangeCategory
