@@ -29,4 +29,5 @@ data class ProductFormState(
     val packageList: List<BillItemChart>? = null,
     val enableToSave: Boolean = false,
     val categoryIdToChange: Int? = null,
+    val packageIdToChange: Int? = null,
 ) : State

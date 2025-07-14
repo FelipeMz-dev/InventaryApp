@@ -12,6 +12,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.core.KEY_BARCODE_CREATE
 import com.felipemz.inventaryapp.core.KEY_CATEGORY_CHANGED
 import com.felipemz.inventaryapp.core.KEY_CATEGORY_TO_CHANGE
+import com.felipemz.inventaryapp.core.KEY_PACKAGE_CHANGE
+import com.felipemz.inventaryapp.core.KEY_PACKAGE_TO_CHANGE
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
 import com.felipemz.inventaryapp.core.extensions.showToast
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
@@ -44,8 +46,10 @@ class ProductFormActivity : AppCompatActivity() {
         val bundle = intent.extras
         val productId = bundle?.getInt(KEY_PRODUCT_ID)
         val categoryId = bundle?.getInt(KEY_CATEGORY_TO_CHANGE)
+        val packageId = bundle?.getInt(KEY_PACKAGE_TO_CHANGE)
         val barcode = bundle?.getString(KEY_BARCODE_CREATE)
         categoryId?.let { if (it != 0) eventHandler(ProductFormEvent.SetCategoryToChange(it)) }
+        packageId?.let { if (it != 0) eventHandler(ProductFormEvent.SetPackageToChange(it)) }
         eventHandler(
             ProductFormEvent.Init(
                 productId = productId,
@@ -66,6 +70,14 @@ class ProductFormActivity : AppCompatActivity() {
                     categoryId = event.categoryId
                 )
             }
+            is ProductFormEvent.GoToChangePackage -> {
+                viewModel.state.value.editProduct?.let {
+                    goToChangePackageFromProduct(
+                        packageId = event.productId,
+                        productId = it.id
+                    )
+                }
+            }
             else -> viewModel.eventHandler(event)
         }
     }
@@ -74,6 +86,7 @@ class ProductFormActivity : AppCompatActivity() {
         when (action) {
             is ProductFormAction.ShowMessage -> showToast(action.message)
             is ProductFormAction.OnCategoryChangeDone -> onCategoryChangeDone(action.productId)
+            is ProductFormAction.OnPackageChangeDone -> onPackageChangeDone(action.productId)
             is ProductFormAction.OnCreateFromBarcode -> onCreateFromBarcode(action.barcode)
             else -> Unit
         }
@@ -83,6 +96,15 @@ class ProductFormActivity : AppCompatActivity() {
         setResult(
             RESULT_OK, Intent().apply {
                 putExtra(KEY_CATEGORY_CHANGED, productId)
+            }
+        )
+        finish()
+    }
+
+    private fun onPackageChangeDone(productId: Int) {
+        setResult(
+            RESULT_OK, Intent().apply {
+                putExtra(KEY_PACKAGE_CHANGE, productId)
             }
         )
         finish()
@@ -108,6 +130,17 @@ class ProductFormActivity : AppCompatActivity() {
         productFormLauncher.launch(intent)
     }
 
+    private fun goToChangePackageFromProduct(
+        packageId: Int,
+        productId: Int,
+    ) {
+        val intent = Intent(this, ProductFormActivity::class.java).apply {
+            putExtra(KEY_PRODUCT_ID, packageId)
+            putExtra(KEY_PACKAGE_TO_CHANGE, productId)
+        }
+        productFormLauncher.launch(intent)
+    }
+
     private fun handleResult() {
         productFormLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -117,6 +150,12 @@ class ProductFormActivity : AppCompatActivity() {
                     val productId = data.getIntExtra(KEY_CATEGORY_CHANGED, 0)
                     if (productId != 0) {
                         viewModel.eventHandler(ProductFormEvent.SetChangedSuccessfulCategory(productId))
+                    }
+                    viewModel.state.value.editProduct?.let {
+                        val packageId = data.getIntExtra(KEY_PACKAGE_CHANGE, 0)
+                        if (packageId != 0) {
+                            viewModel.eventHandler(ProductFormEvent.SetChangedSuccessfulPackage(packageId))
+                        }
                     }
                 }
             }

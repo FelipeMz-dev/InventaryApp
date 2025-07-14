@@ -6,5 +6,7 @@ sealed interface ProductFormAction {
 
     data class OnCategoryChangeDone(val productId: Int) : ProductFormAction
 
+    data class OnPackageChangeDone(val productId: Int) : ProductFormAction
+
     data class OnCreateFromBarcode(val barcode: String) : ProductFormAction
 }

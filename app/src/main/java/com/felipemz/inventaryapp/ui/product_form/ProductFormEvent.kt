@@ -44,8 +44,6 @@ sealed interface ProductFormEvent : Event {
 
     data class OnOpenProduct(val product: BillItemChart) : ProductFormEvent
 
-    data class OnPackageProductSelect(val product: BillItemChart) : ProductFormEvent
-
     data class OnTogglePackage(val value: Boolean) : ProductFormEvent
 
     data class OnInsertOrUpdateCategory(val category: CategoryModel) : ProductFormEvent
@@ -56,9 +54,15 @@ sealed interface ProductFormEvent : Event {
 
     data class GoToChangeCategory(val productId: Int, val categoryId: Int) : ProductFormEvent
 
+    data class GoToChangePackage(val productId: Int) : ProductFormEvent
+
     data class SetCategoryToChange(val categoryId: Int) : ProductFormEvent
 
+    data class SetPackageToChange(val packageId: Int) : ProductFormEvent
+
     data class SetChangedSuccessfulCategory(val productId: Int) : ProductFormEvent
+
+    data class SetChangedSuccessfulPackage(val packageId: Int) : ProductFormEvent
 
     data class OnPackageAction(val action: BillActions) : ProductFormEvent
 }

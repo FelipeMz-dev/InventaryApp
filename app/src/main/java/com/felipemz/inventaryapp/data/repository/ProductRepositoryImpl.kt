@@ -12,6 +12,8 @@ import com.felipemz.inventaryapp.domain.repository.mapper.toProductModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -67,6 +69,12 @@ class ProductRepositoryImpl(
 
     override suspend fun countProductsFromCategoryId(categoryId: Int): Int {
         return productDao.countProductsFromCategoryId(categoryId)
+    }
+
+    override suspend fun getPackagesIdFromProduct(productId: Int): List<ProductModel> {
+        val packageIds = packageDao.gerPackagesIdFromProductId(productId)
+        val products = productCache.products.firstOrNull() ?: emptyList()
+        return products.filter { it.id in packageIds }
     }
 
     override suspend fun getProductsIdFromCategoryId(categoryId: Int): List<Int> {

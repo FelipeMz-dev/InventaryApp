@@ -51,6 +51,7 @@ internal fun CategoryField(
     category: CategoryModel?,
     categories: List<CategoryModel>,
     categoryIdToChange: Int? = null,
+    isEnable: Boolean,
     onInsertOrUpdate: (CategoryModel) -> Unit,
     onDelete: (CategoryModel) -> Unit,
     onSort: (CategoryModel, CategoryModel) -> Unit,
@@ -89,7 +90,8 @@ internal fun CategoryField(
 
         ButtonCategories(
             modifier = Modifier.fillMaxWidth(),
-            category = category
+            category = category,
+            enabled = isEnable,
         ) { showDropCategory = true }
 
         CategoriesDropDownMenu(
@@ -120,11 +122,13 @@ internal fun CategoryField(
 private fun ButtonCategories(
     modifier: Modifier,
     category: CategoryModel?,
+    enabled: Boolean,
     onClick: () -> Unit,
 ) {
     Button(
         modifier = modifier,
         onClick = onClick,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = category?.let {
                 colorResource(id = it.color)

@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,10 +27,11 @@ import com.felipemz.inventaryapp.R
 @Composable
 internal fun CommonAlertDialog(
     message: String,
+    textAction: String,
     body: @Composable () -> Unit = {},
-    canAccept: Boolean = true,
+    canAction: Boolean = true,
     onDismiss: () -> Unit,
-    onAccept: () -> Unit = onDismiss
+    onAction: () -> Unit = onDismiss
 ) {
     AlertDialog(
         title = {
@@ -75,10 +75,10 @@ internal fun CommonAlertDialog(
         confirmButton = {
             Button(
                 modifier = Modifier.Companion.fillMaxWidth(),
-                onClick = onAccept,
-                enabled = canAccept,
+                onClick = onAction,
+                enabled = canAction,
             ) {
-                Text(text = stringResource(R.string.copy_accept))
+                Text(text = textAction)
             }
         }
     )
