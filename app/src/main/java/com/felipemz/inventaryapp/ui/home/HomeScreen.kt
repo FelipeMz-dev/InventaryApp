@@ -106,11 +106,11 @@ internal fun HomeScreen(
             modifier = Modifier.padding(it),
             tabSelected = tabSelected,
             state = state,
-            eventHandler = {
-                if (it is OnMovementFilterSelected){
-                    isShowLabelPopup = it.filter == MovementsFilterChip.LABEL
+            eventHandler = { event ->
+                if (event is OnMovementFilterSelected){
+                    isShowLabelPopup = event.filter == MovementsFilterChip.LABEL
                 }
-                eventHandler(it)
+                eventHandler(event)
             }
         )
     }

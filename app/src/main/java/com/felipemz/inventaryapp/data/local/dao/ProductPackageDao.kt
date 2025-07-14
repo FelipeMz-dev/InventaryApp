@@ -17,4 +17,7 @@ interface ProductPackageDao {
 
     @Query("DELETE FROM product_packages WHERE packageId = :packageId")
     suspend fun deletePackagesByPackageId(packageId: Int)
+
+    @Query("SELECT packageId FROM product_packages WHERE productId = :productId")
+    suspend fun gerPackagesIdFromProductId(productId: Int): List<Int>
 }

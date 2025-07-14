@@ -27,6 +27,7 @@ internal fun CostField(
         thumbContent = {
             Switch(
                 checked = value.isNotNull(),
+                enabled = isEnable,
                 onCheckedChange = { state ->
                     onChange(if (value.isNull()) 0 else null)
                 }

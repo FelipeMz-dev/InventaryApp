@@ -26,20 +26,37 @@ import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.*
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBack
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBarcodeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCategoryChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnCostChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDeleteCategory
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnDescriptionChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnImageChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnInsertOrUpdateCategory
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnNameChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnOpenProduct
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPackageAction
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSortCategories
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTogglePackage
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTryDeleteProduct
+import com.felipemz.inventaryapp.ui.product_form.components.EmojiSelectorBottomSheet
+import com.felipemz.inventaryapp.ui.product_form.components.ImageSelectorBottomSheet
+import com.felipemz.inventaryapp.ui.product_form.components.TopBarProduct
 import com.felipemz.inventaryapp.ui.product_form.components.alert_dialog.AlertDialogProductForm
 import com.felipemz.inventaryapp.ui.product_form.field.CategoryField
 import com.felipemz.inventaryapp.ui.product_form.field.CostField
 import com.felipemz.inventaryapp.ui.product_form.field.DescriptionField
-import com.felipemz.inventaryapp.ui.product_form.components.EmojiSelectorBottomSheet
 import com.felipemz.inventaryapp.ui.product_form.field.IdProductField
 import com.felipemz.inventaryapp.ui.product_form.field.ImageField
-import com.felipemz.inventaryapp.ui.product_form.components.ImageSelectorBottomSheet
 import com.felipemz.inventaryapp.ui.product_form.field.NameField
 import com.felipemz.inventaryapp.ui.product_form.field.PackageField
 import com.felipemz.inventaryapp.ui.product_form.field.PriceField
 import com.felipemz.inventaryapp.ui.product_form.field.QuantityField
-import com.felipemz.inventaryapp.ui.product_form.components.TopBarProduct
 
 @Composable
 internal fun ProductFormScreen(
@@ -48,7 +65,7 @@ internal fun ProductFormScreen(
 ) {
 
     val scrollState = rememberScrollState()
-    var showImageField = remember { mutableStateOf(false) }
+    val showImageField = remember { mutableStateOf(false) }
     var showEmojiPopup by remember { mutableStateOf(false) }
     var showImagePopup by remember { mutableStateOf(false) }
 
@@ -105,13 +122,15 @@ internal fun ProductFormScreen(
                 modifier = Modifier.fillMaxWidth(),
                 idProduct = state.editProduct?.id,
                 canDelete = state.editProduct.isNotNull()
-                        && state.categoryIdToChange.isNull(),
+                        && state.categoryIdToChange.isNull()
+                        && state.packageIdToChange.isNull(),
             ) { eventHandler(OnTryDeleteProduct) }
 
             NameField(
                 modifier = Modifier.fillMaxWidth(),
                 name = state.name,
-                isEnable = state.categoryIdToChange.isNull(),
+                isEnable = state.categoryIdToChange.isNull()
+                        && state.packageIdToChange.isNull(),
                 onChange = { eventHandler(OnNameChanged(it)) },
             ) {
                 showImageField.value = true
@@ -121,7 +140,8 @@ internal fun ProductFormScreen(
             PriceField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.price,
-                isEnable = state.categoryIdToChange.isNull(),
+                isEnable = state.categoryIdToChange.isNull()
+                        && state.packageIdToChange.isNull(),
             ) { eventHandler(OnPriceChanged(it)) }
 
             CategoryField(
@@ -129,6 +149,7 @@ internal fun ProductFormScreen(
                 category = state.category,
                 categories = state.categories,
                 categoryIdToChange = state.categoryIdToChange,
+                isEnable = state.packageIdToChange.isNull(),
                 onInsertOrUpdate = { eventHandler(OnInsertOrUpdateCategory(it)) },
                 onDelete = { eventHandler(OnDeleteCategory(it.id)) },
                 onSort = { from, to -> eventHandler(OnSortCategories(from, to)) },
@@ -141,7 +162,8 @@ internal fun ProductFormScreen(
                 images = state.images,
                 imageSelected = state.imageSelected,
                 category = state.category,
-                isEnable = state.categoryIdToChange.isNull(),
+                isEnable = state.categoryIdToChange.isNull()
+                        && state.packageIdToChange.isNull(),
                 isVisible = showImageField,
                 onOpen = { moveToFinal() }
             ) {
@@ -155,7 +177,8 @@ internal fun ProductFormScreen(
             DescriptionField(
                 modifier = Modifier.fillMaxWidth(),
                 description = state.description,
-                isEnable = state.categoryIdToChange.isNull(),
+                isEnable = state.categoryIdToChange.isNull()
+                        && state.packageIdToChange.isNull(),
                 onOpen = { moveToFinal() }
             ) { eventHandler(OnDescriptionChanged(it)) }
 
@@ -180,7 +203,8 @@ private fun AdvancedField(
         modifier = Modifier.fillMaxWidth(),
         title = stringResource(R.string.copy_advanced),
         isMandatory = null,
-        visible = state.barcodeCreation,
+        visible = state.barcodeCreation
+                || state.packageIdToChange.isNotNull(),
         concealable = true,
         onOpen = { onOpen() }
     ) {
@@ -188,7 +212,8 @@ private fun AdvancedField(
             modifier = Modifier.fillMaxWidth(),
             barcode = state.barcode,
             showAlertBarcode = state.alertBarcode,
-            isEnable = state.categoryIdToChange.isNull() && !state.barcodeCreation,
+            isEnable = !state.barcodeCreation && state.categoryIdToChange.isNull()
+                    && state.packageIdToChange.isNull(),
             onChange = { eventHandler(OnBarcodeChanged(it)) },
             onOpen = { onOpen() }
         )
@@ -196,7 +221,8 @@ private fun AdvancedField(
         CostField(
             modifier = Modifier.fillMaxWidth(),
             value = state.cost,
-            isEnable = state.categoryIdToChange.isNull(),
+            isEnable = state.categoryIdToChange.isNull()
+                    && state.packageIdToChange.isNull(),
             onChange = { eventHandler(OnCostChanged(it)) },
             onOpen = { onOpen() }
         )
@@ -204,7 +230,9 @@ private fun AdvancedField(
         QuantityField(
             modifier = Modifier.fillMaxWidth(),
             quantityType = state.quantityType,
-            isEnabled = state.packageList.isNull() && state.categoryIdToChange.isNull(),
+            isEnabled = state.packageList.isNull()
+                    && state.categoryIdToChange.isNull()
+                    && state.packageIdToChange.isNull(),
             quantity = state.quantity,
             onOpen = { onOpen() },
             onChange = { eventHandler(OnQuantityChanged(it)) }
@@ -214,7 +242,8 @@ private fun AdvancedField(
             modifier = Modifier.fillMaxWidth(),
             productList = state.productList.filterNot { it.id == state.editProduct?.id },
             selectedProducts = state.packageList,
-            isEnabled = state.categoryIdToChange.isNull() && state.quantityType.isNull(),
+            isEnabled = state.categoryIdToChange.isNull()
+                    && state.quantityType.isNull(),
             onOpen = onOpen,
             onClick = { eventHandler(OnOpenProduct(it)) },
             onSelect = { eventHandler(OnPackageAction(it)) },

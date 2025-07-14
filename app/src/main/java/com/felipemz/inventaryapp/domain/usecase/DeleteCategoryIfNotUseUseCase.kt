@@ -8,7 +8,8 @@ class DeleteCategoryIfNotUseUseCase(
     private val productRepository: ProductRepository
 ) {
     suspend operator fun invoke(id: Int): Boolean {
-        if (productRepository.countProductsFromCategoryId(id) > 0) return false
+        val uses = productRepository.countProductsFromCategoryId(id)
+        if (uses > 0) return false
         categoryRepository.delete(id)
         return true
     }

@@ -23,6 +23,8 @@ interface ProductRepository {
 
     suspend fun countProductsFromCategoryId(categoryId: Int): Int
 
+    suspend fun getPackagesIdFromProduct(productId: Int): List<ProductModel>
+
     suspend fun getProductsIdFromCategoryId(categoryId: Int): List<Int>
 
     suspend fun getNameById(id: Int): String?

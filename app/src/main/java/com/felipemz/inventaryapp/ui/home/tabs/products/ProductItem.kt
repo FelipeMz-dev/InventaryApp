@@ -60,7 +60,7 @@ internal fun ProductItem(
     onClick: (() -> Unit) = {},
 ) {
 
-    val name = remember {
+    val name = remember(product) {
         product.name.takeIf { it.isNotEmpty() }
     } ?: stringResource(R.string.copy_without_concept)
 
