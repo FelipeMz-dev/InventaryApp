@@ -25,11 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
@@ -41,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
@@ -60,7 +64,7 @@ internal fun ProductItem(
     onClick: (() -> Unit) = {},
 ) {
 
-    val name = remember(product) {
+    val name = remember {
         product.name.takeIf { it.isNotEmpty() }
     } ?: stringResource(R.string.copy_without_concept)
 
@@ -261,14 +265,10 @@ private fun ImageByType(
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer
 ) {
 
-    val backgroundModifier by remember {
-        derivedStateOf {
-            Modifier.background(
-                color = backgroundColor,
-                shape = CircleShape
-            )
-        }
-    }
+    val backgroundModifier = Modifier.background(
+        color = backgroundColor,
+        shape = CircleShape
+    )
 
     when (image) {
         is ProductTypeImage.LetterImage -> Box(
@@ -283,42 +283,41 @@ private fun ImageByType(
                 fontSize = (size.value - 24).sp
             )
         }
-        is ProductTypeImage.EmojiImage -> if (image.emoji.isEmpty()) {
-            EmptyImage(
-                modifier = modifier.then(backgroundModifier),
-                typeImage = image
-            )
-        } else Box(
-            modifier = modifier
-                .fillMaxSize()
-                .then(backgroundModifier)
-        ) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = image.emoji,
-                fontSize = (size.value - 18).sp
-            )
+        is ProductTypeImage.EmojiImage -> {
+            if (image.emoji.isEmpty()) {
+                EmptyImage(
+                    modifier = modifier.then(backgroundModifier),
+                    typeImage = image
+                )
+            } else Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .then(backgroundModifier)
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = image.emoji,
+                    fontSize = (size.value - 18).sp
+                )
+            }
         }
         is ProductTypeImage.PhatImage -> {
 
-            val bitmap by remember(image.path) {
-                derivedStateOf {
-                    tryOrDefault(null) {
-                        val inputStream = File(image.path).inputStream()
-                        inputStream.use { BitmapFactory.decodeStream(it) }
-                    }
-                }
-            }
+            var showDefault by remember { mutableStateOf(false) }
 
-            bitmap?.let {
-                Image(
-                    modifier = modifier.then(backgroundModifier),
-                    bitmap = it.asImageBitmap(),
-                    contentDescription = null
-                )
-            } ?: EmptyImage(
+            val painter = rememberAsyncImagePainter(
+                model = image.path,
+                filterQuality = FilterQuality.Low,
+                onError = { showDefault = true },
+            )
+
+            if (showDefault) EmptyImage(
                 modifier = modifier.then(backgroundModifier),
                 typeImage = image
+            ) else Image(
+                modifier = modifier.then(backgroundModifier),
+                painter = painter,
+                contentDescription = null
             )
         }
     }
