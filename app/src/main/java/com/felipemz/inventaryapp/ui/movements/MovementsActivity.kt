@@ -5,12 +5,18 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.core.KEY_BARCODE_CREATE
 import com.felipemz.inventaryapp.core.base.BaseActivity
 import com.felipemz.inventaryapp.core.extensions.showToast
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.*
+import com.felipemz.inventaryapp.ui.LocalProductList
+import com.felipemz.inventaryapp.ui.movements.MovementsEvent.Init
+import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnBack
+import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnClearBarcodeError
+import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnSelectProductFromBarcode
 import com.felipemz.inventaryapp.ui.product_form.ProductFormActivity
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
@@ -22,20 +28,31 @@ class MovementsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setShowWhenLocked()
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
+            val productList by viewModel.productList.collectAsStateWithLifecycle()
             InventaryAppTheme {
-                MovementsScreen(
-                    state = state,
-                    eventHandler = ::eventHandler
-                )
+                CompositionLocalProvider(LocalProductList provides productList) {
+                    MovementsScreen(
+                        state = state,
+                        eventHandler = ::eventHandler
+                    )
+                }
             }
         }
 
+        setShowWhenLocked()
         handleResult()
         initViewModel()
     }
+
+    //private fun <T> LiveData<T>.observeAsState(): T? {
+    //    var value: T? = null
+    //    observe(this@MovementsActivity) { newValue ->
+    //        value = newValue
+    //    }
+    //    return value
+    //}
 
     private fun initViewModel() {
         viewModel.actionLiveData.observe(this) { action ->

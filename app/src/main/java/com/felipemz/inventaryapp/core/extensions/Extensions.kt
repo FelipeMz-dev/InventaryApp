@@ -1,12 +1,22 @@
 package com.felipemz.inventaryapp.core.extensions
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.felipemz.inventaryapp.core.EMPTY_STRING
 import java.time.Clock
 import java.time.LocalDate
 import java.util.Date
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 inline fun Boolean.ifTrue(block: () -> Unit) {
     if (this) block()
@@ -54,12 +64,12 @@ fun <T> T?.orDefault(default: T): T {
     return this ?: default
 }
 
-fun Any?.orTrue(default: Boolean = true): Boolean {
-    return this as? Boolean ?: default
+fun Any?.orTrue(): Boolean {
+    return this as? Boolean ?: true
 }
 
-fun Any?.orFalse(default: Boolean = false): Boolean {
-    return this as? Boolean ?: default
+fun Any?.orFalse(): Boolean {
+    return this as? Boolean ?: false
 }
 
 fun <T> tryOrDefault(
@@ -98,4 +108,27 @@ inline fun String.ifNotEmpty(block: (String) -> Unit): Unit? {
 
 fun Modifier.thenIf(condition: Boolean, modifier: Modifier): Modifier {
     return if (condition) this.then(modifier) else this
+}
+
+@Composable
+fun <T> LiveData<T>.observeAsState(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
+    context: CoroutineContext = EmptyCoroutineContext
+): State<T> {
+    return produceState(this.value, this, lifecycleOwner.lifecycle, minActiveState, context) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(minActiveState) {
+            if (context == EmptyCoroutineContext) {
+                this@observeAsState.observe(lifecycleOwner) {
+                    this@produceState.value = it
+                }
+            } else {
+                with(context){
+                    this@observeAsState.observe(lifecycleOwner) {
+                        this@produceState.value = it
+                    }
+                }
+            }
+        }
+    }
 }

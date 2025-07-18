@@ -19,24 +19,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.charts.BillItemChart
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
-import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
-import com.felipemz.inventaryapp.core.charts.BillItemChart
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
 
 @Composable
 fun PackageField(
     modifier: Modifier,
-    productList: List<ProductModel>,
+    categories: List<CategoryModel>,
     selectedProducts: List<BillItemChart>?,
     isEnabled: Boolean,
     onOpen: suspend () -> Unit,
+    onSetNameFilter: (String?) -> Unit,
+    onSetCategoryFilter: (CategoryModel?) -> Unit,
     onClick: (BillItemChart) -> Unit,
     onSelect: (BillActions) -> Unit,
     toggle: (Boolean) -> Unit,
@@ -46,8 +48,11 @@ fun PackageField(
 
     showProductsListBottomSheet.ifTrue {
         ProductsListBottomSheet(
-            productList = productList,
             selected = selectedProducts ?: emptyList(),
+            categories = categories,
+            emptyMessage = "No hay productos con inventario disponibles",
+            onSetNameFilter = onSetNameFilter,
+            onSetCategoryFilter = onSetCategoryFilter,
             onDismiss = { showProductsListBottomSheet = false },
             onAction = onSelect
         )

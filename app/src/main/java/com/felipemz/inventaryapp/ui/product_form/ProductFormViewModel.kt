@@ -33,6 +33,8 @@ import com.felipemz.inventaryapp.domain.usecase.VerifyPackagedProductUseCase
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.ui.commons.delegate.InvoiceItemsDelegate
 import com.felipemz.inventaryapp.ui.commons.delegate.InvoiceItemsDelegateImpl
+import com.felipemz.inventaryapp.ui.commons.delegate.ProductListFilterDelegate
+import com.felipemz.inventaryapp.ui.commons.delegate.ProductListFilterDelegateImpl
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.CloseAlertDialog
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.Init
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnBarcodeChanged
@@ -49,6 +51,8 @@ import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductDelet
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSetCategoryFilter
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSetNameFilter
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSortCategories
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTogglePackage
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTryDeleteProduct
@@ -80,6 +84,10 @@ class ProductFormViewModel(
         updateBillList = ::updateBillListAndQuantity
     )
 
+    private val productsFilteredDelegate: ProductListFilterDelegate = ProductListFilterDelegateImpl()
+
+    val productList = productsFilteredDelegate.filteredProductList
+
     override fun initState() = ProductFormState()
 
     override fun intentHandler() {
@@ -108,6 +116,8 @@ class ProductFormViewModel(
                 is SetChangedSuccessfulCategory -> setChangedSuccessfulCategory(event.productId)
                 is SetChangedSuccessfulPackage -> setChangedSuccessfulPackage(event.packageId)
                 is OnPackageAction -> handlePackageAction(event.action)
+                is OnSetNameFilter -> productsFilteredDelegate.setFilterName(event.name)
+                is OnSetCategoryFilter -> productsFilteredDelegate.setFilterCategory(event.category)
                 else -> Unit
             }
         }
@@ -171,7 +181,8 @@ class ProductFormViewModel(
 
     private fun observeAllQuantityProducts() = execute(Dispatchers.IO) {
         observeQuantityProducts().collect { products ->
-            updateState { it.copy(productList = products) }
+            val list = products.filterNot { it.id == state.value.editProduct?.id }
+            productsFilteredDelegate.setProductList(list)
         }
     }
 
@@ -471,9 +482,9 @@ class ProductFormViewModel(
     }
 
     private fun getPackageProducts(product: ProductModel): List<BillItemChart>? {
-        if (product.packageProducts.isNullOrEmpty()) return null
+        if (product.packageProducts.isNullOrEmpty()) return null //TODO: move to use case
         return product.packageProducts.mapNotNull { item ->
-            state.value.productList.firstOrNull { it.id == item.productId }?.let {
+            productList.value.firstOrNull { it.id == item.productId }?.let {
                 BillItemChart(
                     product = it,
                     quantity = item.quantity
@@ -500,6 +511,6 @@ class ProductFormViewModel(
     }
 
     private fun cleanData() {
-        updateState { ProductFormState(productList = it.productList) }
+        updateState { ProductFormState() }
     }
 }

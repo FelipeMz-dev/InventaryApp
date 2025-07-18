@@ -86,6 +86,12 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun verifyBarcode(barcode: String): Boolean {
-        return productDao.verifyBarcode(barcode)
+        val products = productCache.products.firstOrNull()
+        return products?.any { it.barcode == barcode } ?: false
+    }
+
+    override suspend fun getFromBarcode(barcode: String): ProductModel? {
+        val products = productCache.products.firstOrNull()
+        return products?.firstOrNull { it.barcode == barcode }
     }
 }

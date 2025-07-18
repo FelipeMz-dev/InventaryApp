@@ -166,7 +166,6 @@ private fun TabsContentBody(
                 categorySelected = state.categorySelected,
                 isInventory = pagerState.settledPage == HomeTabs.PRODUCTS.ordinal,
                 isFocusSearch = state.isSearchFocused,
-                products = state.products,
                 eventHandler = eventHandler,
             )
             HomeTabs.MOVEMENTS.ordinal -> MovementsTab(

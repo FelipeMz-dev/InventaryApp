@@ -4,6 +4,7 @@ import com.felipemz.inventaryapp.domain.usecase.DeleteCategoryIfNotUseUseCase
 import com.felipemz.inventaryapp.domain.usecase.DeleteProductUseCase
 import com.felipemz.inventaryapp.domain.usecase.GetAllProductsUseCase
 import com.felipemz.inventaryapp.domain.usecase.GetProductByIdUseCase
+import com.felipemz.inventaryapp.domain.usecase.GetProductFromBarcodeUseCase
 import com.felipemz.inventaryapp.domain.usecase.GetProductsIdAndNameFromCategoryUseCase
 import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateCategoryUseCase
 import com.felipemz.inventaryapp.domain.usecase.InsertOrUpdateProductUseCase
@@ -29,4 +30,5 @@ val useCaseModule = module {
     factory { GetProductByIdUseCase(get()) }
     factory { VerifyBarcodeUseCase(get()) }
     factory { VerifyPackagedProductUseCase(get()) }
+    factory { GetProductFromBarcodeUseCase(get()) }
 }
