@@ -1,6 +1,5 @@
 package com.felipemz.inventaryapp.ui.home.tabs.products
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -47,12 +44,10 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.extensions.onColor
-import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
-import java.io.File
 
 @Composable
 internal fun ProductItem(
