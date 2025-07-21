@@ -1,7 +1,6 @@
-package com.felipemz.inventaryapp.ui.product_form.components
+package com.felipemz.inventaryapp.ui.commons
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
@@ -13,50 +12,35 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions.*
-import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
-import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
-import com.felipemz.inventaryapp.ui.home.tabs.products.ProductItem
 import com.felipemz.inventaryapp.ui.home.tabs.products.ProductQuantityActionType
 import com.felipemz.inventaryapp.core.charts.BillItemChart
+import com.felipemz.inventaryapp.ui.home.tabs.products.ProductBillItem
 
 @Composable
-fun ProductSelectedItem(
-    amount: BillItemChart,
+fun ProductBillItemSelected(
+    item: BillItemChart,
+    showTotal: Boolean = true,
     onClick: () -> Unit,
+    onOpenCalculator: () -> Unit,
     onAction: (BillActions) -> Unit
 ) {
 
     val state = rememberSwipeToDismissBoxState()
-    var showCalculator by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.currentValue) {
         if (state.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onAction(OnRemoveItem(amount))
+            onAction(OnRemoveItem(item))
             state.snapTo(SwipeToDismissBoxValue.Settled)
         }
     }
 
-    showCalculator.ifTrue {
-        CalculatorBottomSheet(
-            controller = CalculatorController(amount.quantity),
-            onDismiss = { showCalculator = false }
-        ) { onAction(OnUpdateItem(amount.copy(quantity = it))) }
-    }
-
     SwipeToDismissBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth(),
         state = state,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
@@ -72,20 +56,21 @@ fun ProductSelectedItem(
         }
     ) {
 
-        ProductItem(
+        ProductBillItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceContainer),
-            isSmall = true,
-            product = amount.product ?: ProductModel(price = amount.value),
-            selection = amount.quantity,
+            showTotal = showTotal,
+            product = item.product ?: ProductModel(price = item.value),
+            quantity = item.quantity,
             onQuantity = {
                 when (it) {
-                    ProductQuantityActionType.ADD -> onAction(OnAddItem(amount))
-                    ProductQuantityActionType.SUBTRACT -> onAction(OnSubtractItem(amount))
-                    ProductQuantityActionType.UPDATE -> showCalculator = true
+                    ProductQuantityActionType.ADD -> onAction(OnAddItem(item))
+                    ProductQuantityActionType.SUBTRACT -> onAction(OnSubtractItem(item))
+                    ProductQuantityActionType.UPDATE -> onOpenCalculator()
                 }
             },
+            onClick = onClick
         )
     }
 }

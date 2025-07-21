@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.onColor
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.domain.model.ProductModel
@@ -54,14 +56,54 @@ internal fun ProductItem(
     modifier: Modifier,
     isSmall: Boolean = false,
     product: ProductModel,
-    selection: Int? = null,
+    onClick: (() -> Unit) = {},
+) {
+    Row(
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ImageAndCounter(
+            image = product.image,
+            size = if (isSmall) 40.dp else 48.dp,
+            quantity = product.quantityModel?.quantity,
+            colorCategory = colorResource(product.category.color)
+        )
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+
+            NameAndPrice(
+                modifier = Modifier.fillMaxWidth(),
+                name = product.name,
+                price = product.price,
+                isSmall = isSmall,
+                hasName = product.name.isNotEmpty(),
+            )
+
+            InformationField(
+                modifier = Modifier.height(IntrinsicSize.Max),
+                product = product
+            )
+        }
+    }
+}
+
+@Composable
+internal fun ProductBillItem(
+    modifier: Modifier,
+    showTotal: Boolean,
+    product: ProductModel,
+    quantity: Int,
     onQuantity: (ProductQuantityActionType) -> Unit = {},
     onClick: (() -> Unit) = {},
 ) {
 
-    val name = remember {
-        product.name.takeIf { it.isNotEmpty() }
-    } ?: stringResource(R.string.copy_without_concept)
+    val name = product.name.takeIf { it.isNotEmpty() } ?: stringResource(R.string.copy_without_concept)
 
     Row(
         modifier = modifier
@@ -73,7 +115,7 @@ internal fun ProductItem(
 
         ImageAndCounter(
             image = product.image,
-            size = if (isSmall) 40.dp else 48.dp,
+            size = 40.dp,
             quantity = product.quantityModel?.quantity,
             colorCategory = if (product.category.color == 0) MaterialTheme.colorScheme.secondaryContainer
             else colorResource(product.category.color)
@@ -88,58 +130,83 @@ internal fun ProductItem(
                 modifier = Modifier.fillMaxWidth(),
                 name = name,
                 price = product.price,
-                isSmall = isSmall,
+                isSmall = true,
                 hasName = product.name.isNotEmpty(),
             )
 
-            selection?.let {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = "Total: ${PriceUtil.formatPrice(product.price * it)}",
-                        color = MaterialTheme.colorScheme.outline,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = if (isSmall) 14.sp else 16.sp
-                    )
-
-                    Icon(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .clickable { onQuantity(ProductQuantityActionType.SUBTRACT) }
-                            .padding(4.dp)
-                            .size(16.dp),
-                        imageVector = Icons.Default.KeyboardArrowLeft,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = null
-                    )
-
-                    TextButtonUnderline(
-                        text = "$it${product.quantityModel?.type?.initial?.let { "/$it" }.orEmpty()}"
-                    ) { onQuantity(ProductQuantityActionType.UPDATE) }
-
-                    Icon(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .clickable { onQuantity(ProductQuantityActionType.ADD) }
-                            .padding(4.dp)
-                            .size(16.dp),
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = null
-                    )
-                }
-            } ?: InformationField(
-                modifier = Modifier.height(IntrinsicSize.Max),
-                product = product
+            QuantityField(
+                product = product,
+                quantity = quantity,
+                showTotal = showTotal,
+                onQuantity = onQuantity
             )
         }
+    }
+}
+
+@Composable
+private fun QuantityField(
+    product: ProductModel,
+    quantity: Int,
+    showTotal: Boolean,
+    onQuantity: (ProductQuantityActionType) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+
+        showTotal.ifTrue {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Total: ${PriceUtil.formatPrice(product.price.toLong() * quantity)}",
+                color = MaterialTheme.colorScheme.outline,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 14.sp
+            )
+        }
+
+        product.quantityModel?.type?.text?.let {
+            Text(
+
+                modifier = Modifier
+                    .weight(0.5f)
+                    .wrapContentWidth(Alignment.CenterHorizontally),
+                text = "($it)",
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                fontSize = 14.sp
+            )
+        }
+
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable { onQuantity(ProductQuantityActionType.SUBTRACT) }
+                .padding(4.dp)
+                .size(16.dp),
+            imageVector = Icons.Default.KeyboardArrowLeft,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            contentDescription = null
+        )
+
+        TextButtonUnderline(
+            text = "$quantity"
+        ) { onQuantity(ProductQuantityActionType.UPDATE) }
+
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable { onQuantity(ProductQuantityActionType.ADD) }
+                .padding(4.dp)
+                .size(16.dp),
+            imageVector = Icons.Default.KeyboardArrowRight,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            contentDescription = null
+        )
     }
 }
 

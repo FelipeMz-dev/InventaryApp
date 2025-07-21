@@ -28,7 +28,10 @@ import com.felipemz.inventaryapp.ui.commons.CommonFormField
 import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
-import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
+import com.felipemz.inventaryapp.ui.commons.ProductBillItemSelected
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions.OnUpdateItem
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
 
 @Composable
 fun PackageField(
@@ -48,7 +51,7 @@ fun PackageField(
 
     showProductsListBottomSheet.ifTrue {
         ProductsListBottomSheet(
-            selected = selectedProducts ?: emptyList(),
+            selection = selectedProducts ?: emptyList(),
             categories = categories,
             emptyMessage = "No hay productos con inventario disponibles",
             onSetNameFilter = onSetNameFilter,
@@ -104,6 +107,18 @@ private fun ProductSelectionField(
     onClick: (BillItemChart) -> Unit,
     onAction: (BillActions) -> Unit
 ) {
+
+    var showCalculatorItem by remember { mutableStateOf<Int?>(null) }
+
+    showCalculatorItem?.let { productId ->
+        packageProducts?.find { it.product?.id == productId }?.let { selection ->
+            CalculatorBottomSheet(
+                controller = CalculatorController(selection.quantity),
+                onDismiss = { showCalculatorItem = null },
+            ) { onAction(OnUpdateItem(selection.copy(quantity = it))) }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -113,9 +128,11 @@ private fun ProductSelectionField(
     ) {
         packageProducts?.let { pack ->
             if (pack.isNotEmpty()) pack.forEach { product ->
-                ProductSelectedItem(
-                    amount = product,
+                ProductBillItemSelected(
+                    item = product,
+                    showTotal = false,
                     onClick = { onClick(product) },
+                    onOpenCalculator = { showCalculatorItem = product.product?.id },
                     onAction = { onAction(it) },
                 )
             } else Text(
