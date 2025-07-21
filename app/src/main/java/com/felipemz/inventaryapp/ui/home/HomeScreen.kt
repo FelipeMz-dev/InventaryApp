@@ -19,8 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
+import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.extensions.ifFalse
 import com.felipemz.inventaryapp.ui.home.HomeEvent.*
 import com.felipemz.inventaryapp.ui.home.components.BottomBarHome
@@ -45,30 +47,26 @@ internal fun HomeScreen(
 
 
     val tabSelected = remember { mutableStateOf(HomeTabs.MOVEMENTS) }
-    val isReports by remember(tabSelected.value) {
-        derivedStateOf { tabSelected.value == HomeTabs.REPORTS }
+    val isReports = remember(tabSelected.value) {
+        tabSelected.value == HomeTabs.REPORTS
     }
 
     LaunchedEffect(Unit) { eventHandler(Init) }
 
-    when {
-        isShowLabelPopup -> MovementLabelDialog(
-            labelList = state.movementLabelList,
-            onDismiss = { isShowLabelPopup = false }
-        ) { eventHandler(OnLabelSelected(it)) }
-
-        isReportsCalendarPopup -> ReportsCalendarDialog(
-            onDismiss = { isReportsCalendarPopup = false },
-        ) { eventHandler(OnReportsCustomFilterSelected(it)) }
-
-        isProductOrderPopup -> ProductsSortDialog(
-            productOrderSelected = state.productOrderSelected,
-            isProductOrderInverted = state.isProductOrderInverted
-        ) { orderBy, isOrderInverted ->
+    HomeDialogs(
+        isShowLabelPopup = isShowLabelPopup,
+        isReportsCalendarPopup = isReportsCalendarPopup,
+        isProductOrderPopup = isProductOrderPopup,
+        state = state,
+        onDismissLabel = { isShowLabelPopup = false },
+        onLabelSelected = { eventHandler(OnLabelSelected(it)) },
+        onDismissReports = { isReportsCalendarPopup = false },
+        onReportsSelected = { eventHandler(OnReportsCustomFilterSelected(it)) },
+        onOrderSelected = { order, inverted ->
+            eventHandler(OnProductOrderSelected(order, inverted))
             isProductOrderPopup = false
-            eventHandler(OnProductOrderSelected(orderBy, isOrderInverted))
         }
-    }
+    )
 
     Scaffold(
         modifier = Modifier
@@ -137,22 +135,19 @@ private fun TabsContentBody(
     state: HomeState,
     eventHandler: (HomeEvent) -> Unit,
 ){
-    val pagerState = rememberPagerState(1) { HomeTabs.entries.size }
+    val pagerState = rememberPagerState(tabSelected.value.ordinal) { HomeTabs.entries.size }
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(tabSelected.value) {
+    LaunchedEffect(tabSelected.value, pagerState.currentPage, pagerState.isScrollInProgress) {
         if (pagerState.isScrollInProgress) {
             tabSelected.value = HomeTabs.entries[pagerState.currentPage]
         } else {
             val tab = tabSelected.value.ordinal
-            if (pagerState.currentPage != tab) pagerState.animateScrollToPage(tab)
-        }
-    }
-
-    LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.targetPage == pagerState.currentPage) {
-            focusManager.clearFocus()
-            tabSelected.value = HomeTabs.entries[pagerState.currentPage]
+            if (pagerState.currentPage != tab) {
+                pagerState.animateScrollToPage(tab)
+            } else {
+                focusManager.clearFocus()
+            }
         }
     }
 
@@ -166,7 +161,6 @@ private fun TabsContentBody(
                 categorySelected = state.categorySelected,
                 isInventory = pagerState.settledPage == HomeTabs.PRODUCTS.ordinal,
                 isFocusSearch = state.isSearchFocused,
-                products = state.products,
                 eventHandler = eventHandler,
             )
             HomeTabs.MOVEMENTS.ordinal -> MovementsTab(
@@ -183,5 +177,39 @@ private fun TabsContentBody(
                 eventHandler = eventHandler
             )
         }
+    }
+}
+
+@Composable
+private fun HomeDialogs(
+    isShowLabelPopup: Boolean,
+    isReportsCalendarPopup: Boolean,
+    isProductOrderPopup: Boolean,
+    state: HomeState,
+    onDismissLabel: () -> Unit,
+    onLabelSelected: (String) -> Unit,
+    onDismissReports: () -> Unit,
+    onReportsSelected: (RangeDateChart) -> Unit,
+    onOrderSelected: (ProductsOrderBy, Boolean) -> Unit
+) {
+    if (isShowLabelPopup) {
+        MovementLabelDialog(
+            labelList = state.movementLabelList,
+            onDismiss = onDismissLabel,
+            onSelect = onLabelSelected
+        )
+    }
+    if (isReportsCalendarPopup) {
+        ReportsCalendarDialog(
+            onDismiss = onDismissReports,
+            onAccept = onReportsSelected
+        )
+    }
+    if (isProductOrderPopup) {
+        ProductsSortDialog(
+            productOrderSelected = state.productOrderSelected,
+            isProductOrderInverted = state.isProductOrderInverted,
+            onClose = onOrderSelected
+        )
     }
 }

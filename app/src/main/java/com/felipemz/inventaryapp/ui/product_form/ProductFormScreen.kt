@@ -41,6 +41,8 @@ import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnPriceChanged
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnProductSaved
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityChanged
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnQuantityTypeChanged
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSetCategoryFilter
+import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSetNameFilter
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSortCategories
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTogglePackage
 import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnTryDeleteProduct
@@ -240,11 +242,13 @@ private fun AdvancedField(
 
         PackageField(
             modifier = Modifier.fillMaxWidth(),
-            productList = state.productList.filterNot { it.id == state.editProduct?.id },
             selectedProducts = state.packageList,
+            categories = state.categories,
             isEnabled = state.categoryIdToChange.isNull()
                     && state.quantityType.isNull(),
             onOpen = onOpen,
+            onSetNameFilter = { eventHandler(OnSetNameFilter(it)) },
+            onSetCategoryFilter = { eventHandler(OnSetCategoryFilter(it)) },
             onClick = { eventHandler(OnOpenProduct(it)) },
             onSelect = { eventHandler(OnPackageAction(it)) },
             toggle = { eventHandler(OnTogglePackage(it)) }

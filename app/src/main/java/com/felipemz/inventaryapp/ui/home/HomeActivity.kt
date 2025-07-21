@@ -8,10 +8,13 @@ import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
+import com.felipemz.inventaryapp.ui.LocalProductList
+import com.felipemz.inventaryapp.ui.commons.header_product.HeaderProductEvent
 import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.ui.movements.MovementsActivity
 import com.felipemz.inventaryapp.ui.product_form.ProductFormActivity
@@ -28,11 +31,14 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
+            val productList by viewModel.productList.collectAsStateWithLifecycle()
             InventaryAppTheme {
-                HomeScreen(
-                    state = state,
-                    eventHandler = ::eventHandler
-                )
+                CompositionLocalProvider(LocalProductList provides productList) {
+                    HomeScreen(
+                        state = state,
+                        eventHandler = ::eventHandler
+                    )
+                }
             }
         }
 

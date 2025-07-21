@@ -79,8 +79,10 @@ internal fun MovementsScreen(
 
     when {
         showProductsPopup -> ProductsListBottomSheet(
-            productList = state.productList,
-            selected = state.billList.filter { it.product.isNotNull() },
+            selection = state.billList.filter { it.product.isNotNull() },
+            categories = state.categories,
+            onSetNameFilter = { eventHandler(OnSetNameFilter(it)) },
+            onSetCategoryFilter = { eventHandler(OnSetCategoryFilter(it)) },
             onDismiss = { showProductsPopup = false },
             onAction = { eventHandler(OnInvoiceAction(it)) }
         )

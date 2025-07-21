@@ -1,6 +1,5 @@
 package com.felipemz.inventaryapp.ui.home.tabs.products
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -23,14 +23,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -41,28 +42,68 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.onColor
-import com.felipemz.inventaryapp.core.extensions.tryOrDefault
 import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
-import java.io.File
 
 @Composable
 internal fun ProductItem(
     modifier: Modifier,
     isSmall: Boolean = false,
     product: ProductModel,
-    selection: Int? = null,
+    onClick: (() -> Unit) = {},
+) {
+    Row(
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ImageAndCounter(
+            image = product.image,
+            size = if (isSmall) 40.dp else 48.dp,
+            quantity = product.quantityModel?.quantity,
+            colorCategory = colorResource(product.category.color)
+        )
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+
+            NameAndPrice(
+                modifier = Modifier.fillMaxWidth(),
+                name = product.name,
+                price = product.price,
+                isSmall = isSmall,
+                hasName = product.name.isNotEmpty(),
+            )
+
+            InformationField(
+                modifier = Modifier.height(IntrinsicSize.Max),
+                product = product
+            )
+        }
+    }
+}
+
+@Composable
+internal fun ProductBillItem(
+    modifier: Modifier,
+    showTotal: Boolean,
+    product: ProductModel,
+    quantity: Int,
     onQuantity: (ProductQuantityActionType) -> Unit = {},
     onClick: (() -> Unit) = {},
 ) {
 
-    val name = remember(product) {
-        product.name.takeIf { it.isNotEmpty() }
-    } ?: stringResource(R.string.copy_without_concept)
+    val name = product.name.takeIf { it.isNotEmpty() } ?: stringResource(R.string.copy_without_concept)
 
     Row(
         modifier = modifier
@@ -74,7 +115,7 @@ internal fun ProductItem(
 
         ImageAndCounter(
             image = product.image,
-            size = if (isSmall) 40.dp else 48.dp,
+            size = 40.dp,
             quantity = product.quantityModel?.quantity,
             colorCategory = if (product.category.color == 0) MaterialTheme.colorScheme.secondaryContainer
             else colorResource(product.category.color)
@@ -89,58 +130,83 @@ internal fun ProductItem(
                 modifier = Modifier.fillMaxWidth(),
                 name = name,
                 price = product.price,
-                isSmall = isSmall,
+                isSmall = true,
                 hasName = product.name.isNotEmpty(),
             )
 
-            selection?.let {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = "Total: ${PriceUtil.formatPrice(product.price * it)}",
-                        color = MaterialTheme.colorScheme.outline,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontSize = if (isSmall) 14.sp else 16.sp
-                    )
-
-                    Icon(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .clickable { onQuantity(ProductQuantityActionType.SUBTRACT) }
-                            .padding(4.dp)
-                            .size(16.dp),
-                        imageVector = Icons.Default.KeyboardArrowLeft,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = null
-                    )
-
-                    TextButtonUnderline(
-                        text = "$it${product.quantityModel?.type?.initial?.let { "/$it" }.orEmpty()}"
-                    ) { onQuantity(ProductQuantityActionType.UPDATE) }
-
-                    Icon(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .clickable { onQuantity(ProductQuantityActionType.ADD) }
-                            .padding(4.dp)
-                            .size(16.dp),
-                        imageVector = Icons.Default.KeyboardArrowRight,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        contentDescription = null
-                    )
-                }
-            } ?: InformationField(
-                modifier = Modifier.height(IntrinsicSize.Max),
-                product = product
+            QuantityField(
+                product = product,
+                quantity = quantity,
+                showTotal = showTotal,
+                onQuantity = onQuantity
             )
         }
+    }
+}
+
+@Composable
+private fun QuantityField(
+    product: ProductModel,
+    quantity: Int,
+    showTotal: Boolean,
+    onQuantity: (ProductQuantityActionType) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+
+        showTotal.ifTrue {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Total: ${PriceUtil.formatPrice(product.price.toLong() * quantity)}",
+                color = MaterialTheme.colorScheme.outline,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 14.sp
+            )
+        }
+
+        product.quantityModel?.type?.text?.let {
+            Text(
+
+                modifier = Modifier
+                    .weight(0.5f)
+                    .wrapContentWidth(Alignment.CenterHorizontally),
+                text = "($it)",
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                fontSize = 14.sp
+            )
+        }
+
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable { onQuantity(ProductQuantityActionType.SUBTRACT) }
+                .padding(4.dp)
+                .size(16.dp),
+            imageVector = Icons.Default.KeyboardArrowLeft,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            contentDescription = null
+        )
+
+        TextButtonUnderline(
+            text = "$quantity"
+        ) { onQuantity(ProductQuantityActionType.UPDATE) }
+
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable { onQuantity(ProductQuantityActionType.ADD) }
+                .padding(4.dp)
+                .size(16.dp),
+            imageVector = Icons.Default.KeyboardArrowRight,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            contentDescription = null
+        )
     }
 }
 
@@ -261,14 +327,10 @@ private fun ImageByType(
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer
 ) {
 
-    val backgroundModifier by remember {
-        derivedStateOf {
-            Modifier.background(
-                color = backgroundColor,
-                shape = CircleShape
-            )
-        }
-    }
+    val backgroundModifier = Modifier.background(
+        color = backgroundColor,
+        shape = CircleShape
+    )
 
     when (image) {
         is ProductTypeImage.LetterImage -> Box(
@@ -283,42 +345,41 @@ private fun ImageByType(
                 fontSize = (size.value - 24).sp
             )
         }
-        is ProductTypeImage.EmojiImage -> if (image.emoji.isEmpty()) {
-            EmptyImage(
-                modifier = modifier.then(backgroundModifier),
-                typeImage = image
-            )
-        } else Box(
-            modifier = modifier
-                .fillMaxSize()
-                .then(backgroundModifier)
-        ) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = image.emoji,
-                fontSize = (size.value - 18).sp
-            )
+        is ProductTypeImage.EmojiImage -> {
+            if (image.emoji.isEmpty()) {
+                EmptyImage(
+                    modifier = modifier.then(backgroundModifier),
+                    typeImage = image
+                )
+            } else Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .then(backgroundModifier)
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = image.emoji,
+                    fontSize = (size.value - 18).sp
+                )
+            }
         }
         is ProductTypeImage.PhatImage -> {
 
-            val bitmap by remember(image.path) {
-                derivedStateOf {
-                    tryOrDefault(null) {
-                        val inputStream = File(image.path).inputStream()
-                        inputStream.use { BitmapFactory.decodeStream(it) }
-                    }
-                }
-            }
+            var showDefault by remember { mutableStateOf(false) }
 
-            bitmap?.let {
-                Image(
-                    modifier = modifier.then(backgroundModifier),
-                    bitmap = it.asImageBitmap(),
-                    contentDescription = null
-                )
-            } ?: EmptyImage(
+            val painter = rememberAsyncImagePainter(
+                model = image.path,
+                filterQuality = FilterQuality.Low,
+                onError = { showDefault = true },
+            )
+
+            if (showDefault) EmptyImage(
                 modifier = modifier.then(backgroundModifier),
                 typeImage = image
+            ) else Image(
+                modifier = modifier.then(backgroundModifier),
+                painter = painter,
+                contentDescription = null
             )
         }
     }

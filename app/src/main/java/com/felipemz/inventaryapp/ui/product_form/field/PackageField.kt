@@ -19,24 +19,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.charts.BillItemChart
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.ui.commons.CommonFormField
-import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
-import com.felipemz.inventaryapp.core.charts.BillItemChart
-import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
+import com.felipemz.inventaryapp.ui.commons.ProductBillItemSelected
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions.OnUpdateItem
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
 
 @Composable
 fun PackageField(
     modifier: Modifier,
-    productList: List<ProductModel>,
+    categories: List<CategoryModel>,
     selectedProducts: List<BillItemChart>?,
     isEnabled: Boolean,
     onOpen: suspend () -> Unit,
+    onSetNameFilter: (String?) -> Unit,
+    onSetCategoryFilter: (CategoryModel?) -> Unit,
     onClick: (BillItemChart) -> Unit,
     onSelect: (BillActions) -> Unit,
     toggle: (Boolean) -> Unit,
@@ -46,8 +51,11 @@ fun PackageField(
 
     showProductsListBottomSheet.ifTrue {
         ProductsListBottomSheet(
-            productList = productList,
-            selected = selectedProducts ?: emptyList(),
+            selection = selectedProducts ?: emptyList(),
+            categories = categories,
+            emptyMessage = "No hay productos con inventario disponibles",
+            onSetNameFilter = onSetNameFilter,
+            onSetCategoryFilter = onSetCategoryFilter,
             onDismiss = { showProductsListBottomSheet = false },
             onAction = onSelect
         )
@@ -99,6 +107,18 @@ private fun ProductSelectionField(
     onClick: (BillItemChart) -> Unit,
     onAction: (BillActions) -> Unit
 ) {
+
+    var showCalculatorItem by remember { mutableStateOf<Int?>(null) }
+
+    showCalculatorItem?.let { productId ->
+        packageProducts?.find { it.product?.id == productId }?.let { selection ->
+            CalculatorBottomSheet(
+                controller = CalculatorController(selection.quantity),
+                onDismiss = { showCalculatorItem = null },
+            ) { onAction(OnUpdateItem(selection.copy(quantity = it))) }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -108,9 +128,11 @@ private fun ProductSelectionField(
     ) {
         packageProducts?.let { pack ->
             if (pack.isNotEmpty()) pack.forEach { product ->
-                ProductSelectedItem(
-                    amount = product,
+                ProductBillItemSelected(
+                    item = product,
+                    showTotal = false,
                     onClick = { onClick(product) },
+                    onOpenCalculator = { showCalculatorItem = product.product?.id },
                     onAction = { onAction(it) },
                 )
             } else Text(

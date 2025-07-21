@@ -56,63 +56,65 @@ fun Modifier.scanAnimation(): Modifier = composed {
 }
 
 private fun ContentDrawScope.drawBarcodeGuidelines() {
+    val color = Color.Companion.White
     val centerX = size.width / 2
     val centerY = size.height / 2
-    val alpha = 0.8f
+    val alpha = 0.6f
+    val strokeWidth = 6f
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX - 200, centerY - 100),
         end = Offset(centerX - 150, centerY - 100),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX + 150, centerY - 100),
         end = Offset(centerX + 200, centerY - 100),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX - 200, centerY + 100),
         end = Offset(centerX - 150, centerY + 100),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX + 150, centerY + 100),
         end = Offset(centerX + 200, centerY + 100),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX - 200, centerY - 100),
         end = Offset(centerX - 200, centerY - 50),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX + 200, centerY - 100),
         end = Offset(centerX + 200, centerY - 50),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX - 200, centerY + 100),
         end = Offset(centerX - 200, centerY + 50),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
     drawLine(
-        color = Color.Companion.Green,
+        color = color,
         start = Offset(centerX + 200, centerY + 100),
         end = Offset(centerX + 200, centerY + 50),
-        strokeWidth = 8f,
+        strokeWidth = strokeWidth,
         alpha = alpha
     )
 }

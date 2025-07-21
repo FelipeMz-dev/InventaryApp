@@ -13,6 +13,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,7 +25,10 @@ import com.felipemz.inventaryapp.core.utils.PriceUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.core.charts.BillItemChart
-import com.felipemz.inventaryapp.ui.product_form.components.ProductSelectedItem
+import com.felipemz.inventaryapp.ui.commons.ProductBillItemSelected
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions.OnUpdateItem
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
 
 @Composable
 internal fun InvoiceColumn(
@@ -31,6 +38,18 @@ internal fun InvoiceColumn(
     invoiceList: List<BillItemChart>,
     onAction: (BillActions) -> Unit,
 ) {
+
+    var showCalculatorItem by remember { mutableStateOf<Int?>(null) }
+
+    showCalculatorItem?.let { productId ->
+        invoiceList.find { it.product?.id == productId }?.let { selection ->
+            CalculatorBottomSheet(
+                controller = CalculatorController(selection.quantity),
+                onDismiss = { showCalculatorItem = null },
+            ) { onAction(OnUpdateItem(selection.copy(quantity = it))) }
+        }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -41,9 +60,10 @@ internal fun InvoiceColumn(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(invoiceList) { item ->
-            ProductSelectedItem(
-                amount = item,
-                onClick = { },
+            ProductBillItemSelected(
+                item = item,
+                onClick = { TODO("Show options") },
+                onOpenCalculator = { showCalculatorItem = item.product?.id },
                 onAction = onAction
             )
         }

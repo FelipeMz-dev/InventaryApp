@@ -1,11 +1,12 @@
 package com.felipemz.inventaryapp.ui.product_form
 
 import com.felipemz.inventaryapp.core.base.Event
+import com.felipemz.inventaryapp.core.charts.BillItemChart
 import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
-import com.felipemz.inventaryapp.core.charts.BillItemChart
+import com.felipemz.inventaryapp.ui.commons.header_product.HeaderProductEvent
 
 sealed interface ProductFormEvent : Event {
 
@@ -65,4 +66,10 @@ sealed interface ProductFormEvent : Event {
     data class SetChangedSuccessfulPackage(val packageId: Int) : ProductFormEvent
 
     data class OnPackageAction(val action: BillActions) : ProductFormEvent
+
+    data class OnHeaderProductEvent(val event: HeaderProductEvent) : ProductFormEvent
+
+    data class OnSetNameFilter(val name: String?) : ProductFormEvent
+
+    data class OnSetCategoryFilter(val category: CategoryModel?) : ProductFormEvent
 }

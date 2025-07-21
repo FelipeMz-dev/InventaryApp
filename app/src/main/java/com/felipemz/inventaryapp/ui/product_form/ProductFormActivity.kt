@@ -2,11 +2,11 @@ package com.felipemz.inventaryapp.ui.product_form
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.core.KEY_BARCODE_CREATE
@@ -16,29 +16,29 @@ import com.felipemz.inventaryapp.core.KEY_PACKAGE_CHANGE
 import com.felipemz.inventaryapp.core.KEY_PACKAGE_TO_CHANGE
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
 import com.felipemz.inventaryapp.core.extensions.showToast
+import com.felipemz.inventaryapp.ui.LocalProductList
 import com.felipemz.inventaryapp.ui.theme.InventaryAppTheme
 import org.koin.android.ext.android.inject
 
 class ProductFormActivity : AppCompatActivity() {
-
     private val viewModel: ProductFormViewModel by inject()
-
-    private lateinit var productFormLauncher: ActivityResultLauncher<Intent>
+    private val productFormLauncher = makeResultActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
-
+            val productList by viewModel.productList.collectAsStateWithLifecycle()
             InventaryAppTheme {
-                ProductFormScreen(
-                    state = state,
-                    eventHandler = ::eventHandler
-                )
+                CompositionLocalProvider(LocalProductList provides productList) {
+                    ProductFormScreen(
+                        state = state,
+                        eventHandler = ::eventHandler
+                    )
+                }
             }
         }
 
-        handleResult()
         initViewModel()
     }
 
@@ -141,21 +141,19 @@ class ProductFormActivity : AppCompatActivity() {
         productFormLauncher.launch(intent)
     }
 
-    private fun handleResult() {
-        productFormLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                result.data?.let { data ->
-                    val productId = data.getIntExtra(KEY_CATEGORY_CHANGED, 0)
-                    if (productId != 0) {
-                        viewModel.eventHandler(ProductFormEvent.SetChangedSuccessfulCategory(productId))
-                    }
-                    viewModel.state.value.editProduct?.let {
-                        val packageId = data.getIntExtra(KEY_PACKAGE_CHANGE, 0)
-                        if (packageId != 0) {
-                            viewModel.eventHandler(ProductFormEvent.SetChangedSuccessfulPackage(packageId))
-                        }
+    private fun makeResultActivity() = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.let { data ->
+                val productId = data.getIntExtra(KEY_CATEGORY_CHANGED, 0)
+                if (productId != 0) {
+                    viewModel.eventHandler(ProductFormEvent.SetChangedSuccessfulCategory(productId))
+                }
+                viewModel.state.value.editProduct?.let {
+                    val packageId = data.getIntExtra(KEY_PACKAGE_CHANGE, 0)
+                    if (packageId != 0) {
+                        viewModel.eventHandler(ProductFormEvent.SetChangedSuccessfulPackage(packageId))
                     }
                 }
             }

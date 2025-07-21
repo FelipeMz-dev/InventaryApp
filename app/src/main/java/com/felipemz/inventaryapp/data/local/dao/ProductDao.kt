@@ -42,7 +42,4 @@ interface ProductDao {
 
     @Query("SELECT id FROM products WHERE categoryId = :categoryId")
     suspend fun getProductsIdFromCategoryId(categoryId: Int): List<Int>
-
-    @Query("SELECT COUNT(*) FROM products WHERE barcode = :barcode")
-    suspend fun verifyBarcode(barcode: String): Boolean
 }

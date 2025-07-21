@@ -1,7 +1,9 @@
 package com.felipemz.inventaryapp.ui.movements
 
 import com.felipemz.inventaryapp.core.base.Event
+import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
+import com.felipemz.inventaryapp.ui.commons.header_product.HeaderProductEvent
 
 sealed interface MovementsEvent : Event {
 
@@ -22,4 +24,8 @@ sealed interface MovementsEvent : Event {
     data class OnExecuteAction(val action: MovementsAction) : MovementsEvent
 
     data class OnInvoiceAction(val action: BillActions) : MovementsEvent
+
+    data class OnSetCategoryFilter(val category: CategoryModel?) : MovementsEvent
+
+    data class OnSetNameFilter(val name: String?) : MovementsEvent
 }

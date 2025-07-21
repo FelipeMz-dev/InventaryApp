@@ -8,28 +8,15 @@ import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
 import com.felipemz.inventaryapp.core.charts.RangeDateChart
+import com.felipemz.inventaryapp.ui.commons.header_product.HeaderProductEvent
 
 sealed interface HomeEvent : Event {
 
     object Init : HomeEvent
 
-    object OnHideLabelPopup : HomeEvent
-
-    object OnOpenProductOrderPopup : HomeEvent
-
-    object OpenReportsCalendarPopup : HomeEvent
-
-    object OnCloseReportsCalendarPopup : HomeEvent
-
     object OnOpenCalendar : HomeEvent
 
-    data class OnFocusSearch(val isFocus: Boolean) : HomeEvent
-
     data class OnFAB(val tabSelected: HomeTabs) : HomeEvent
-
-    data class OnChangeSearchText(val text: String) : HomeEvent
-
-    data class OnCategorySelected(val category: CategoryModel?) : HomeEvent
 
     data class OnMovementFilterSelected(val filter: MovementsFilterChip) : HomeEvent
 
@@ -47,4 +34,10 @@ sealed interface HomeEvent : Event {
     data class OnReportsFilterSelected(val filter: ReportsFilterDate) : HomeEvent
 
     data class OnOpenProduct(val product: ProductModel) : HomeEvent
+
+    data class OnSetNameFilterProducts(val name: String?) : HomeEvent
+
+    data class OnSetCategoryFilterProducts(val category: CategoryModel?) : HomeEvent
+
+    data class OnFocusSearch(val isFocus: Boolean) : HomeEvent
 }

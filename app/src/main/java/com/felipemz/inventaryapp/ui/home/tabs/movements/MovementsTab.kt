@@ -47,15 +47,15 @@ internal fun MovementsTab(
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
 
-        item {
-            HeaderMovements(
-                modifier = Modifier.fillMaxWidth(),
-                chipSelected = chipSelected,
-                labelSelected = labelSelected,
-                date = date,
-                total = total
-            )
-        }
+        //item {
+        //    HeaderMovements(
+        //        modifier = Modifier.fillMaxWidth(),
+        //        chipSelected = chipSelected,
+        //        labelSelected = labelSelected,
+        //        date = date,
+        //        total = total
+        //    )
+        //}
 
         item {
             FilterChipCategories(
@@ -66,7 +66,10 @@ internal fun MovementsTab(
             ) { eventHandler(HomeEvent.OnMovementFilterSelected(it)) }
         }
 
-        items(movements) { movement ->
+        items(
+            items = movements,
+            key = { it.id }
+        ) { movement ->
             MovementItem(
                 modifier = Modifier
                     .fillMaxWidth()

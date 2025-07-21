@@ -129,6 +129,7 @@ val fakeLabelList = listOf(
 
 val fakeMovements = listOf(
     MovementModel(
+        id = 1,
         type = MovementItemType.MOVEMENT_SALE,
         number = 1,
         date = "12/12/2021",
@@ -136,6 +137,7 @@ val fakeMovements = listOf(
         total = 10000,
     ),
     MovementModel(
+        id = 2,
         type = MovementItemType.MOVEMENT_SALE,
         number = 2,
         date = "12/12/2021",
@@ -144,6 +146,7 @@ val fakeMovements = listOf(
         labels = listOf("rappy", "domicilios", "mesa 1", "mesa 2", "caja 1", "caja 2")
     ),
     MovementModel(
+        id = 3,
         type = MovementItemType.MOVEMENT_SALE,
         number = 3,
         date = "12/12/2021",
@@ -152,6 +155,7 @@ val fakeMovements = listOf(
         labels = listOf("fiado"),
     ),
     MovementModel(
+        id = 4,
         type = MovementItemType.MOVEMENT_PENDING,
         date = "12/12/2021",
         time = "4:00 pm",
@@ -159,6 +163,7 @@ val fakeMovements = listOf(
         labels = listOf("fiado", "caja 1", "caja 2")
     ),
     MovementModel(
+        id = 5,
         type = MovementItemType.MOVEMENT_EXPENSE,
         number = 1,
         date = "12/12/2021",
@@ -167,6 +172,7 @@ val fakeMovements = listOf(
         labels = listOf("caja 1"),
     ),
     MovementModel(
+        id = 6,
         type = MovementItemType.MOVEMENT_SALE,
         number = 4,
         date = "12/12/2021",
@@ -174,6 +180,7 @@ val fakeMovements = listOf(
         total = 2000,
     ),
     MovementModel(
+        id = 7,
         type = MovementItemType.MOVEMENT_EXPENSE,
         number = 2,
         date = "12/12/2021",
@@ -182,6 +189,7 @@ val fakeMovements = listOf(
         total = 500,
     ),
     MovementModel(
+        id = 8,
         type = MovementItemType.MOVEMENT_SALE,
         number = 3,
         date = "12/12/2021",

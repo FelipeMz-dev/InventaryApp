@@ -30,4 +30,6 @@ interface ProductRepository {
     suspend fun getNameById(id: Int): String?
 
     suspend fun verifyBarcode(barcode: String): Boolean
+
+    suspend fun getFromBarcode(barcode: String): ProductModel?
 }
