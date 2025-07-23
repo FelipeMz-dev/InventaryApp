@@ -12,9 +12,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.felipemz.inventaryapp.R
+import com.felipemz.inventaryapp.core.KEY_CREATE_FROM_BARCODE
+import com.felipemz.inventaryapp.core.KEY_CREATE_FROM_CATEGORY
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
+import com.felipemz.inventaryapp.core.extensions.showToast
 import com.felipemz.inventaryapp.ui.LocalProductList
-import com.felipemz.inventaryapp.ui.commons.header_product.HeaderProductEvent
 import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.ui.movements.MovementsActivity
 import com.felipemz.inventaryapp.ui.product_form.ProductFormActivity
@@ -48,6 +50,10 @@ class HomeActivity : AppCompatActivity() {
                     WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
                     WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
         )
+
+        viewModel.actionLiveData.observe(this) { action ->
+            action?.also { actionHandler(it) }
+        }
     }
 
     private fun eventHandler(event: HomeEvent) {
@@ -66,17 +72,38 @@ class HomeActivity : AppCompatActivity() {
                 datePicker.show()
             }
             is HomeEvent.OnFAB -> when (event.tabSelected) {
-                HomeTabs.PRODUCTS -> startActivity(Intent(this, ProductFormActivity::class.java))
+                HomeTabs.PRODUCTS -> startProductForm()
                 HomeTabs.MOVEMENTS -> startActivity(Intent(this, MovementsActivity::class.java))
                 else -> Unit
             }
-            is HomeEvent.OnOpenProduct -> startActivity(
-                Intent(this, ProductFormActivity::class.java).putExtras(
-                    Bundle().apply { putInt(KEY_PRODUCT_ID, event.product.id) }
-                )
-            )
+            is HomeEvent.OnOpenProduct -> startProductForm(productId = event.product.id, categoryId = null)
             else -> viewModel.eventHandler(event)
         }
+    }
+
+    private fun actionHandler(action: HomeAction) {
+        when (action) {
+            is HomeAction.OnBack -> finish()
+            is HomeAction.ShowMessage -> showToast(action.message)
+            is HomeAction.CreateProductFromBarcode -> startProductForm(barcode = action.barcode)
+            is HomeAction.OpenProduct -> startProductForm(productId = action.productId, categoryId = null)
+        }
+    }
+
+    private fun startProductForm(
+        productId: Int? = null,
+        categoryId: Int? = viewModel.state.value.categorySelected?.id,
+        barcode: String? = null
+    ){
+        startActivity(
+            Intent(this, ProductFormActivity::class.java).putExtras(
+                Bundle().apply {
+                    productId?.let { putInt(KEY_PRODUCT_ID, it) }
+                    categoryId?.let { putInt(KEY_CREATE_FROM_CATEGORY, it) }
+                    barcode?.let { putString(KEY_CREATE_FROM_BARCODE, it) }
+                }
+            )
+        )
     }
 
     override fun onBackPressed() {

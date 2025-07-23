@@ -93,7 +93,7 @@ class ProductFormViewModel(
     override fun intentHandler() {
         executeIntent { event ->
             when (event) {
-                is Init -> init(event.productId, event.barcode)
+                is Init -> init(event.productId, event.barcode, event.categoryId)
                 is CloseAlertDialog -> closeAlertDialog()
                 is OnTryDeleteProduct -> tryToDeleteProduct()
                 is OnProductDeleted -> deleteProduct()
@@ -135,11 +135,12 @@ class ProductFormViewModel(
 
     private fun init(
         productId: Int?,
-        barcode: String?
+        barcode: String?,
+        categoryId: Int?,
     ) {
         productId?.let { loadProduct(it) }
         barcode?.let { createFromBarcode(it) }
-        observeAllCategories()
+        observeAllCategories(categoryId)
         observeAllQuantityProducts()
     }
 
@@ -173,9 +174,16 @@ class ProductFormViewModel(
         }
     }
 
-    private fun observeAllCategories() = execute(Dispatchers.IO) {
+    private fun observeAllCategories(initialCategory: Int?) = execute(Dispatchers.IO) {
+        var isFirst = true
         observeAllCategoriesUseCase().collect { categories ->
             updateState { it.copy(categories = categories) }
+            if (isFirst) {
+                isFirst = false
+                categories.firstOrNull { it.id == initialCategory }?.let {
+                    categoryChanged(it)
+                }
+            }
         }
     }
 

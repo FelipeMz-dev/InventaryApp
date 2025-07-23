@@ -6,13 +6,13 @@ import com.felipemz.inventaryapp.core.enums.QuantityType
 import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
-import com.felipemz.inventaryapp.ui.commons.header_product.HeaderProductEvent
 
 sealed interface ProductFormEvent : Event {
 
     data class Init(
         val productId: Int?,
-        val barcode: String?
+        val barcode: String?,
+        val categoryId: Int?,
     ) : ProductFormEvent
 
     data object OnBack : ProductFormEvent
@@ -66,8 +66,6 @@ sealed interface ProductFormEvent : Event {
     data class SetChangedSuccessfulPackage(val packageId: Int) : ProductFormEvent
 
     data class OnPackageAction(val action: BillActions) : ProductFormEvent
-
-    data class OnHeaderProductEvent(val event: HeaderProductEvent) : ProductFormEvent
 
     data class OnSetNameFilter(val name: String?) : ProductFormEvent
 
