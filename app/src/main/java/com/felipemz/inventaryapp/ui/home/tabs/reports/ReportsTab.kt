@@ -22,13 +22,22 @@ import com.felipemz.inventaryapp.ui.commons.fakeIntervals
 import com.felipemz.inventaryapp.ui.commons.fakeLabelsRating
 import com.felipemz.inventaryapp.ui.commons.fakeProductsRating
 import com.felipemz.inventaryapp.ui.home.HomeEvent
+import com.felipemz.inventaryapp.ui.home.components.ReportsCalendarDialog
 
 @Composable
 internal fun ReportsTab(
     chipSelected: ReportsFilterDate?,
     customDateSelected: RangeDateChart?,
+    isShowReportsCalendarDialog: Boolean,
     eventHandler: (HomeEvent) -> Unit,
 ) {
+
+    if (isShowReportsCalendarDialog) {
+        ReportsCalendarDialog(
+            onDismiss = { eventHandler(HomeEvent.OnReportsCalendarChangeToShow(false)) },
+            onAccept = { eventHandler(HomeEvent.OnReportsCustomFilterSelected(it)) },
+        )
+    }
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),

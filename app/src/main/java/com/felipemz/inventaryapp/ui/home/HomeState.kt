@@ -16,6 +16,7 @@ data class HomeState(
     val categorySelected: CategoryModel? = null,
     val movements: List<MovementModel> = emptyList(),
     val movementLabelList: List<String> = emptyList(),
+    val isShowLabelPopup: Boolean = false,
     val currentDate: String = "Lun. 30 de diciembre",
     val movementFilterText: String = String(),
     val totalAmount: Int = 0,
@@ -25,5 +26,8 @@ data class HomeState(
     val productOrderSelected: ProductsOrderBy = ProductsOrderBy.ID,
     val isProductOrderInverted: Boolean = false,
     val reportsFilterChipSelected: ReportsFilterDate? = ReportsFilterDate.TODAY,
-    val reportsCustomFilterSelected: RangeDateChart? = null
+    val reportsCustomFilterSelected: RangeDateChart? = null,
+    val showScanner: Boolean = false,
+    val showProductOrderDialog: Boolean = false,
+    val showReportsCalendarDialog: Boolean = false,
 ) : State

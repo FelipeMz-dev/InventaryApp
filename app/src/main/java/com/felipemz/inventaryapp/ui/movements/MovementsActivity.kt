@@ -45,14 +45,6 @@ class MovementsActivity : BaseActivity() {
         initViewModel()
     }
 
-    //private fun <T> LiveData<T>.observeAsState(): T? {
-    //    var value: T? = null
-    //    observe(this@MovementsActivity) { newValue ->
-    //        value = newValue
-    //    }
-    //    return value
-    //}
-
     private fun initViewModel() {
         viewModel.actionLiveData.observe(this) { action ->
             action?.also { actionHandler(it) }
