@@ -6,10 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.felipemz.inventaryapp.core.KEY_BARCODE_CREATE
+import com.felipemz.inventaryapp.core.KEY_CREATE_FROM_BARCODE
 import com.felipemz.inventaryapp.core.base.BaseActivity
 import com.felipemz.inventaryapp.core.extensions.showToast
 import com.felipemz.inventaryapp.ui.LocalProductList
@@ -72,7 +71,7 @@ class MovementsActivity : BaseActivity() {
         when (action) {
             is MovementsAction.CreateProductFromBarcode -> {
                 val intent = Intent(this, ProductFormActivity::class.java).apply {
-                    putExtra(KEY_BARCODE_CREATE, action.barcode)
+                    putExtra(KEY_CREATE_FROM_BARCODE, action.barcode)
                 }
                 movementsLauncher.launch(intent)
             }
@@ -87,7 +86,7 @@ class MovementsActivity : BaseActivity() {
         ) { result ->
             if (result.resultCode == RESULT_OK) {
                 result.data?.let { data ->
-                    val barcode = data.getStringExtra(KEY_BARCODE_CREATE)
+                    val barcode = data.getStringExtra(KEY_CREATE_FROM_BARCODE)
                     barcode?.let {
                         viewModel.eventHandler(OnSelectProductFromBarcode(it))
                         viewModel.eventHandler(OnClearBarcodeError)

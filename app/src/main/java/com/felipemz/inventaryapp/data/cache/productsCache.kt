@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.combine
 
 object ProductsCache {
 
-    val orderBy = MutableStateFlow(ProductsOrderBy.ID)
+    val orderBy = MutableStateFlow(ProductsOrderBy.CATEGORY)
     val isInverted = MutableStateFlow(false)
 
     private val _products = MutableStateFlow<List<ProductModel>>(emptyList())
@@ -31,7 +31,7 @@ object ProductsCache {
     ) = when (order) {
         ProductsOrderBy.ID -> products.sortedBy { it.id }
         ProductsOrderBy.NAME -> products.sortedBy { it.name }
-        ProductsOrderBy.CATEGORY -> products.sortedBy { it.category.name }
+        ProductsOrderBy.CATEGORY -> products.sortedBy { it.category.position }
         ProductsOrderBy.PRICE -> products.sortedBy { it.price }
         ProductsOrderBy.STOCK -> products.sortedByDescending { it.quantityModel?.quantity }
     }.let { if (inverted) it.reversed() else it }

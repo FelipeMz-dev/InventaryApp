@@ -6,12 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.felipemz.inventaryapp.core.KEY_BARCODE_CREATE
 import com.felipemz.inventaryapp.core.KEY_CATEGORY_CHANGED
 import com.felipemz.inventaryapp.core.KEY_CATEGORY_TO_CHANGE
+import com.felipemz.inventaryapp.core.KEY_CREATE_FROM_BARCODE
+import com.felipemz.inventaryapp.core.KEY_CREATE_FROM_CATEGORY
 import com.felipemz.inventaryapp.core.KEY_PACKAGE_CHANGE
 import com.felipemz.inventaryapp.core.KEY_PACKAGE_TO_CHANGE
 import com.felipemz.inventaryapp.core.KEY_PRODUCT_ID
@@ -47,13 +47,15 @@ class ProductFormActivity : AppCompatActivity() {
         val productId = bundle?.getInt(KEY_PRODUCT_ID)
         val categoryId = bundle?.getInt(KEY_CATEGORY_TO_CHANGE)
         val packageId = bundle?.getInt(KEY_PACKAGE_TO_CHANGE)
-        val barcode = bundle?.getString(KEY_BARCODE_CREATE)
+        val fromBarcode = bundle?.getString(KEY_CREATE_FROM_BARCODE)
+        val fromCategory = bundle?.getInt(KEY_CREATE_FROM_CATEGORY)
         categoryId?.let { if (it != 0) eventHandler(ProductFormEvent.SetCategoryToChange(it)) }
         packageId?.let { if (it != 0) eventHandler(ProductFormEvent.SetPackageToChange(it)) }
         eventHandler(
             ProductFormEvent.Init(
                 productId = productId,
-                barcode = barcode
+                barcode = fromBarcode,
+                categoryId = fromCategory,
             )
         )
         viewModel.actionLiveData.observe(this) { action ->
@@ -113,7 +115,7 @@ class ProductFormActivity : AppCompatActivity() {
     private fun onCreateFromBarcode(barcode: String) {
         setResult(
             RESULT_OK, Intent().apply {
-                putExtra(KEY_BARCODE_CREATE, barcode)
+                putExtra(KEY_CREATE_FROM_BARCODE, barcode)
             }
         )
         finish()

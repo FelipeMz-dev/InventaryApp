@@ -12,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,17 +19,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import com.felipemz.inventaryapp.core.charts.RangeDateChart
-import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.extensions.ifFalse
-import com.felipemz.inventaryapp.ui.home.HomeEvent.*
+import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
+import com.felipemz.inventaryapp.ui.home.HomeEvent.Init
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnCreateProductFromBarcode
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnFAB
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnLabelSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnMovementFilterSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnMovementsInverted
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnProductOrderSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnReportsCustomFilterSelected
 import com.felipemz.inventaryapp.ui.home.components.BottomBarHome
 import com.felipemz.inventaryapp.ui.home.components.FABHome
 import com.felipemz.inventaryapp.ui.home.components.MovementLabelDialog
 import com.felipemz.inventaryapp.ui.home.components.ProductsSortDialog
 import com.felipemz.inventaryapp.ui.home.components.ReportsCalendarDialog
 import com.felipemz.inventaryapp.ui.home.components.TopBarHome
+import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.ui.home.tabs.movements.MovementsTab
 import com.felipemz.inventaryapp.ui.home.tabs.products.InventoryTab
 import com.felipemz.inventaryapp.ui.home.tabs.reports.ReportsTab
@@ -44,6 +51,7 @@ internal fun HomeScreen(
     var isShowLabelPopup by remember { mutableStateOf(false) }
     var isProductOrderPopup by remember { mutableStateOf(false) }
     var isReportsCalendarPopup by remember { mutableStateOf(false) }
+    var showScanner by remember { mutableStateOf(false) }
 
 
     val tabSelected = remember { mutableStateOf(HomeTabs.MOVEMENTS) }
@@ -57,6 +65,7 @@ internal fun HomeScreen(
         isShowLabelPopup = isShowLabelPopup,
         isReportsCalendarPopup = isReportsCalendarPopup,
         isProductOrderPopup = isProductOrderPopup,
+        isShowScanner = showScanner,
         state = state,
         onDismissLabel = { isShowLabelPopup = false },
         onLabelSelected = { eventHandler(OnLabelSelected(it)) },
@@ -65,7 +74,9 @@ internal fun HomeScreen(
         onOrderSelected = { order, inverted ->
             eventHandler(OnProductOrderSelected(order, inverted))
             isProductOrderPopup = false
-        }
+        },
+        onDismissScanner = { showScanner = false },
+        onBarcodeScanned = { eventHandler(OnCreateProductFromBarcode(it)) }
     )
 
     Scaffold(
@@ -94,18 +105,26 @@ internal fun HomeScreen(
         },
         floatingActionButton = {
             isReports.ifFalse {
-                FABHome(tabSelected.value) {
-                    eventHandler(OnFAB(tabSelected.value))
-                }
+                FABHome(
+                    tabSelected = tabSelected.value,
+                    onClick = {
+                        eventHandler(OnFAB(tabSelected.value))
+                    },
+                    onClickSmall = {
+                        if (tabSelected.value == HomeTabs.PRODUCTS) {
+                            showScanner = true
+                        }
+                    }
+                )
             }
-        }
+        },
     ) {
         TabsContentBody(
             modifier = Modifier.padding(it),
             tabSelected = tabSelected,
             state = state,
             eventHandler = { event ->
-                if (event is OnMovementFilterSelected){
+                if (event is OnMovementFilterSelected) {
                     isShowLabelPopup = event.filter == MovementsFilterChip.LABEL
                 }
                 eventHandler(event)
@@ -134,7 +153,7 @@ private fun TabsContentBody(
     tabSelected: MutableState<HomeTabs>,
     state: HomeState,
     eventHandler: (HomeEvent) -> Unit,
-){
+) {
     val pagerState = rememberPagerState(tabSelected.value.ordinal) { HomeTabs.entries.size }
     val focusManager = LocalFocusManager.current
 
@@ -185,12 +204,15 @@ private fun HomeDialogs(
     isShowLabelPopup: Boolean,
     isReportsCalendarPopup: Boolean,
     isProductOrderPopup: Boolean,
+    isShowScanner: Boolean,
     state: HomeState,
     onDismissLabel: () -> Unit,
     onLabelSelected: (String) -> Unit,
     onDismissReports: () -> Unit,
     onReportsSelected: (RangeDateChart) -> Unit,
-    onOrderSelected: (ProductsOrderBy, Boolean) -> Unit
+    onOrderSelected: (ProductsOrderBy, Boolean) -> Unit,
+    onDismissScanner: () -> Unit,
+    onBarcodeScanned: (String) -> Unit,
 ) {
     if (isShowLabelPopup) {
         MovementLabelDialog(
@@ -210,6 +232,12 @@ private fun HomeDialogs(
             productOrderSelected = state.productOrderSelected,
             isProductOrderInverted = state.isProductOrderInverted,
             onClose = onOrderSelected
+        )
+    }
+    if (isShowScanner) {
+        BarcodeScannerDialog(
+            onDismiss = onDismissScanner,
+            onBarcodeScanned = onBarcodeScanned
         )
     }
 }

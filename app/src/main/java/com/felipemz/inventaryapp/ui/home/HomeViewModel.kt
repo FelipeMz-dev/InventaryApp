@@ -1,17 +1,16 @@
 package com.felipemz.inventaryapp.ui.home
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.felipemz.inventaryapp.core.base.BaseViewModel
 import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.core.enums.MovementItemType
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
-import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.core.extensions.orEmpty
-import com.felipemz.inventaryapp.domain.model.CategoryModel
 import com.felipemz.inventaryapp.domain.model.MovementModel
-import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.domain.usecase.GetProductFromBarcodeUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllCategoriesUseCase
 import com.felipemz.inventaryapp.domain.usecase.ObserveAllProductsUseCase
 import com.felipemz.inventaryapp.domain.usecase.SortProductsFromObserver
@@ -19,18 +18,28 @@ import com.felipemz.inventaryapp.ui.commons.delegate.ProductListFilterDelegate
 import com.felipemz.inventaryapp.ui.commons.delegate.ProductListFilterDelegateImpl
 import com.felipemz.inventaryapp.ui.commons.fakeLabelList
 import com.felipemz.inventaryapp.ui.commons.fakeMovements
-import com.felipemz.inventaryapp.ui.commons.header_product.HeaderProductEvent
-import com.felipemz.inventaryapp.ui.home.HomeEvent.*
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSetCategoryFilter
-import com.felipemz.inventaryapp.ui.product_form.ProductFormEvent.OnSetNameFilter
+import com.felipemz.inventaryapp.ui.home.HomeEvent.Init
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnCreateProductFromBarcode
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnFocusSearch
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnLabelSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnMovementFilterSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnMovementsInverted
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnProductOrderSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnReportsCustomFilterSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnReportsFilterSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnSetCategoryFilterProducts
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnSetNameFilterProducts
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class HomeViewModel(
     private val observeAllProductsUseCase: ObserveAllProductsUseCase,
     private val sortProductsFromObserver: SortProductsFromObserver,
     private val observeAllCategoriesUseCase: ObserveAllCategoriesUseCase,
+    private val getProductFromBarcodeUseCase: GetProductFromBarcodeUseCase,
 ) : BaseViewModel<HomeState, HomeEvent>() {
+
+    private val action = MutableLiveData<HomeAction>()
+    val actionLiveData: LiveData<HomeAction> = action
 
     private val _movements = mutableStateOf<List<MovementModel>>(emptyList())
 
@@ -66,8 +75,12 @@ class HomeViewModel(
                 is OnReportsCustomFilterSelected -> reportsCustomFilterSelected(event.filter)
                 is OnReportsFilterSelected -> reportsFilterSelected(event.filter)
                 is OnSetNameFilterProducts -> productsFilteredDelegate.setFilterName(event.name)
-                is OnSetCategoryFilterProducts -> productsFilteredDelegate.setFilterCategory(event.category)
+                is OnSetCategoryFilterProducts -> {
+                    productsFilteredDelegate.setFilterCategory(event.category)
+                    updateState { state -> state.copy(categorySelected = event.category) }
+                }
                 is OnFocusSearch -> updateState { it.copy(isSearchFocused = event.isFocus) }
+                is OnCreateProductFromBarcode -> verifyBarcodeToCreateProduct(event.barcode)
                 else -> Unit
             }
         }
@@ -160,5 +173,14 @@ class HomeViewModel(
                 }
             )
         }
+    }
+
+    private fun verifyBarcodeToCreateProduct(barcode: String) = execute(Dispatchers.IO) {
+        getProductFromBarcodeUseCase(barcode)?.let {
+            action.postValue(HomeAction.OpenProduct(it.id))
+        } ?: run {
+            action.postValue(HomeAction.CreateProductFromBarcode(barcode))
+        }
+
     }
 }

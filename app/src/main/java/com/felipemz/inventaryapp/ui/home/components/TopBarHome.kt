@@ -31,11 +31,7 @@ internal fun TopBarHome(
     onItemClick: (HomeTabs) -> Unit,
 ) {
 
-    val productsIcon = remember(isProductOrderInverted) {
-        derivedStateOf {
-            if (isProductOrderInverted) R.drawable.ic_sort_up else R.drawable.ic_sort_down
-        }
-    }
+    val productsIcon = if (isProductOrderInverted) R.drawable.ic_sort_up else R.drawable.ic_sort_down
 
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
@@ -50,7 +46,7 @@ internal fun TopBarHome(
             IconButton(onClick = { onItemClick(tabSelected) }) {
                 when (tabSelected) {
                     HomeTabs.PRODUCTS -> Icon(
-                        imageVector = ImageVector.vectorResource(id = productsIcon.value),
+                        imageVector = ImageVector.vectorResource(id = productsIcon),
                         contentDescription = null
                     )
                     HomeTabs.MOVEMENTS -> Icon(

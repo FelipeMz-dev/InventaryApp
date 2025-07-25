@@ -18,6 +18,8 @@ sealed interface HomeEvent : Event {
 
     data class OnFAB(val tabSelected: HomeTabs) : HomeEvent
 
+    data class OnCreateProductFromBarcode(val barcode: String) : HomeEvent
+
     data class OnMovementFilterSelected(val filter: MovementsFilterChip) : HomeEvent
 
     data class OnLabelSelected(val label: String) : HomeEvent
