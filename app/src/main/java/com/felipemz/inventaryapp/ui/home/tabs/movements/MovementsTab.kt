@@ -26,44 +26,46 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.domain.model.MovementModel
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.domain.model.MovementModel
 import com.felipemz.inventaryapp.ui.commons.FilterChipRow
 import com.felipemz.inventaryapp.ui.home.HomeEvent
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnLabelChangeToShow
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnLabelSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnMovementFilterSelected
+import com.felipemz.inventaryapp.ui.home.components.MovementLabelDialog
 import kotlin.math.absoluteValue
 
 @Composable
 internal fun MovementsTab(
-    date: String,
-    total: Int,
     chipSelected: MovementsFilterChip,
     labelSelected: String?,
     movements: List<MovementModel>,
+    movementLabelList: List<String>,
+    isShowLabelPopup: Boolean,
     eventHandler: (HomeEvent) -> Unit,
 ) {
+
+    if (isShowLabelPopup) {
+        MovementLabelDialog(
+            labelList = movementLabelList,
+            onDismiss = { eventHandler(OnLabelChangeToShow(false)) },
+            onSelect = { eventHandler(OnLabelSelected(it)) }
+        )
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
-
-        //item {
-        //    HeaderMovements(
-        //        modifier = Modifier.fillMaxWidth(),
-        //        chipSelected = chipSelected,
-        //        labelSelected = labelSelected,
-        //        date = date,
-        //        total = total
-        //    )
-        //}
-
         item {
             FilterChipCategories(
                 modifier = Modifier.fillMaxWidth(),
                 chipList = MovementsFilterChip.entries,
                 chipSelected = chipSelected,
                 labelSelected = labelSelected,
-            ) { eventHandler(HomeEvent.OnMovementFilterSelected(it)) }
+            ) { eventHandler(OnMovementFilterSelected(it)) }
         }
 
         items(
@@ -155,7 +157,7 @@ private fun FilterChipCategories(
             }
         } else null
     },
-    text = { if (it == MovementsFilterChip.LABEL) labelSelected?: it.text else it.text },
+    text = { if (it == MovementsFilterChip.LABEL) labelSelected ?: it.text else it.text },
     chipList = chipList,
     chipSelected = chipSelected,
     onSelectChip = onChipSelected,

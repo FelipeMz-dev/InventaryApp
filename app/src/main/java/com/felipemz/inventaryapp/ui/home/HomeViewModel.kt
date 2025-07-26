@@ -21,12 +21,16 @@ import com.felipemz.inventaryapp.ui.commons.fakeMovements
 import com.felipemz.inventaryapp.ui.home.HomeEvent.Init
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnCreateProductFromBarcode
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnFocusSearch
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnLabelChangeToShow
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnLabelSelected
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnMovementFilterSelected
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnMovementsInverted
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnProductOrderSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnProductsOrderChangeToShow
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnReportsCalendarChangeToShow
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnReportsCustomFilterSelected
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnReportsFilterSelected
+import com.felipemz.inventaryapp.ui.home.HomeEvent.OnScannerChangeToShow
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnSetCategoryFilterProducts
 import com.felipemz.inventaryapp.ui.home.HomeEvent.OnSetNameFilterProducts
 import kotlinx.coroutines.Dispatchers
@@ -75,12 +79,13 @@ class HomeViewModel(
                 is OnReportsCustomFilterSelected -> reportsCustomFilterSelected(event.filter)
                 is OnReportsFilterSelected -> reportsFilterSelected(event.filter)
                 is OnSetNameFilterProducts -> productsFilteredDelegate.setFilterName(event.name)
-                is OnSetCategoryFilterProducts -> {
-                    productsFilteredDelegate.setFilterCategory(event.category)
-                    updateState { state -> state.copy(categorySelected = event.category) }
-                }
+                is OnSetCategoryFilterProducts -> setCategoryFilterProducts(event)
                 is OnFocusSearch -> updateState { it.copy(isSearchFocused = event.isFocus) }
                 is OnCreateProductFromBarcode -> verifyBarcodeToCreateProduct(event.barcode)
+                is OnLabelChangeToShow -> updateState { it.copy(isShowLabelPopup = event.isShow) }
+                is OnScannerChangeToShow -> updateState { it.copy(showScanner = event.isShow) }
+                is OnProductsOrderChangeToShow -> updateState { it.copy(showProductOrderDialog = event.isShow) }
+                is OnReportsCalendarChangeToShow -> updateState { it.copy(showReportsCalendarDialog = event.isShow) }
                 else -> Unit
             }
         }
@@ -107,7 +112,8 @@ class HomeViewModel(
         updateState { state ->
             state.copy(
                 reportsCustomFilterSelected = filter,
-                reportsFilterChipSelected = null
+                reportsFilterChipSelected = null,
+                showReportsCalendarDialog = false,
             )
         }
     }
@@ -121,6 +127,11 @@ class HomeViewModel(
         }
     }
 
+    private fun setCategoryFilterProducts(event: OnSetCategoryFilterProducts) {
+        productsFilteredDelegate.setFilterCategory(event.category)
+        updateState { state -> state.copy(categorySelected = event.category) }
+    }
+
     private fun setOrderProducts(
         orderBy: ProductsOrderBy,
         isInverted: Boolean
@@ -129,6 +140,7 @@ class HomeViewModel(
             it.copy(
                 productOrderSelected = orderBy,
                 isProductOrderInverted = isInverted,
+                showProductOrderDialog = false,
             ).also {
                 sortProductsFromObserver(orderBy, isInverted)
             }
