@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.extensions.isNotNull
 import com.felipemz.inventaryapp.core.charts.BillItemChart
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
 import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
@@ -59,7 +59,7 @@ internal fun MovementsScreen(
         val data = result.data
         val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
         matches?.firstOrNull()?.let {
-            val value = PriceUtil.getValue(it)
+            val value = CurrencyUtil.getValue(it)
             if (value > 0) eventHandler(
                 OnInvoiceAction(
                     BillActions.OnInsertItem(BillItemChart(value = value))
@@ -87,7 +87,6 @@ internal fun MovementsScreen(
             onAction = { eventHandler(OnInvoiceAction(it)) }
         )
         showCalculatorPopup -> CalculatorBottomSheet(
-            controller = CalculatorController(0),
             onDismiss = { showCalculatorPopup = false },
             onSelect = { value ->
                 eventHandler(

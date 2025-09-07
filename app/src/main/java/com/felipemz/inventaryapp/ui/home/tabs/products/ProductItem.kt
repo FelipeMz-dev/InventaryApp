@@ -46,7 +46,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.onColor
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.domain.model.ProductModel
 import com.felipemz.inventaryapp.domain.model.ProductTypeImage
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
@@ -159,7 +159,7 @@ private fun QuantityField(
         showTotal.ifTrue {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Total: ${PriceUtil.formatPrice(product.price.toLong() * quantity)}",
+                text = "Total: ${CurrencyUtil.formatPrice(product.price.toLong() * quantity)}",
                 color = MaterialTheme.colorScheme.outline,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -268,7 +268,7 @@ private fun NameAndPrice(
                     shape = CircleShape
                 )
                 .padding(horizontal = 6.dp),
-            text = PriceUtil.formatPrice(price),
+            text = CurrencyUtil.formatPrice(price),
             fontWeight = FontWeight.Bold,
             fontSize = if (isSmall) 14.sp else 16.sp
         )

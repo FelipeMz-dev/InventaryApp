@@ -3,7 +3,6 @@ package com.felipemz.inventaryapp.ui.home.tabs.reports
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -19,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.enums.ReportsType
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 
 @Composable
 internal fun HeaderReportsItem(
@@ -65,7 +64,7 @@ internal fun HeaderReportsItem(
                 shape = CircleShape
             )
             .padding(horizontal = 8.dp),
-        text = PriceUtil.formatPrice(totalValue),
+        text = CurrencyUtil.formatPrice(totalValue),
         fontWeight = FontWeight.Bold,
     )
 }

@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.enums.ReportsType
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 
@@ -59,7 +59,7 @@ internal fun ReportItem(
                     )
                     .padding(horizontal = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
-                text = PriceUtil.formatPrice(it.second),
+                text = CurrencyUtil.formatPrice(it.second),
             )
         }
     }

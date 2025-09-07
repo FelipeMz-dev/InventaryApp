@@ -37,11 +37,12 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.EMPTY_STRING
 import com.felipemz.inventaryapp.core.extensions.thenIf
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import kotlinx.coroutines.delay
 
 @Composable
 fun CalculatorTextField(
-    value: String,
+    value: Int,
     textStyle: TextStyle = MaterialTheme.typography.headlineSmall,
     leadingText: String? = null,
     result: CalculatorResult,
@@ -50,32 +51,35 @@ fun CalculatorTextField(
     onMoveCursor: (Int) -> Unit,
     onDone: () -> Unit,
 ) {
+
+    val textValue = CurrencyUtil.formatWithoutCurrency(value)
+
     Row(
-        modifier = Modifier.Companion.padding(16.dp),
-        verticalAlignment = Alignment.Companion.CenterVertically,
+        modifier = Modifier.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
         Column(
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .weight(1f)
                 .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
                 .padding(vertical = 8.dp, horizontal = 12.dp),
         ) {
 
             Text(
-                text = "${result.first} ${result.second.key}",
+                text = "${CurrencyUtil.formatWithoutCurrency(result.first)} ${result.second.key}",
                 style = textStyle.copy(
                     fontSize = textStyle.fontSize * 0.5f,
                     lineHeight = textStyle.fontSize * 0.5f
                 ),
                 color = MaterialTheme.colorScheme.primary,
-                fontFamily = FontFamily.Companion.Monospace,
-                fontWeight = FontWeight.Companion.Bold,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
             )
 
             Row(
-                verticalAlignment = Alignment.Companion.Bottom,
+                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
@@ -84,15 +88,15 @@ fun CalculatorTextField(
                         text = it,
                         style = textStyle.copy(fontSize = textStyle.fontSize * 0.8f),
                         color = MaterialTheme.colorScheme.outline,
-                        fontFamily = FontFamily.Companion.Monospace,
-                        fontWeight = FontWeight.Companion.Bold
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
                 TextWithCursor(
                     enable = enable,
                     cursorPosition = cursorPosition,
-                    value = value,
+                    value = textValue,
                     textStyle = textStyle
                 ) { onMoveCursor(it) }
             }
@@ -108,7 +112,7 @@ fun CalculatorTextField(
         ) {
             Icon(
                 modifier = Modifier.size(34.dp),
-                imageVector = ImageVector.Companion.vectorResource(id = R.drawable.ic_send_calculator),
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_send_calculator),
                 contentDescription = null
             )
         }
@@ -127,33 +131,41 @@ private fun TextWithCursor(
     var isVisible by remember { mutableStateOf(true) }
     val alpha by remember { derivedStateOf { if (isVisible) 1f else 0f } }
     val cursorColor = MaterialTheme.colorScheme.primary.copy(alpha = alpha)
-    val widthLetter = with(LocalDensity.current) { textStyle.fontSize.toPx() / 1.65f }
+    val widthLetter = with(LocalDensity.current) { textStyle.fontSize.toPx() / 1.66f }
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(800)
+            delay(500)
             isVisible = !isVisible
         }
     }
 
     Text(
-        modifier = Modifier.Companion
+        modifier = Modifier
             .fillMaxWidth()
             .thenIf(
                 condition = enable,
-                modifier = Modifier.Companion
+                modifier = Modifier
                     .drawWithContent {
+                        val textUntilCursor = value.substring(0, cursorPosition.coerceAtMost(value.length))
+                        val positionWithDots = cursorPosition + textUntilCursor.count { it == '.'}
+                        val xCursor = (widthLetter * positionWithDots)
                         drawRect(
                             color = cursorColor,
-                            topLeft = Offset(widthLetter * cursorPosition, 0f),
+                            topLeft = Offset(xCursor, 0f),
                             size = Size(2.dp.toPx(), size.height)
                         )
                         drawContent()
                     }
                     .pointerInput(value.length) {
-                        detectTapGestures {
-                            val position = (it.x / widthLetter).toInt()
-                            onMoveCursor(position.coerceAtMost(value.length))
+                        detectTapGestures { gesture ->
+                            val position = (gesture.x / widthLetter).toInt()
+                            val textUntilCursor = value.substring(0, position.coerceAtMost(value.length))
+                            println("Text until cursor: $textUntilCursor")
+                            val positionWithOutDots = position - textUntilCursor.count { it == '.'}
+                            println("dots: ${textUntilCursor.count { it == '.' }}")
+                            println("Position with out dots: $positionWithOutDots")
+                            onMoveCursor(positionWithOutDots.coerceAtMost(value.length))
                         }
                     }
             ),

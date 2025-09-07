@@ -14,8 +14,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
@@ -24,11 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.extensions.orEmpty
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorBottomSheet(
-    controller: CalculatorController,
+    controller: CalculatorController = CalculatorController(0),
     onDismiss: () -> Unit,
     onSelect: (Int) -> Unit
 ) {
@@ -47,7 +46,7 @@ fun CalculatorBottomSheet(
         }
 
         CalculatorTextField(
-            value = controller.value.toString(),
+            value = controller.value,
             cursorPosition = controller.cursorPosition,
             leadingText = controller.temporalResult?.let { result ->
                 controller.temporalOperator?.let { "$result ${it.key}" } ?: result.toString()
@@ -98,7 +97,7 @@ private fun HistoryContent(
                 ) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = item.first.toString(),
+                        text = CurrencyUtil.formatWithoutCurrency(item.first),
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
@@ -112,7 +111,7 @@ private fun HistoryContent(
                     )
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = item.second.takeIf { it != 0 }?.toString() ?: "?",
+                        text = item.second.let { if (it == 0) "?" else CurrencyUtil.formatWithoutCurrency(it) },
                         fontFamily = FontFamily.Monospace,
                         textAlign = TextAlign.Start
                     )

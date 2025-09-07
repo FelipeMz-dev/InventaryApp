@@ -16,7 +16,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 
 @Composable
 fun OutlinedPriceField(
@@ -26,7 +26,7 @@ fun OutlinedPriceField(
     onChange: (Int) -> Unit
 ){
 
-    var text by remember(value) { mutableStateOf(PriceUtil.formatPrice(value)) }
+    var text by remember(value) { mutableStateOf(CurrencyUtil.formatPrice(value)) }
     var selection by remember { mutableStateOf(TextRange.Zero) }
 
     OutlinedTextField(
@@ -37,8 +37,8 @@ fun OutlinedPriceField(
             selection = selection
         ),
         onValueChange = { newText ->
-            val newValue = PriceUtil.getValue(newText.text, value)
-            val newValueText = PriceUtil.formatPrice(newValue)
+            val newValue = CurrencyUtil.getValue(newText.text, value)
+            val newValueText = CurrencyUtil.formatPrice(newValue)
             val setSelection: (Int) -> Unit = { sum ->
                 selection = tryOrDefault(TextRange.Zero) {
                     TextRange(newText.selection.start + sum).coerceIn(2, newValueText.length)
@@ -61,7 +61,7 @@ fun OutlinedPriceField(
         trailingIcon = {
             isEnable.ifTrue {
                 CommonTrailingIcon(value == 0) {
-                    val newValue = PriceUtil.getValue(it)
+                    val newValue = CurrencyUtil.getValue(it)
                     onChange(newValue)
                 }
             }

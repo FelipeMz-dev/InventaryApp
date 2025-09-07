@@ -23,7 +23,7 @@ import com.felipemz.inventaryapp.domain.model.CategoryRatingModel
 import com.felipemz.inventaryapp.domain.model.LabelRatingModel
 import com.felipemz.inventaryapp.domain.model.ProductRatingModel
 import com.felipemz.inventaryapp.core.enums.ReportsType
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ImageAndCounter
@@ -120,7 +120,7 @@ internal fun ReportRatingItem(
                     )
                     .padding(horizontal = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
-                text = PriceUtil.formatPrice(it.totalValue),
+                text = CurrencyUtil.formatPrice(it.totalValue),
             )
         }
     }

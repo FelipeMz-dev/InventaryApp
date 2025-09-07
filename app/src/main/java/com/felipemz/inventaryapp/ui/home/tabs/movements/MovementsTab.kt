@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.R
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.domain.model.MovementModel
 import com.felipemz.inventaryapp.ui.commons.FilterChipRow
 import com.felipemz.inventaryapp.ui.home.HomeEvent
@@ -132,7 +132,7 @@ private fun HeaderMovements(
                 )
                 .padding(horizontal = 6.dp),
             style = MaterialTheme.typography.bodySmall,
-            text = PriceUtil.formatPrice(total.absoluteValue, isLess = total < 0),
+            text = CurrencyUtil.formatPrice(total.absoluteValue, isLess = total < 0),
             fontWeight = FontWeight.Bold
         )
     }

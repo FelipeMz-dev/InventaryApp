@@ -21,7 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.actions.BillActions
 import com.felipemz.inventaryapp.core.charts.BillItemChart
@@ -101,7 +101,7 @@ private fun TotalInvoiceField(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "Subtotal:")
-            Text(text = PriceUtil.formatPrice(subTotal))
+            Text(text = CurrencyUtil.formatPrice(subTotal))
         }
 
         Row(
@@ -110,7 +110,7 @@ private fun TotalInvoiceField(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "Descuento:")
-            Text(text = PriceUtil.formatPrice(discount))
+            Text(text = CurrencyUtil.formatPrice(discount))
         }
 
         Row(
@@ -119,7 +119,7 @@ private fun TotalInvoiceField(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = "Total:")
-            Text(text = PriceUtil.formatPrice(total))
+            Text(text = CurrencyUtil.formatPrice(total))
         }
     }
 }

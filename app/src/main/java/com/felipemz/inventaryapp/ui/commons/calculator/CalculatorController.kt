@@ -13,7 +13,7 @@ import kotlin.takeUnless
 class CalculatorController(initialQuantity: Int) {
     var value by mutableIntStateOf(initialQuantity)
     var listOperation by mutableStateOf(listOf<MathOperation>())
-    var cursorPosition by mutableIntStateOf(1)
+    var cursorPosition by mutableIntStateOf(initialQuantity.toString().length)
     var showHistory by mutableStateOf(false)
     var result by mutableStateOf(0 to CalculatorKey.EQUAL)
     var temporalResult by mutableStateOf<Int?>(null)
@@ -35,12 +35,14 @@ class CalculatorController(initialQuantity: Int) {
 
     private fun insertNumber(key: CalculatorKey) {
         value = tryOrDefault(value) {
-            if (cursorPosition != value.toString().length) {
-                StringBuilder(value.toString()).insert(cursorPosition, key.key).toString().toInt()
+            if (cursorPosition == value.toString().length) {
+                (value.toString() + key.key)
             } else {
-                (value.toString() + key.key).toInt()
-            }.also {
-                cursorPosition += key.key.length.takeUnless { value == 0 } ?: 0
+                StringBuilder(value.toString()).insert(cursorPosition, key.key).toString()
+            }.toInt().also {
+                cursorPosition += key.key.length.takeUnless {
+                    value == 0 && cursorPosition == 1
+                } ?: 0
             }
         }
     }
@@ -113,8 +115,11 @@ class CalculatorController(initialQuantity: Int) {
             leaveTemporal()
             return
         }
-        value = value.toString().dropLast(1).toIntOrNull() ?: 0
-        cursorPosition = (cursorPosition - 1).coerceAtLeast(1)
+        if (cursorPosition > 0) {
+            val cursorLess = cursorPosition - 1
+            value = value.toString().removeRange(cursorLess..cursorLess).toIntOrNull() ?: 0
+            if (value > 0) cursorPosition = (cursorLess)
+        }
     }
 
     private fun leaveTemporal() = temporalResult?.let {
