@@ -1,33 +1,21 @@
 package com.felipemz.inventaryapp.ui.home
 
 import com.felipemz.inventaryapp.core.base.Event
-import com.felipemz.inventaryapp.model.CategoryEntity
-import com.felipemz.inventaryapp.model.ProductEntity
-import com.felipemz.inventaryapp.core.enums.HomeTabs
+import com.felipemz.inventaryapp.domain.model.CategoryModel
+import com.felipemz.inventaryapp.domain.model.ProductModel
+import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.core.enums.MovementsFilterChip
 import com.felipemz.inventaryapp.core.enums.ProductsOrderBy
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 
 sealed interface HomeEvent : Event {
 
-    object OnHideLabelPopup : HomeEvent
-
-    object OnOpenProductOrderPopup : HomeEvent
-
-    object OpenReportsCalendarPopup : HomeEvent
-
-    object OnCloseReportsCalendarPopup : HomeEvent
-
-    object OnOpenCalendar : HomeEvent
-
-    data class OnFocusSearch(val isFocus: Boolean) : HomeEvent
+    object Init : HomeEvent
 
     data class OnFAB(val tabSelected: HomeTabs) : HomeEvent
 
-    data class OnChangeSearchText(val text: String) : HomeEvent
-
-    data class OnCategorySelected(val category: CategoryEntity?) : HomeEvent
+    data class OnCreateProductFromBarcode(val barcode: String) : HomeEvent
 
     data class OnMovementFilterSelected(val filter: MovementsFilterChip) : HomeEvent
 
@@ -40,9 +28,23 @@ sealed interface HomeEvent : Event {
         val isInverted: Boolean
     ) : HomeEvent
 
-    data class OnReportsCustomFilterSelected(val filter: RangeDateModel) : HomeEvent
+    data class OnReportsCustomFilterSelected(val filter: RangeDateChart) : HomeEvent
 
     data class OnReportsFilterSelected(val filter: ReportsFilterDate) : HomeEvent
 
-    data class OnOpenProduct(val product: ProductEntity) : HomeEvent
+    data class OnOpenProduct(val product: ProductModel) : HomeEvent
+
+    data class OnSetNameFilterProducts(val name: String?) : HomeEvent
+
+    data class OnSetCategoryFilterProducts(val category: CategoryModel?) : HomeEvent
+
+    data class OnFocusSearch(val isFocus: Boolean) : HomeEvent
+
+    data class OnLabelChangeToShow(val isShow: Boolean) : HomeEvent
+
+    data class OnScannerChangeToShow(val isShow: Boolean) : HomeEvent
+
+    data class OnProductsOrderChangeToShow(val isShow: Boolean) : HomeEvent
+
+    data class OnReportsCalendarChangeToShow(val isShow: Boolean) : HomeEvent
 }

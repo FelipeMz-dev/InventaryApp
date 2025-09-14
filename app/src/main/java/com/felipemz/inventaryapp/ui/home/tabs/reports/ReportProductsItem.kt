@@ -18,12 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.model.BaseRatingEntity
-import com.felipemz.inventaryapp.model.CategoryRatingEntity
-import com.felipemz.inventaryapp.model.LabelRatingEntity
-import com.felipemz.inventaryapp.model.ProductRatingEntity
+import com.felipemz.inventaryapp.domain.model.BaseRatingModel
+import com.felipemz.inventaryapp.domain.model.CategoryRatingModel
+import com.felipemz.inventaryapp.domain.model.LabelRatingModel
+import com.felipemz.inventaryapp.domain.model.ProductRatingModel
 import com.felipemz.inventaryapp.core.enums.ReportsType
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import com.felipemz.inventaryapp.ui.home.tabs.products.ImageAndCounter
@@ -33,7 +33,7 @@ internal fun ReportRatingItem(
     modifier: Modifier,
     reportType: ReportsType,
     totalValue: Int,
-    intervals: List<BaseRatingEntity>,
+    intervals: List<BaseRatingModel>,
     onSeeMore: () -> Unit
 ) = Column(
     modifier = modifier.padding(
@@ -59,13 +59,13 @@ internal fun ReportRatingItem(
         ) {
 
             when (it) {
-                is ProductRatingEntity -> ImageAndCounter(
+                is ProductRatingModel -> ImageAndCounter(
                     image = it.product.image,
                     quantity = null,
                     colorCategory = colorResource(id = it.product.category.color),
                     size = 32.dp,
                 )
-                is CategoryRatingEntity -> Spacer(
+                is CategoryRatingModel -> Spacer(
                     modifier = Modifier
                         .padding(4.dp)
                         .background(
@@ -74,7 +74,7 @@ internal fun ReportRatingItem(
                         )
                         .size(24.dp)
                 )
-                is LabelRatingEntity -> Text(
+                is LabelRatingModel -> Text(
                     modifier = Modifier
                         .weight(1f)
                         .wrapContentWidth(Alignment.Start)
@@ -93,12 +93,12 @@ internal fun ReportRatingItem(
                 else -> Unit
             }
 
-            if (it !is LabelRatingEntity) {
+            if (it !is LabelRatingModel) {
                 Text(
                     modifier = Modifier.weight(1f),
                     text = when (it) {
-                        is ProductRatingEntity -> it.product.name
-                        is CategoryRatingEntity -> it.category.name
+                        is ProductRatingModel -> it.product.name
+                        is CategoryRatingModel -> it.category.name
                         else -> String()
                     },
                     style = MaterialTheme.typography.bodyMedium,
@@ -120,7 +120,7 @@ internal fun ReportRatingItem(
                     )
                     .padding(horizontal = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
-                text = PriceUtil.formatPrice(it.totalValue),
+                text = CurrencyUtil.formatPrice(it.totalValue),
             )
         }
     }
@@ -128,7 +128,7 @@ internal fun ReportRatingItem(
     TextButtonUnderline(
         modifier = Modifier.fillMaxWidth(),
         text = "Ver más",
-        enabled = true
+        isEnabled = true
     ) { onSeeMore() }
 
     HorizontalDotDivider(

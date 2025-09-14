@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.core.utils.FormatDateUtil
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import java.time.LocalDate
@@ -28,7 +28,7 @@ import java.time.LocalDate
 internal fun CustomYearPicker(
     modifier: Modifier,
     selectableDates: SelectableDates,
-    dateSelected: MutableState<RangeDateModel?>
+    dateSelected: MutableState<RangeDateChart?>
 ) {
 
     val currentYear by remember { derivedStateOf { LocalDate.now().year } }
@@ -51,7 +51,7 @@ internal fun CustomYearPicker(
             currentYear = currentYear
         ) { year ->
             val dateYear = LocalDate.of(year, 1, 1)
-            dateSelected.value = RangeDateModel(
+            dateSelected.value = RangeDateChart(
                 title = FormatDateUtil.getOfCustomYear(dateYear),
                 startDate = dateYear
             )
@@ -64,7 +64,7 @@ internal fun CustomYearPicker(
 @Composable
 private fun HeadLineYearPicker(
     modifier: Modifier,
-    dateSelected: RangeDateModel?,
+    dateSelected: RangeDateChart?,
     onClear: () -> Unit,
 ) {
 
@@ -80,7 +80,7 @@ private fun HeadLineYearPicker(
 
         TextButtonUnderline(
             text = dateSelected?.title ?: "No se ha seleccionado un año",
-            enabled = !dateSelected.isNull()
+            isEnabled = !dateSelected.isNull()
         ) { onClear() }
     }
 }

@@ -17,7 +17,7 @@ import com.felipemz.inventaryapp.core.customs.CustomSelectableDates
 import com.felipemz.inventaryapp.core.enums.CustomFilterDate
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.core.extensions.toLong
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import java.time.LocalDate
 
@@ -25,11 +25,11 @@ import java.time.LocalDate
 @Composable
 fun DatePickerDialogPopup(
     dateType: CustomFilterDate = CustomFilterDate.DAY,
-    onConfirm: (RangeDateModel) -> Unit,
+    onConfirm: (RangeDateChart) -> Unit,
     onDismiss: () -> Unit,
 ) {
 
-    val selectedDate = remember { mutableStateOf<RangeDateModel?>(null) }
+    val selectedDate = remember { mutableStateOf<RangeDateChart?>(null) }
     val currentDate by remember { derivedStateOf { LocalDate.now() } }
     val selectableDates by remember {
         derivedStateOf {
@@ -44,13 +44,13 @@ fun DatePickerDialogPopup(
         dismissButton = {
             TextButtonUnderline(
                 text = "Salir",
-                enabled = true
+                isEnabled = true
             ) { onDismiss() }
         },
         confirmButton = {
             TextButtonUnderline(
                 text = "Confirmar",
-                enabled = !selectedDate.value.isNull()
+                isEnabled = !selectedDate.value.isNull()
             ) { selectedDate.value?.let { onConfirm(it) } }
         }
     ) {

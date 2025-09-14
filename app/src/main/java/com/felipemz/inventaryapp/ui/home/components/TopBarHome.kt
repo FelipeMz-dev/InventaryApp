@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.core.enums.HomeTabs
+import com.felipemz.inventaryapp.ui.home.tabs.HomeTabs
 import com.felipemz.inventaryapp.ui.home.HomeEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,14 +28,10 @@ internal fun TopBarHome(
     tabSelected: HomeTabs,
     isMovementsInverted: Boolean,
     isProductOrderInverted: Boolean,
-    eventHandler: (HomeEvent) -> Unit,
+    onItemClick: (HomeTabs) -> Unit,
 ) {
 
-    val productsIcon = remember(isProductOrderInverted) {
-        derivedStateOf {
-            if (isProductOrderInverted) R.drawable.ic_sort_up else R.drawable.ic_sort_down
-        }
-    }
+    val productsIcon = if (isProductOrderInverted) R.drawable.ic_sort_up else R.drawable.ic_sort_down
 
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
@@ -47,25 +43,18 @@ internal fun TopBarHome(
             )
         },
         actions = {
-
-            when (tabSelected) {
-                HomeTabs.PRODUCTS -> IconButton(onClick = { eventHandler(HomeEvent.OnOpenProductOrderPopup) }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = productsIcon.value),
+            IconButton(onClick = { onItemClick(tabSelected) }) {
+                when (tabSelected) {
+                    HomeTabs.PRODUCTS -> Icon(
+                        imageVector = ImageVector.vectorResource(id = productsIcon),
                         contentDescription = null
                     )
-                }
-                HomeTabs.MOVEMENTS -> IconButton(
-                    { eventHandler(HomeEvent.OnMovementsInverted(!isMovementsInverted)) }
-                ) {
-                    Icon(
+                    HomeTabs.MOVEMENTS -> Icon(
                         modifier = Modifier.graphicsLayer(if (isMovementsInverted) -1f else 1f),
                         imageVector = ImageVector.vectorResource(id = R.drawable.sort_vertical_svgrepo_com),
                         contentDescription = null
                     )
-                }
-                HomeTabs.REPORTS -> IconButton(onClick = { eventHandler(HomeEvent.OpenReportsCalendarPopup) }) {
-                    Icon(
+                    HomeTabs.REPORTS -> Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_calendary),
                         contentDescription = null
                     )

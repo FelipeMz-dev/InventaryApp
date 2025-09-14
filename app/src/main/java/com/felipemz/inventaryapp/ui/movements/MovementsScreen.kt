@@ -1,57 +1,44 @@
 package com.felipemz.inventaryapp.ui.movements
 
-import androidx.compose.foundation.background
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.R
-import com.felipemz.inventaryapp.model.ProductQuantityEntity
-import com.felipemz.inventaryapp.core.enums.MovementStateType
-import com.felipemz.inventaryapp.core.enums.QuantityType
-import com.felipemz.inventaryapp.core.extensions.ifTrue
-import com.felipemz.inventaryapp.ui.commons.CalculatorBottomSheet
-import com.felipemz.inventaryapp.ui.commons.ProductsAddBottomSheet
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.IncrementCalculatorId
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnBack
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnChangeDiscount
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnDeleteMovement
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnSaveMovement
-import com.felipemz.inventaryapp.ui.movements.MovementsEvent.OnSelectProduct
-import com.felipemz.inventaryapp.ui.movements.components.InvoiceList
-import com.felipemz.inventaryapp.ui.product_form.components.QuantityChangeBottomSheet
-import com.felipemz.inventaryapp.ui.product_form.components.getIdString
+import com.felipemz.inventaryapp.core.extensions.isNotNull
+import com.felipemz.inventaryapp.core.charts.BillItemChart
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
+import com.felipemz.inventaryapp.ui.commons.BarcodeScannerDialog
+import com.felipemz.inventaryapp.ui.commons.CommonCustomDialog
+import com.felipemz.inventaryapp.ui.commons.actions.BillActions
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorBottomSheet
+import com.felipemz.inventaryapp.ui.commons.ProductsListBottomSheet
+import com.felipemz.inventaryapp.ui.commons.calculator.CalculatorController
+import com.felipemz.inventaryapp.ui.movements.MovementsEvent.*
+import com.felipemz.inventaryapp.ui.movements.components.BottomBarMovements
+import com.felipemz.inventaryapp.ui.movements.components.IdMovementField
+import com.felipemz.inventaryapp.ui.movements.components.actions.FABMovements
+import com.felipemz.inventaryapp.ui.movements.components.InvoiceColumn
+import com.felipemz.inventaryapp.ui.movements.components.TopBarMovements
+import com.felipemz.inventaryapp.ui.movements.components.actions.MovementsActions
+import java.util.Locale
 
 @Composable
 internal fun MovementsScreen(
@@ -61,62 +48,93 @@ internal fun MovementsScreen(
 
     var showProductsPopup by remember { mutableStateOf(false) }
     var showCalculatorPopup by remember { mutableStateOf(false) }
-    var showDiscountPopup by remember { mutableStateOf(false) }
-    var showProductQuantityPopup by remember { mutableStateOf<ProductQuantityEntity?>(null) }
+    var showScannerDialog by remember { mutableStateOf(false) }
+
+    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+    }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data
+        val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+        matches?.firstOrNull()?.let {
+            val value = CurrencyUtil.getValue(it)
+            if (value > 0) eventHandler(
+                OnInvoiceAction(
+                    BillActions.OnInsertItem(BillItemChart(value = value))
+                )
+            )
+        }
+    }
 
     val fabActions: (MovementsActions) -> Unit = { action ->
         when (action) {
             MovementsActions.CALCULATOR -> showCalculatorPopup = true
-            MovementsActions.DISCOUNT -> showDiscountPopup = true
-            MovementsActions.DETAILS -> {}
+            MovementsActions.SCANNER -> showScannerDialog = true
+            MovementsActions.MICROPHONE -> launcher.launch(intent)
             MovementsActions.NAVIGATE -> {}
         }
     }
 
     when {
-        showProductsPopup -> ProductsAddBottomSheet(
-            productList = state.productList,
-            selected = state.selectedProducts,
-            onQuantity = { showProductQuantityPopup = it },
+        showProductsPopup -> ProductsListBottomSheet(
+            selection = state.billList.filter { it.product.isNotNull() },
+            categories = state.categories,
+            onSetNameFilter = { eventHandler(OnSetNameFilter(it)) },
+            onSetCategoryFilter = { eventHandler(OnSetCategoryFilter(it)) },
             onDismiss = { showProductsPopup = false },
-            onSelect = { eventHandler(OnSelectProduct(it)) }
-        )
-        showDiscountPopup -> QuantityChangeBottomSheet(
-            currentQuantity = state.discount,
-            quantityType = QuantityType.UNIT,
-            onDismiss = { showDiscountPopup = false },
-            onSelect = {
-                eventHandler(OnChangeDiscount(it))
-                showDiscountPopup = false
-            }
+            onAction = { eventHandler(OnInvoiceAction(it)) }
         )
         showCalculatorPopup -> CalculatorBottomSheet(
-            currentQuantity = 0,
             onDismiss = { showCalculatorPopup = false },
-            onSelect = {
-                eventHandler(IncrementCalculatorId)
+            onSelect = { value ->
                 eventHandler(
-                    OnSelectProduct(
-                        ProductQuantityEntity(
-                            price = it,
-                            quantity = 1
-                        )
+                    OnInvoiceAction(
+                        BillActions.OnInsertItem(BillItemChart(value = value))
                     )
                 )
             }
         )
+        showScannerDialog -> BarcodeScannerDialog(
+            onDismiss = { showScannerDialog = false },
+        ) { eventHandler(OnSelectProductFromBarcode(it)) }
     }
 
-    showProductQuantityPopup?.let { product ->
-        QuantityChangeBottomSheet(
-            currentQuantity = product.quantity,
-            quantityType = product.product?.quantityChart?.type ?: QuantityType.UNIT,
-            onDismiss = { showProductQuantityPopup = null },
-            onSelect = {
-                eventHandler(OnSelectProduct(product.copy(quantity = it)))
-                showProductQuantityPopup = null
+    state.errorBarcode?.let {
+        CommonCustomDialog(
+            title = "Barcode not found",
+            onDismiss = { eventHandler(OnClearBarcodeError) }
+        ) {
+            Text(
+                text = "The barcode '$it' does not match any product in the inventory.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventHandler(OnExecuteAction(MovementsAction.CreateProductFromBarcode(it)))
+                    }
+                ) {
+                    Text(text = "Create new")
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        eventHandler(OnClearBarcodeError)
+                        showScannerDialog = true
+                    }
+                ) {
+                    Text(text = "Scan Again")
+                }
             }
-        )
+        }
     }
 
     Scaffold(
@@ -152,7 +170,11 @@ internal fun MovementsScreen(
         ) {
 
             Text(
-                text = "${state.movementState.typeName} #${state.movementNumber} - ${state.movementDate}",
+                text = formattedMovementTitle(
+                    typeName = state.movementState.typeName,
+                    movementNumber = state.movementNumber,
+                    movementDate = state.movementDate
+                ),
                 color = MaterialTheme.colorScheme.outline,
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -163,145 +185,20 @@ internal fun MovementsScreen(
                 movementType = state.movementState,
             ) { eventHandler(OnDeleteMovement) }
 
-            InvoiceList(
+            InvoiceColumn(
                 subTotal = state.subTotal,
                 discount = state.discount,
                 total = state.total,
-                selectedProducts = state.selectedProducts,
-                onQuantityProduct = { showProductQuantityPopup = it },
-                onSelect = { eventHandler(OnSelectProduct(it)) }
+                invoiceList = state.billList,
+                onAction = { eventHandler(OnInvoiceAction(it)) },
             )
         }
     }
 }
 
 @Composable
-internal fun IdMovementField(
-    modifier: Modifier,
-    idMovement: Int?,
-    movementType: MovementStateType,
-    action: () -> Unit,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Text(
-            text = getIdString(idMovement),
-            fontWeight = FontWeight.Bold,
-        )
-
-        IconButton(onClick = action) {
-            movementType.isDone().ifTrue {
-                Icon(
-                    imageVector = Icons.Rounded.Delete,
-                    tint = MaterialTheme.colorScheme.error,
-                    contentDescription = null
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun TopBarMovements(
-    onBack: () -> Unit,
-    title: String,
-) {
-    TopAppBar(
-        modifier = Modifier.fillMaxWidth(),
-        title = {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold,
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
-                    contentDescription = null
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.Rounded.Info,
-                    contentDescription = null
-                )
-            }
-        }
-    )
-}
-
-@Composable
-private fun BottomBarMovements(
-    text: String,
-    enable: Boolean,
-    action: () -> Unit,
-) {
-    BottomAppBar {
-        Button(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth(),
-            onClick = action,
-            enabled = enable
-        ) {
-            Text(
-                text = text,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-private fun FABMovements(
-    onAction: (MovementsActions) -> Unit,
-    onOpenProducts: () -> Unit,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-
-        Row(
-            modifier = Modifier
-                .width(IntrinsicSize.Min)
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    shape = CircleShape
-                )
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            MovementsActions.entries.forEach {
-                IconButton(onClick = { onAction(it) }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = it.resId),
-                        contentDescription = null
-                    )
-                }
-            }
-        }
-
-        FloatingActionButton(onClick = onOpenProducts) {
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_product_add),
-                contentDescription = null
-            )
-        }
-    }
-}
-
-enum class MovementsActions(val resId: Int) {
-    CALCULATOR(R.drawable.ic_calculator),
-    DISCOUNT(R.drawable.ic_discount),
-    DETAILS(R.drawable.ic_details),
-    NAVIGATE(R.drawable.ic_navigate), ;
-}
+private fun formattedMovementTitle(
+    typeName: String,
+    movementNumber: Int,
+    movementDate: String,
+): String = "$typeName #$movementNumber - $movementDate"

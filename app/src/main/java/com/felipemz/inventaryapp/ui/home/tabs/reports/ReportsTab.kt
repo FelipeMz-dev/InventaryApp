@@ -15,20 +15,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.enums.ReportsFilterDate
 import com.felipemz.inventaryapp.core.enums.ReportsType
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.ui.commons.FilterChipRow
 import com.felipemz.inventaryapp.ui.commons.fakeCategoriesRating
 import com.felipemz.inventaryapp.ui.commons.fakeIntervals
 import com.felipemz.inventaryapp.ui.commons.fakeLabelsRating
 import com.felipemz.inventaryapp.ui.commons.fakeProductsRating
 import com.felipemz.inventaryapp.ui.home.HomeEvent
+import com.felipemz.inventaryapp.ui.home.components.ReportsCalendarDialog
 
 @Composable
 internal fun ReportsTab(
     chipSelected: ReportsFilterDate?,
-    customDateSelected: RangeDateModel?,
+    customDateSelected: RangeDateChart?,
+    isShowReportsCalendarDialog: Boolean,
     eventHandler: (HomeEvent) -> Unit,
 ) {
+
+    if (isShowReportsCalendarDialog) {
+        ReportsCalendarDialog(
+            onDismiss = { eventHandler(HomeEvent.OnReportsCalendarChangeToShow(false)) },
+            onAccept = { eventHandler(HomeEvent.OnReportsCustomFilterSelected(it)) },
+        )
+    }
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),

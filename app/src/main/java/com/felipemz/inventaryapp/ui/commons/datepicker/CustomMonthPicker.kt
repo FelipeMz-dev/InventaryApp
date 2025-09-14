@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.customs.CustomSelectableDates
 import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.isNull
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 import java.time.LocalDate
 
@@ -42,7 +42,7 @@ import java.time.LocalDate
 internal fun CustomMonthPicker(
     modifier: Modifier,
     selectableDates: CustomSelectableDates,
-    dateSelected: MutableState<RangeDateModel?>
+    dateSelected: MutableState<RangeDateChart?>
 ) {
 
     val currentDate by remember { derivedStateOf { LocalDate.now() } }
@@ -93,7 +93,7 @@ internal fun CustomMonthPicker(
 @Composable
 private fun HeadLineYearPicker(
     modifier: Modifier,
-    dateSelected: RangeDateModel?,
+    dateSelected: RangeDateChart?,
     onClear: () -> Unit,
 ) {
 
@@ -109,7 +109,7 @@ private fun HeadLineYearPicker(
 
         TextButtonUnderline(
             text = dateSelected?.title ?: "No se ha seleccionado un mes",
-            enabled = !dateSelected.isNull()
+            isEnabled = !dateSelected.isNull()
         ) { onClear() }
     }
 }

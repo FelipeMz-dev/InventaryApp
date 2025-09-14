@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.felipemz.inventaryapp.core.extensions.ifNotNull
 import com.felipemz.inventaryapp.core.extensions.isNull
 import com.felipemz.inventaryapp.core.extensions.toLocalDate
-import com.felipemz.inventaryapp.core.models.RangeDateModel
+import com.felipemz.inventaryapp.core.charts.RangeDateChart
 import com.felipemz.inventaryapp.core.utils.FormatDateUtil
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 
@@ -26,7 +26,7 @@ import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 @Composable
 internal fun HeadLineDatePicker(
     modifier: Modifier,
-    selectedDate: MutableState<RangeDateModel?>,
+    selectedDate: MutableState<RangeDateChart?>,
     datePickerState: DatePickerState,
 ) {
 
@@ -36,7 +36,7 @@ internal fun HeadLineDatePicker(
 
     LaunchedEffect(selectedDateMillis) {
         selectedDateMillis.ifNotNull {
-            selectedDate.value = RangeDateModel(it.toLocalDate())
+            selectedDate.value = RangeDateChart(it.toLocalDate())
         } ?: run { selectedDate.value = null }
     }
 
@@ -54,7 +54,7 @@ internal fun HeadLineDatePicker(
             text = selectedDateMillis?.let {
                 FormatDateUtil.getOfCustomDate(it.toLocalDate())
             } ?: "No se ha seleccionado una fecha",
-            enabled = !selectedDateMillis.isNull()
+            isEnabled = !selectedDateMillis.isNull()
         ) { datePickerState.selectedDateMillis = null }
     }
 }

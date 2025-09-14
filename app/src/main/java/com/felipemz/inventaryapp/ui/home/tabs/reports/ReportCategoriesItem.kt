@@ -14,9 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.felipemz.inventaryapp.model.CategoryRatingEntity
+import com.felipemz.inventaryapp.domain.model.CategoryRatingModel
 import com.felipemz.inventaryapp.core.enums.ReportsType
-import com.felipemz.inventaryapp.core.utils.PriceUtil
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 import com.felipemz.inventaryapp.ui.commons.HorizontalDotDivider
 import com.felipemz.inventaryapp.ui.commons.TextButtonUnderline
 
@@ -25,7 +25,7 @@ internal fun ReportCategoriesItem(
     modifier: Modifier,
     reportType: ReportsType,
     totalValue: Int,
-    intervals: List<CategoryRatingEntity>,
+    intervals: List<CategoryRatingModel>,
 ) = Column(
     modifier = modifier.padding(
         horizontal = 12.dp,
@@ -72,7 +72,7 @@ internal fun ReportCategoriesItem(
                     )
                     .padding(horizontal = 8.dp),
                 style = MaterialTheme.typography.bodySmall,
-                text = PriceUtil.formatPrice(it.totalValue),
+                text = CurrencyUtil.formatPrice(it.totalValue),
             )
         }
     }
@@ -80,7 +80,7 @@ internal fun ReportCategoriesItem(
     TextButtonUnderline(
         modifier = Modifier.fillMaxWidth(),
         text = "Ver más",
-        enabled = true
+        isEnabled = true
     ) {
 
     }

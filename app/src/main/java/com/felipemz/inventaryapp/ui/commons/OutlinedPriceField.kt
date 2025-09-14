@@ -14,18 +14,19 @@ import androidx.compose.ui.text.coerceIn
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.felipemz.inventaryapp.core.extensions.ifTrue
 import com.felipemz.inventaryapp.core.extensions.tryOrDefault
-import com.felipemz.inventaryapp.core.utils.PriceUtil
-import com.felipemz.inventaryapp.ui.product_form.components.CommonTrailingIcon
+import com.felipemz.inventaryapp.core.utils.CurrencyUtil
 
 @Composable
 fun OutlinedPriceField(
     modifier: Modifier,
     value: Int,
+    isEnable: Boolean = true,
     onChange: (Int) -> Unit
 ){
 
-    var text by remember(value) { mutableStateOf(PriceUtil.formatPrice(value)) }
+    var text by remember(value) { mutableStateOf(CurrencyUtil.formatPrice(value)) }
     var selection by remember { mutableStateOf(TextRange.Zero) }
 
     OutlinedTextField(
@@ -36,8 +37,8 @@ fun OutlinedPriceField(
             selection = selection
         ),
         onValueChange = { newText ->
-            val newValue = PriceUtil.getValue(newText.text, value)
-            val newValueText = PriceUtil.formatPrice(newValue)
+            val newValue = CurrencyUtil.getValue(newText.text, value)
+            val newValueText = CurrencyUtil.formatPrice(newValue)
             val setSelection: (Int) -> Unit = { sum ->
                 selection = tryOrDefault(TextRange.Zero) {
                     TextRange(newText.selection.start + sum).coerceIn(2, newValueText.length)
@@ -58,11 +59,14 @@ fun OutlinedPriceField(
             }
         },
         trailingIcon = {
-            CommonTrailingIcon(value == 0) {
-                val newValue = PriceUtil.getValue(it)
-                onChange(newValue)
+            isEnable.ifTrue {
+                CommonTrailingIcon(value == 0) {
+                    val newValue = CurrencyUtil.getValue(it)
+                    onChange(newValue)
+                }
             }
         },
+        enabled = isEnable,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
