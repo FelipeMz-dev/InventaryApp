@@ -70,6 +70,12 @@ La app sigue una arquitectura limpia basada en **Clean Architecture** y **MVI**:
 
 ---
 
+### 📱 Diseño
+
+<img width="697" height="902" alt="El texto del párrafo" src="https://github.com/user-attachments/assets/ea5a3f8e-d121-4631-b989-2632c46affbc" />
+
+---
+
 ## ⚙️ Cómo clonar y correr la app
 
 1. Clona el repositorio:
